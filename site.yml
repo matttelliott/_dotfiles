@@ -4,6 +4,7 @@
 - name: Configure development environment with dotfiles
   hosts: localhost
   connection: local
+  become: false
   vars:
     user_name: "developer"
     user_home: "/home/developer"
@@ -46,6 +47,9 @@
 
     - role: neovim
       tags: ['neovim', 'editor']
+
+    - role: doctl
+      tags: ['doctl', 'digitalocean', 'cloud']
 
   post_tasks:
     - name: Create local bin directory

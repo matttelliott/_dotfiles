@@ -12,6 +12,7 @@
   apt:
     name: tmux
     state: present
+  become: true
   when: ansible_os_family == "Debian"
   tags: tmux
 
@@ -26,6 +27,7 @@
   pacman:
     name: tmux
     state: present
+  become: true
   when: ansible_os_family == "Archlinux"
   tags: tmux
 
@@ -43,6 +45,7 @@
   apt:
     name: xclip
     state: present
+  become: true
   when: ansible_os_family == "Debian"
   tags: tmux
   ignore_errors: yes

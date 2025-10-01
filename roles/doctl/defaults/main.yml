@@ -1,0 +1,5 @@
+---
+# DigitalOcean CLI (doctl) defaults
+doctl_version: "latest"
+doctl_install_path: "/usr/local/bin"
+doctl_config_path: "{{ user_home }}/.config/doctl"

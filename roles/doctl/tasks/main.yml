@@ -1,0 +1,130 @@
+---
+# DigitalOcean CLI (doctl) installation and configuration
+
+- name: Install dependencies (Debian/Ubuntu)
+  apt:
+    name:
+      - wget
+      - tar
+    state: present
+  become: true
+  when: ansible_os_family == "Debian"
+  tags: doctl
+
+- name: Install dependencies (macOS)
+  homebrew:
+    name: doctl
+    state: present
+  when: ansible_os_family == "Darwin"
+  tags: doctl
+
+- name: Install dependencies (Arch Linux)
+  pacman:
+    name:
+      - wget
+      - tar
+    state: present
+  become: true
+  when: ansible_os_family == "Archlinux"
+  tags: doctl
+
+- name: Check if doctl is already installed
+  command: which doctl
+  register: doctl_installed
+  failed_when: false
+  changed_when: false
+  tags: doctl
+
+- name: Get latest doctl version
+  uri:
+    url: https://api.github.com/repos/digitalocean/doctl/releases/latest
+    return_content: yes
+  register: doctl_latest_release
+  when:
+    - ansible_os_family != "Darwin"
+    - doctl_installed.rc != 0
+  tags: doctl
+
+- name: Set doctl version
+  set_fact:
+    doctl_version_tag: "{{ doctl_latest_release.json.tag_name }}"
+  when:
+    - ansible_os_family != "Darwin"
+    - doctl_installed.rc != 0
+  tags: doctl
+
+- name: Download doctl (Linux)
+  get_url:
+    url: "https://github.com/digitalocean/doctl/releases/download/{{ doctl_version_tag }}/doctl-{{ doctl_version_tag[1:] }}-linux-amd64.tar.gz"
+    dest: "/tmp/doctl.tar.gz"
+    mode: '0644'
+  when:
+    - ansible_os_family == "Debian" or ansible_os_family == "Archlinux"
+    - doctl_installed.rc != 0
+  tags: doctl
+
+- name: Extract doctl binary
+  unarchive:
+    src: "/tmp/doctl.tar.gz"
+    dest: "/tmp"
+    remote_src: yes
+  when:
+    - ansible_os_family == "Debian" or ansible_os_family == "Archlinux"
+    - doctl_installed.rc != 0
+  tags: doctl
+
+- name: Install doctl binary
+  copy:
+    src: "/tmp/doctl"
+    dest: "{{ doctl_install_path }}/doctl"
+    mode: '0755'
+    remote_src: yes
+  become: true
+  when:
+    - ansible_os_family == "Debian" or ansible_os_family == "Archlinux"
+    - doctl_installed.rc != 0
+  tags: doctl
+
+- name: Clean up downloaded files
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "/tmp/doctl.tar.gz"
+    - "/tmp/doctl"
+  when:
+    - ansible_os_family == "Debian" or ansible_os_family == "Archlinux"
+    - doctl_installed.rc != 0
+  tags: doctl
+
+- name: Create doctl config directory
+  file:
+    path: "{{ doctl_config_path }}"
+    state: directory
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
+    mode: '0700'
+  become: false
+  tags: doctl
+
+- name: Configure doctl with API token
+  template:
+    src: config.yaml.j2
+    dest: "{{ doctl_config_path }}/config.yaml"
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
+    mode: '0600'
+  become: false
+  when: digitalocean_api_token is defined
+  tags: doctl
+
+- name: Verify doctl installation
+  command: doctl version
+  register: doctl_version_output
+  changed_when: false
+  tags: doctl
+
+- name: Display doctl version
+  debug:
+    msg: "doctl installed: {{ doctl_version_output.stdout }}"
+  tags: doctl

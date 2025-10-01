@@ -12,6 +12,7 @@
   apt:
     name: zsh
     state: present
+  become: true
   when: ansible_os_family == "Debian"
   tags: zsh
 
@@ -26,6 +27,7 @@
   pacman:
     name: zsh
     state: present
+  become: true
   when: ansible_os_family == "Archlinux"
   tags: zsh
 

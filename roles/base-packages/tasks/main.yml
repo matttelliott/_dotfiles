@@ -13,6 +13,7 @@
     name: "{{ base_packages }}"
     state: present
     update_cache: yes
+  become: true
   when: ansible_os_family == "Debian"
   tags: packages
 
@@ -27,6 +28,7 @@
   pacman:
     name: "{{ base_packages }}"
     state: present
+  become: true
   when: ansible_os_family == "Archlinux"
   tags: packages
 
@@ -34,6 +36,7 @@
   apt:
     name: "{{ build_packages }}"
     state: present
+  become: true
   when: ansible_os_family == "Debian"
   tags: packages
 
@@ -49,5 +52,6 @@
   pacman:
     name: base-devel
     state: present
+  become: true
   when: ansible_os_family == "Archlinux"
   tags: packages
