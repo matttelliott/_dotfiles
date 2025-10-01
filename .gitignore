@@ -42,3 +42,9 @@ id_ed25519
 # Temporary files
 INSTALL_NOW.md
 install_dotfiles.sh
+
+# Claude Flow / Swarm Coordination
+.claude-flow/
+.hive-mind/
+.swarm/
+memory/
