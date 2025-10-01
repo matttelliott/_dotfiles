@@ -16,6 +16,7 @@ Automated dotfiles management using Ansible with cross-platform support for Debi
 - **Zsh**: Modern shell with Zinit plugin manager
 - **Tmux**: Terminal multiplexer with [matttelliott's config](https://github.com/matttelliott/dotfiles/blob/master/tmux/.tmux.conf)
 - **Neovim**: Modern Vim with [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim) configuration
+- **GitHub CLI (gh)**: Official GitHub command-line tool for repository management
 
 ### Base Packages
 - Git, curl, wget, vim
@@ -86,6 +87,8 @@ ansible-playbook deploy.yml --tags zsh,tmux --ask-become-pass
 - `zsh` / `shell` - Zsh shell configuration
 - `tmux` - Tmux configuration
 - `neovim` / `nvim` / `editor` - Neovim setup
+- `gh-cli` / `github` / `git` - GitHub CLI setup
+- `doctl` / `digitalocean` / `cloud` - DigitalOcean CLI setup
 
 ## 🎨 Customization
 
@@ -153,7 +156,9 @@ dotfiles-ansible/
 │   ├── base-packages/  # System packages
 │   ├── zsh/            # Zsh with Zinit
 │   ├── tmux/           # Tmux configuration
-│   └── neovim/         # Neovim with kickstart.nvim
+│   ├── neovim/         # Neovim with kickstart.nvim
+│   ├── gh-cli/         # GitHub CLI
+│   └── doctl/          # DigitalOcean CLI
 ├── scripts/
 │   └── install.sh      # Bootstrap script
 └── docs/
