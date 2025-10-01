@@ -60,7 +60,9 @@
   shell: |
     echo "{{ github_access_token }}" | gh auth login --with-token
   become: false
-  when: gh_installed.rc != 0
+  when:
+    - gh_installed.rc != 0
+    - github_access_token is defined
   no_log: true
   tags: gh-cli
 
@@ -69,4 +71,5 @@
   become: false
   register: gh_auth_status
   changed_when: false
+  failed_when: false
   tags: gh-cli

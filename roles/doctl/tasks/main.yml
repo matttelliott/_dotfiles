@@ -115,7 +115,9 @@
     group: "{{ user_name }}"
     mode: '0600'
   become: false
-  when: digitalocean_api_token is defined
+  when:
+    - digitalocean_api_token is defined
+    - digitalocean_api_token != ""
   tags: doctl
 
 - name: Verify doctl installation
