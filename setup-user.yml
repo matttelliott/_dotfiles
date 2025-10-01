@@ -1,0 +1,71 @@
+---
+# Setup user with SSH keys and dotfiles on remote host
+- name: Setup user with dotfiles
+  hosts: all
+  become: true
+  vars:
+    target_user: ansible-developer
+    target_password: antsy123
+
+  tasks:
+    - name: Install required packages
+      apt:
+        name:
+          - git
+          - ansible
+          - python3-pip
+        state: present
+        update_cache: yes
+
+    - name: Create user with password
+      user:
+        name: "{{ target_user }}"
+        password: "{{ target_password | password_hash('sha512') }}"
+        shell: /bin/bash
+        create_home: yes
+        groups: sudo
+        append: yes
+
+    - name: Allow user to sudo without password
+      lineinfile:
+        path: /etc/sudoers.d/{{ target_user }}
+        line: "{{ target_user }} ALL=(ALL) NOPASSWD:ALL"
+        create: yes
+        mode: '0440'
+        validate: 'visudo -cf %s'
+
+    - name: Create .ssh directory
+      file:
+        path: /home/{{ target_user }}/.ssh
+        state: directory
+        owner: "{{ target_user }}"
+        group: "{{ target_user }}"
+        mode: '0700'
+
+    - name: Copy macbook SSH key to authorized_keys
+      authorized_key:
+        user: "{{ target_user }}"
+        key: "{{ lookup('file', lookup('env', 'HOME') + '/.ssh/id_rsa.pub') }}"
+        state: present
+      ignore_errors: yes
+
+    - name: Copy ansible_control SSH key to authorized_keys
+      authorized_key:
+        user: "{{ target_user }}"
+        key: "{{ lookup('file', lookup('env', 'HOME') + '/.ssh/ansible_control.pub') }}"
+        state: present
+
+    - name: Clone dotfiles repository as user
+      git:
+        repo: https://github.com/matttelliott/_dotfiles.git
+        dest: /home/{{ target_user }}/.dotfiles
+        version: master
+      become_user: "{{ target_user }}"
+
+    - name: Run dotfiles installation script
+      shell: |
+        cd /home/{{ target_user }}/.dotfiles
+        ./scripts/install.sh --skip-deps
+      become_user: "{{ target_user }}"
+      args:
+        executable: /bin/bash
