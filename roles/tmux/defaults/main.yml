@@ -1,0 +1,4 @@
+---
+# Tmux configuration defaults
+# Using matttelliott's dotfiles tmux config as base
+# TPM plugins are commented out in the config by default

@@ -1,0 +1,66 @@
+---
+# Main playbook for dotfiles installation
+# Cross-platform support: Debian, macOS, Arch Linux
+- name: Configure development environment with dotfiles
+  hosts: localhost
+  connection: local
+  vars:
+    user_name: "developer"
+    user_home: "/home/developer"
+    dotfiles_repo: "https://github.com/{{ github_username | default('user') }}/dotfiles"
+
+  pre_tasks:
+    - name: Detect operating system
+      set_fact:
+        os_family: "{{ ansible_os_family | lower }}"
+        os_distribution: "{{ ansible_distribution | lower }}"
+      tags: always
+
+    - name: Display system information
+      debug:
+        msg: "Installing dotfiles on {{ os_distribution }} ({{ os_family }})"
+      tags: always
+
+    - name: Update package cache (Debian/Ubuntu)
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      when: ansible_os_family == "Debian"
+      tags: always
+
+    - name: Update package cache (Arch)
+      pacman:
+        update_cache: yes
+      when: ansible_os_family == "Archlinux"
+      tags: always
+
+  roles:
+    - role: base-packages
+      tags: ['base', 'packages']
+
+    - role: zsh
+      tags: ['zsh', 'shell']
+
+    - role: tmux
+      tags: ['tmux', 'terminal']
+
+    - role: neovim
+      tags: ['neovim', 'editor']
+
+  post_tasks:
+    - name: Create local bin directory
+      file:
+        path: "{{ user_home }}/.local/bin"
+        state: directory
+        owner: "{{ user_name }}"
+        group: "{{ user_name }}"
+        mode: '0755'
+      become: false
+
+    - name: Installation complete
+      debug:
+        msg: |
+          ✓ Dotfiles installation complete!
+          → Please restart your shell or run: exec $SHELL
+          → Run 'tmux' to start tmux with new configuration
+          → Run 'nvim' to start Neovim with plugins

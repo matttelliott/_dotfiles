@@ -1,0 +1,15 @@
+---
+# Arch Linux specific packages
+base_packages:
+  - git
+  - curl
+  - wget
+  - vim
+  - htop
+  - tree
+  - unzip
+  - tar
+  - gzip
+  - base-devel
+
+build_packages: []

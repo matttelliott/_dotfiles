@@ -1,0 +1,100 @@
+---
+# Neovim installation and configuration
+- name: Include OS-specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution | lower }}.yml"
+    - "{{ ansible_os_family | lower }}.yml"
+    - "default.yml"
+  tags: always
+
+- name: Add Neovim PPA (Ubuntu)
+  apt_repository:
+    repo: ppa:neovim-ppa/stable
+    state: present
+  when: ansible_distribution == "Ubuntu"
+  tags: neovim
+
+- name: Install Neovim (Debian/Ubuntu)
+  apt:
+    name: neovim
+    state: present
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+  tags: neovim
+
+- name: Install Neovim (macOS)
+  homebrew:
+    name: neovim
+    state: present
+  when: ansible_os_family == "Darwin"
+  tags: neovim
+
+- name: Install Neovim (Arch Linux)
+  pacman:
+    name: neovim
+    state: present
+  when: ansible_os_family == "Archlinux"
+  tags: neovim
+
+- name: Create Neovim config directory
+  file:
+    path: "{{ user_home }}/.config/nvim"
+    state: directory
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
+    mode: '0755'
+  become: false
+  tags: neovim
+
+- name: Check if kickstart.nvim is already cloned
+  stat:
+    path: "{{ user_home }}/.config/nvim/init.lua"
+  register: kickstart_exists
+  become: false
+  tags: neovim
+
+- name: Clone kickstart.nvim repository
+  git:
+    repo: https://github.com/nvim-lua/kickstart.nvim.git
+    dest: "{{ user_home }}/.config/nvim"
+    version: master
+    force: no
+  become: false
+  when: not kickstart_exists.stat.exists
+  tags: neovim
+
+- name: Create custom configuration directory
+  file:
+    path: "{{ user_home }}/.config/nvim/lua/custom"
+    state: directory
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
+    mode: '0755'
+  become: false
+  tags: neovim
+
+- name: Install Node.js for LSP support (Debian/Ubuntu)
+  apt:
+    name: nodejs
+    state: present
+  when: ansible_os_family == "Debian"
+  tags: neovim
+
+- name: Install Python3 and pip for provider support (Debian/Ubuntu)
+  apt:
+    name:
+      - python3
+      - python3-pip
+    state: present
+  when: ansible_os_family == "Debian"
+  tags: neovim
+
+- name: Install Neovim Python provider
+  pip:
+    name: pynvim
+    state: present
+    break_system_packages: yes
+  become: false
+  tags: neovim
+  ignore_errors: yes

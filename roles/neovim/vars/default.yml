@@ -1,0 +1,4 @@
+---
+# Default neovim variables
+user_home: "{{ ansible_env.HOME }}"
+user_name: "{{ ansible_user_id }}"

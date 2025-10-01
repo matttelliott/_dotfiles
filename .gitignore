@@ -1,0 +1,44 @@
+# Ansible
+*.retry
+.ansible/
+ansible_facts/
+/tmp/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+
+# Environment
+.env
+.venv
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# SSH Keys (never commit private keys!)
+*.pem
+*.key
+id_rsa
+id_ed25519
+*.ppk
+
+# Logs
+*.log
+
+# Temporary files
+INSTALL_NOW.md
+install_dotfiles.sh

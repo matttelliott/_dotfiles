@@ -1,0 +1,16 @@
+---
+# macOS specific packages
+base_packages:
+  - git
+  - curl
+  - wget
+  - vim
+  - htop
+  - tree
+  - coreutils
+  - findutils
+  - gnu-sed
+  - gnu-tar
+  - gzip
+
+build_packages: []

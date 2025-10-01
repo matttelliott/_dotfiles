@@ -1,0 +1,59 @@
+---
+# Remote Deployment Playbook
+# Deploy dotfiles to remote hosts from this control node
+
+- name: Deploy dotfiles to remote hosts
+  hosts: all:!local
+  become: true
+  gather_facts: yes
+
+  vars:
+    user_name: "{{ ansible_user }}"
+    user_home: "{{ ansible_env.HOME }}"
+
+  pre_tasks:
+    - name: Detect operating system
+      set_fact:
+        os_family: "{{ ansible_os_family | lower }}"
+        os_distribution: "{{ ansible_distribution | lower }}"
+      tags: always
+
+    - name: Display deployment target information
+      debug:
+        msg: "Deploying dotfiles to {{ inventory_hostname }} ({{ os_distribution }}/{{ os_family }})"
+      tags: always
+
+    - name: Update package cache (Debian/Ubuntu)
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      when: ansible_os_family == "Debian"
+      tags: always
+
+    - name: Update package cache (Arch)
+      pacman:
+        update_cache: yes
+      when: ansible_os_family == "Archlinux"
+      tags: always
+
+  roles:
+    - role: base-packages
+      tags: [base, packages]
+
+    - role: zsh
+      tags: [zsh, shell]
+
+    - role: tmux
+      tags: [tmux]
+
+    - role: neovim
+      tags: [neovim, nvim, editor]
+
+  post_tasks:
+    - name: Deployment complete
+      debug:
+        msg: |
+          ✓ Dotfiles deployed successfully to {{ inventory_hostname }}!
+          → User {{ user_name }} now has zsh, tmux, and neovim configured
+          → SSH into the host and run: exec zsh
+      tags: always

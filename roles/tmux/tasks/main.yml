@@ -1,0 +1,48 @@
+---
+# Tmux installation and configuration
+- name: Include OS-specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution | lower }}.yml"
+    - "{{ ansible_os_family | lower }}.yml"
+    - "default.yml"
+  tags: always
+
+- name: Install tmux (Debian/Ubuntu)
+  apt:
+    name: tmux
+    state: present
+  when: ansible_os_family == "Debian"
+  tags: tmux
+
+- name: Install tmux (macOS)
+  homebrew:
+    name: tmux
+    state: present
+  when: ansible_os_family == "Darwin"
+  tags: tmux
+
+- name: Install tmux (Arch Linux)
+  pacman:
+    name: tmux
+    state: present
+  when: ansible_os_family == "Archlinux"
+  tags: tmux
+
+- name: Deploy .tmux.conf configuration
+  template:
+    src: tmux.conf.j2
+    dest: "{{ user_home }}/.tmux.conf"
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
+    mode: '0644'
+  become: false
+  tags: tmux
+
+- name: Install xclip for clipboard support (Debian/Ubuntu)
+  apt:
+    name: xclip
+    state: present
+  when: ansible_os_family == "Debian"
+  tags: tmux
+  ignore_errors: yes

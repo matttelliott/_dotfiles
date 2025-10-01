@@ -1,0 +1,8 @@
+---
+# Neovim configuration defaults
+nvim_leader_key: " "
+nvim_colorscheme: "habamax"
+nvim_number: true
+nvim_relative_number: true
+nvim_tab_width: 2
+nvim_expandtab: true

@@ -1,0 +1,30 @@
+---
+# Debian/Ubuntu specific packages
+base_packages:
+  - git
+  - curl
+  - wget
+  - vim
+  - htop
+  - tree
+  - unzip
+  - tar
+  - gzip
+  - apt-transport-https
+  - ca-certificates
+  - gnupg
+  - lsb-release
+
+build_packages:
+  - build-essential
+  - gcc
+  - g++
+  - make
+  - cmake
+  - automake
+  - autoconf
+  - pkg-config
+  - libtool
+  - libssl-dev
+  - libreadline-dev
+  - zlib1g-dev

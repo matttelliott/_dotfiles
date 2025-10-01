@@ -1,0 +1,20 @@
+---
+# Default base packages (cross-platform)
+base_packages:
+  - git
+  - curl
+  - wget
+  - vim
+  - htop
+  - tree
+  - unzip
+  - tar
+  - gzip
+
+build_packages:
+  - build-essential
+  - gcc
+  - make
+  - automake
+  - autoconf
+  - pkg-config

@@ -1,0 +1,82 @@
+# ~/.zshrc - Zsh configuration
+# Managed by Ansible - DO NOT EDIT MANUALLY
+
+# History configuration
+HISTFILE=~/.config/zsh/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_FIND_NO_DUPS
+setopt HIST_SAVE_NO_DUPS
+setopt SHARE_HISTORY
+setopt APPEND_HISTORY
+setopt INC_APPEND_HISTORY
+
+# Directory navigation
+setopt AUTO_CD
+setopt AUTO_PUSHD
+setopt PUSHD_IGNORE_DUPS
+setopt PUSHD_SILENT
+
+# Completion
+autoload -Uz compinit
+compinit -d ~/.cache/zsh/zcompdump-$ZSH_VERSION
+
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*' rehash true
+zstyle ':completion:*' accept-exact '*(N)'
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path ~/.cache/zsh
+
+# Zinit plugin manager
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+source "${ZINIT_HOME}/zinit.zsh"
+
+# Load plugins
+{% for plugin in zsh_zinit_plugins %}
+zinit light {{ plugin }}
+{% endfor %}
+
+# Zinit snippets for common utilities
+zinit snippet OMZP::git
+zinit snippet OMZP::sudo
+zinit snippet OMZP::command-not-found
+
+# Prompt configuration
+autoload -Uz promptinit
+promptinit
+
+# Simple two-line prompt
+setopt PROMPT_SUBST
+PROMPT='%F{cyan}%n@%m%f:%F{yellow}%~%f
+%F{green}❯%f '
+RPROMPT='%F{242}[%D{% raw %}{%H:%M:%S}{% endraw %}]%f'
+
+# Aliases
+alias ll='ls -lah'
+alias la='ls -A'
+alias l='ls -CF'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias g='git'
+alias gs='git status'
+alias ga='git add'
+alias gc='git commit'
+alias gp='git push'
+alias gpl='git pull'
+alias vim='nvim'
+alias v='nvim'
+
+# Environment variables
+export EDITOR='nvim'
+export VISUAL='nvim'
+export PAGER='less'
+export LESS='-R'
+
+# Add local bin to PATH
+export PATH="$HOME/.local/bin:$PATH"
+
+# Load custom configurations
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local

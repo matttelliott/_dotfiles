@@ -1,0 +1,132 @@
+{
+  "test_run": {
+    "timestamp": "YYYY-MM-DDTHH:MM:SSZ",
+    "git_commit": "commit_hash",
+    "git_branch": "branch_name",
+    "runner": "local|github-actions",
+    "os": {
+      "name": "ubuntu|debian|macos|arch",
+      "version": "22.04",
+      "kernel": "5.15.0"
+    }
+  },
+  "test_suites": {
+    "syntax_validation": {
+      "status": "passed|failed|skipped",
+      "duration_seconds": 0,
+      "total_files": 0,
+      "passed_files": 0,
+      "failed_files": 0,
+      "errors": []
+    },
+    "idempotency": {
+      "status": "passed|failed|skipped",
+      "duration_seconds": 0,
+      "first_run": {
+        "changed": 0,
+        "ok": 0,
+        "failed": 0
+      },
+      "second_run": {
+        "changed": 0,
+        "ok": 0,
+        "failed": 0
+      },
+      "is_idempotent": true,
+      "non_idempotent_tasks": []
+    },
+    "functional": {
+      "status": "passed|failed|skipped",
+      "duration_seconds": 0,
+      "total_tests": 0,
+      "passed_tests": 0,
+      "failed_tests": 0,
+      "categories": {
+        "software_installation": {
+          "zsh_installed": true,
+          "zsh_default_shell": true,
+          "tmux_installed": true,
+          "neovim_installed": true,
+          "git_installed": true
+        },
+        "configuration_files": {
+          "zshrc_exists": true,
+          "tmux_conf_exists": true,
+          "nvim_config_exists": true,
+          "gitconfig_exists": true
+        },
+        "functionality": {
+          "zsh_executes": true,
+          "tmux_starts": true,
+          "neovim_works": true,
+          "plugins_loaded": true
+        }
+      },
+      "failed_tests": []
+    },
+    "os_specific": {
+      "status": "passed|failed|skipped",
+      "duration_seconds": 0,
+      "platform": "debian|ubuntu|macos|arch",
+      "total_tests": 0,
+      "passed_tests": 0,
+      "failed_tests": 0,
+      "specific_checks": {
+        "package_manager": "passed|failed",
+        "repositories": "passed|failed",
+        "user_shell": "passed|failed",
+        "system_tools": "passed|failed"
+      },
+      "failed_tests": []
+    },
+    "integration": {
+      "status": "passed|failed|skipped",
+      "duration_seconds": 0,
+      "total_phases": 7,
+      "passed_phases": 0,
+      "failed_phases": 0,
+      "phases": {
+        "preflight": "passed|failed",
+        "syntax": "passed|failed",
+        "dry_run": "passed|failed",
+        "components": "passed|failed",
+        "os_specific": "passed|failed",
+        "configuration": "passed|failed",
+        "idempotency": "passed|failed"
+      },
+      "errors": []
+    }
+  },
+  "coverage": {
+    "total_coverage_percent": 0,
+    "syntax_coverage": 100,
+    "functional_coverage": 0,
+    "os_coverage": {
+      "debian": false,
+      "ubuntu": false,
+      "macos": false,
+      "arch": false
+    }
+  },
+  "summary": {
+    "overall_status": "passed|failed",
+    "total_tests": 0,
+    "passed_tests": 0,
+    "failed_tests": 0,
+    "skipped_tests": 0,
+    "success_rate_percent": 0,
+    "total_duration_seconds": 0
+  },
+  "recommendations": [
+    "Recommendations based on test results",
+    "Areas for improvement",
+    "Security considerations"
+  ],
+  "artifacts": {
+    "logs": [
+      "/tmp/ansible-syntax-*.log",
+      "/tmp/ansible-idempotency-tests/"
+    ],
+    "reports": []
+  }
+}
