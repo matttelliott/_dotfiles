@@ -48,6 +48,9 @@
     - role: neovim
       tags: ['neovim', 'editor']
 
+    - role: gh-cli
+      tags: ['gh-cli', 'github', 'git']
+
     - role: doctl
       tags: ['doctl', 'digitalocean', 'cloud']
 

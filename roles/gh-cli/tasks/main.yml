@@ -1,0 +1,72 @@
+---
+# GitHub CLI installation and configuration tasks
+
+- name: Check if gh is already installed
+  command: which gh
+  register: gh_installed
+  failed_when: false
+  changed_when: false
+  tags: gh-cli
+
+- name: Install dependencies (Debian/Ubuntu)
+  apt:
+    name:
+      - curl
+      - gpg
+    state: present
+  become: true
+  when: ansible_os_family == "Debian"
+  tags: gh-cli
+
+- name: Add GitHub CLI apt repository key (Debian/Ubuntu)
+  shell: |
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | \
+    gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+  become: true
+  when:
+    - ansible_os_family == "Debian"
+    - gh_installed.rc != 0
+  tags: gh-cli
+
+- name: Add GitHub CLI apt repository (Debian/Ubuntu)
+  apt_repository:
+    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
+    state: present
+    filename: github-cli
+  become: true
+  when:
+    - ansible_os_family == "Debian"
+    - gh_installed.rc != 0
+  tags: gh-cli
+
+- name: Install GitHub CLI (Debian/Ubuntu)
+  apt:
+    name: gh
+    state: present
+    update_cache: yes
+  become: true
+  when: ansible_os_family == "Debian"
+  tags: gh-cli
+
+- name: Install GitHub CLI (Arch Linux)
+  pacman:
+    name: github-cli
+    state: present
+  become: true
+  when: ansible_os_family == "Archlinux"
+  tags: gh-cli
+
+- name: Authenticate gh CLI with token
+  shell: |
+    echo "{{ github_access_token }}" | gh auth login --with-token
+  become: false
+  when: gh_installed.rc != 0
+  no_log: true
+  tags: gh-cli
+
+- name: Verify gh authentication
+  command: gh auth status
+  become: false
+  register: gh_auth_status
+  changed_when: false
+  tags: gh-cli
