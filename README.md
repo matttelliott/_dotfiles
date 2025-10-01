@@ -13,7 +13,7 @@ Automated dotfiles management using Ansible with cross-platform support for Debi
 ## 🛠️ What's Included
 
 ### Tools
-- **Zsh**: Modern shell with Zinit plugin manager
+- **Zsh**: Modern shell with default configuration
 - **Tmux**: Terminal multiplexer with [matttelliott's config](https://github.com/matttelliott/dotfiles/blob/master/tmux/.tmux.conf)
 - **Neovim**: Modern Vim with [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim) configuration
 - **GitHub CLI (gh)**: Official GitHub command-line tool for repository management
@@ -94,21 +94,16 @@ ansible-playbook deploy.yml --tags zsh,tmux --ask-become-pass
 
 ### Local Overrides
 
-Create local configuration files that won't be overwritten:
+Create local configuration files to customize your environment:
 
-- `~/.zshrc.local` - Custom Zsh config
+- `~/.zshrc` - Custom Zsh config
 - `~/.tmux.conf.local` - Custom Tmux config
 - `~/.config/nvim/lua/custom/` - Custom Neovim config
 
 ### Variables
 
-#### Zsh (`roles/zsh/defaults/main.yml`)
-```yaml
-zsh_theme: "agnoster"
-zsh_zinit_plugins:
-  - "zdharma-continuum/fast-syntax-highlighting"
-  - "zsh-users/zsh-autosuggestions"
-```
+#### Zsh
+Uses default Zsh configuration. Customize by adding your own `~/.zshrc` file.
 
 #### Tmux
 Uses configuration from [matttelliott's dotfiles](https://github.com/matttelliott/dotfiles/blob/master/tmux/.tmux.conf):

@@ -1,13 +1,5 @@
 ---
-# Zsh installation and configuration
-- name: Include OS-specific variables
-  include_vars: "{{ item }}"
-  with_first_found:
-    - "{{ ansible_distribution | lower }}.yml"
-    - "{{ ansible_os_family | lower }}.yml"
-    - "default.yml"
-  tags: always
-
+# Zsh installation - minimal setup with defaults
 - name: Install zsh (Debian/Ubuntu)
   apt:
     name: zsh
@@ -29,42 +21,6 @@
     state: present
   become: true
   when: ansible_os_family == "Archlinux"
-  tags: zsh
-
-- name: Check if zinit is installed
-  stat:
-    path: "{{ user_home }}/.local/share/zinit/zinit.git"
-  register: zinit_installed
-  become: false
-  tags: zsh
-
-- name: Install zinit plugin manager
-  git:
-    repo: https://github.com/zdharma-continuum/zinit.git
-    dest: "{{ user_home }}/.local/share/zinit/zinit.git"
-    depth: 1
-  become: false
-  when: not zinit_installed.stat.exists
-  tags: zsh
-
-- name: Create zsh config directory
-  file:
-    path: "{{ user_home }}/.config/zsh"
-    state: directory
-    owner: "{{ user_name }}"
-    group: "{{ user_name }}"
-    mode: '0755'
-  become: false
-  tags: zsh
-
-- name: Deploy .zshrc configuration
-  template:
-    src: zshrc.j2
-    dest: "{{ user_home }}/.zshrc"
-    owner: "{{ user_name }}"
-    group: "{{ user_name }}"
-    mode: '0644'
-  become: false
   tags: zsh
 
 - name: Change default shell to zsh
