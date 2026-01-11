@@ -1,10 +1,17 @@
 ---
-- name: Install sd on macOS
+- name: Install sd
   hosts: all
-  gather_facts: false
+  gather_facts: true
 
   tasks:
     - name: Install sd via Homebrew
       shell: /opt/homebrew/bin/brew install sd
       args:
         creates: /opt/homebrew/bin/sd
+      when: ansible_os_family == "Darwin"
+
+    - name: Install sd via cargo
+      shell: ~/.cargo/bin/cargo install sd
+      args:
+        creates: ~/.cargo/bin/sd
+      when: ansible_os_family == "Debian"

@@ -1,0 +1,7 @@
+name: dotphiles-infra
+description: DigitalOcean infrastructure for dotphiles
+runtime: nodejs
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: typescript

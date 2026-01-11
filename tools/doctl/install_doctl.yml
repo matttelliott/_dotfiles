@@ -1,10 +1,28 @@
 ---
-- name: Install DigitalOcean CLI on macOS
+- name: Install DigitalOcean CLI
   hosts: with_login_tools
-  gather_facts: false
+  gather_facts: true
+
+  vars:
+    doctl_version: "1.104.0"
 
   tasks:
     - name: Install doctl via Homebrew
       shell: /opt/homebrew/bin/brew install doctl
       args:
         creates: /opt/homebrew/bin/doctl
+      when: ansible_os_family == "Darwin"
+
+    - name: Check if doctl is installed
+      stat:
+        path: /usr/local/bin/doctl
+      register: doctl_check
+      when: ansible_os_family == "Debian"
+
+    - name: Download and install doctl
+      shell: |
+        curl -sL https://github.com/digitalocean/doctl/releases/download/v{{ doctl_version }}/doctl-{{ doctl_version }}-linux-amd64.tar.gz | tar xz -C /tmp
+        install /tmp/doctl /usr/local/bin
+        rm -f /tmp/doctl
+      become: yes
+      when: ansible_os_family == "Debian" and not doctl_check.stat.exists

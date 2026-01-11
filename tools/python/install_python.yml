@@ -1,10 +1,17 @@
 ---
-- name: Install uv (Python) on macOS
+- name: Install uv (Python)
   hosts: all
-  gather_facts: false
+  gather_facts: true
 
   tasks:
     - name: Install uv via Homebrew
       shell: /opt/homebrew/bin/brew install uv
       args:
         creates: /opt/homebrew/bin/uv
+      when: ansible_os_family == "Darwin"
+
+    - name: Install uv via official installer
+      shell: curl -LsSf https://astral.sh/uv/install.sh | sh
+      args:
+        creates: ~/.local/bin/uv
+      when: ansible_os_family == "Debian"

@@ -1,10 +1,26 @@
 ---
-- name: Install AWS CLI on macOS
+- name: Install AWS CLI
   hosts: with_login_tools
-  gather_facts: false
+  gather_facts: true
 
   tasks:
     - name: Install AWS CLI via Homebrew
       shell: /opt/homebrew/bin/brew install awscli
       args:
         creates: /opt/homebrew/bin/aws
+      when: ansible_os_family == "Darwin"
+
+    - name: Check if AWS CLI is installed
+      stat:
+        path: /usr/local/bin/aws
+      register: aws_check
+      when: ansible_os_family == "Debian"
+
+    - name: Download and install AWS CLI
+      shell: |
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+        unzip -o /tmp/awscliv2.zip -d /tmp
+        /tmp/aws/install --update
+        rm -rf /tmp/aws /tmp/awscliv2.zip
+      become: yes
+      when: ansible_os_family == "Debian" and not aws_check.stat.exists

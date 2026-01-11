@@ -1,10 +1,18 @@
 ---
-- name: Install pandoc on macOS
+- name: Install pandoc
   hosts: all
-  gather_facts: false
+  gather_facts: true
 
   tasks:
     - name: Install pandoc via Homebrew
       shell: /opt/homebrew/bin/brew install pandoc
       args:
         creates: /opt/homebrew/bin/pandoc
+      when: ansible_os_family == "Darwin"
+
+    - name: Install pandoc via apt
+      apt:
+        name: pandoc
+        state: present
+      become: yes
+      when: ansible_os_family == "Debian"

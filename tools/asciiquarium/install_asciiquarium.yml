@@ -1,10 +1,37 @@
 ---
-- name: Install asciiquarium on macOS
+- name: Install asciiquarium
   hosts: all
-  gather_facts: false
+  gather_facts: true
 
   tasks:
     - name: Install asciiquarium via Homebrew
       shell: /opt/homebrew/bin/brew install asciiquarium
       args:
         creates: /opt/homebrew/bin/asciiquarium
+      when: ansible_os_family == "Darwin"
+
+    - name: Install asciiquarium dependencies via apt
+      apt:
+        name:
+          - libcurses-perl
+          - cpanminus
+        state: present
+      become: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Install Term::Animation via cpan
+      shell: cpanm Term::Animation
+      args:
+        creates: /usr/local/share/perl/*/Term/Animation.pm
+      become: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Download and install asciiquarium
+      shell: |
+        curl -sL https://robobunny.com/projects/asciiquarium/asciiquarium.tar.gz | tar xz -C /tmp
+        install /tmp/asciiquarium_1.1/asciiquarium /usr/local/bin/
+        rm -rf /tmp/asciiquarium_1.1
+      args:
+        creates: /usr/local/bin/asciiquarium
+      become: yes
+      when: ansible_os_family == "Debian"

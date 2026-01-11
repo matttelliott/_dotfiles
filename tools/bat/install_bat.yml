@@ -1,10 +1,18 @@
 ---
-- name: Install bat on macOS
+- name: Install bat
   hosts: all
-  gather_facts: false
+  gather_facts: true
 
   tasks:
     - name: Install bat via Homebrew
       shell: /opt/homebrew/bin/brew install bat
       args:
         creates: /opt/homebrew/bin/bat
+      when: ansible_os_family == "Darwin"
+
+    - name: Install bat via apt
+      apt:
+        name: bat
+        state: present
+      become: yes
+      when: ansible_os_family == "Debian"

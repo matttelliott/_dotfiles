@@ -1,13 +1,21 @@
 ---
-- name: Install tmux on macOS
+- name: Install tmux
   hosts: all
-  gather_facts: false
+  gather_facts: true
 
   tasks:
     - name: Install tmux via Homebrew
       shell: /opt/homebrew/bin/brew install tmux
       args:
         creates: /opt/homebrew/bin/tmux
+      when: ansible_os_family == "Darwin"
+
+    - name: Install tmux via apt
+      apt:
+        name: tmux
+        state: present
+      become: yes
+      when: ansible_os_family == "Debian"
 
     - name: Install tmux config
       copy:

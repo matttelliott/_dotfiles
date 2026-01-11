@@ -1,12 +1,22 @@
 ---
-- name: Prevent sleep during setup
-  hosts: all
+- name: Prevent sleep during setup (macOS)
+  hosts: macs
   gather_facts: false
   tasks:
     - name: Disable sleep
       command: pmset -a disablesleep 1
       become: yes
 
+- name: Update apt cache (Debian)
+  hosts: debian
+  gather_facts: false
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+      become: yes
+
+- import_playbook: install_essentials.yml
 - import_playbook: install_homebrew.yml
 - import_playbook: install_ansible.yml
 - import_playbook: tools/zsh/install_zsh.yml
@@ -59,8 +69,8 @@
 - import_playbook: tools/mullvad/install_mullvad.yml
 - import_playbook: tools/min/install_min.yml
 
-- name: Allow sleep after setup
-  hosts: all
+- name: Allow sleep after setup (macOS)
+  hosts: macs
   gather_facts: false
   tasks:
     - name: Re-enable sleep

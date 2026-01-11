@@ -1,9 +1,22 @@
 ---
-- name: Configure zsh
+- name: Install and configure zsh
   hosts: all
-  gather_facts: false
+  gather_facts: true
 
   tasks:
-    - name: Verify zsh is installed
+    - name: Verify zsh is installed (macOS)
       raw: which zsh
+      changed_when: false
+      when: ansible_os_family == "Darwin"
+
+    - name: Install zsh via apt
+      apt:
+        name: zsh
+        state: present
+      become: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Set zsh as default shell
+      shell: chsh -s $(which zsh)
+      when: ansible_os_family == "Debian"
       changed_when: false

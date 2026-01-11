@@ -1,10 +1,18 @@
 ---
-- name: Install ffmpeg on macOS
+- name: Install ffmpeg
   hosts: all
-  gather_facts: false
+  gather_facts: true
 
   tasks:
     - name: Install ffmpeg via Homebrew
       shell: /opt/homebrew/bin/brew install ffmpeg
       args:
         creates: /opt/homebrew/bin/ffmpeg
+      when: ansible_os_family == "Darwin"
+
+    - name: Install ffmpeg via apt
+      apt:
+        name: ffmpeg
+        state: present
+      become: yes
+      when: ansible_os_family == "Debian"

@@ -1,16 +1,18 @@
 ---
-- name: Install nvm on macOS
+- name: Install Node.js via nvm
   hosts: all
-  gather_facts: false
+  gather_facts: true
 
-  vars_files:
-    - vars.yml
+  vars:
+    nvm_dir: ~/.nvm
 
   tasks:
+    # macOS: Install nvm via Homebrew
     - name: Install nvm via Homebrew
       shell: /opt/homebrew/bin/brew install nvm
       args:
         creates: /opt/homebrew/opt/nvm
+      when: ansible_os_family == "Darwin"
 
     - name: Create nvm directory
       file:
@@ -24,13 +26,33 @@
         marker: "# {mark} NVM"
         block: |
           export NVM_DIR="$HOME/.nvm"
-          [ -s "{{ nvm_source }}" ] && \. "{{ nvm_source }}"
-          [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+          [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
 
-    - name: Install Node.js LTS
+    - name: Install Node.js LTS (macOS)
       shell: |
-        {{ nvm_init }}
+        export NVM_DIR="$HOME/.nvm"
+        . /opt/homebrew/opt/nvm/nvm.sh
         nvm install --lts
         nvm alias default lts/*
       args:
         creates: ~/.nvm/alias/default
+      when: ansible_os_family == "Darwin"
+
+    # Debian: Install nvm from official script
+    - name: Install nvm from official script
+      shell: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+      args:
+        creates: ~/.nvm/nvm.sh
+      when: ansible_os_family == "Debian"
+
+    - name: Install Node.js LTS (Debian)
+      shell: |
+        export NVM_DIR="$HOME/.nvm"
+        . ~/.nvm/nvm.sh
+        nvm install --lts
+        nvm alias default lts/*
+      args:
+        creates: ~/.nvm/alias/default
+      when: ansible_os_family == "Debian"

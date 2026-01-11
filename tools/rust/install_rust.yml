@@ -1,7 +1,7 @@
 ---
-- name: Install Rust on macOS
+- name: Install Rust
   hosts: all
-  gather_facts: false
+  gather_facts: true
 
   tasks:
     - name: Install Rust via rustup.rs

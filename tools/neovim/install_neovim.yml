@@ -1,13 +1,21 @@
 ---
-- name: Install Neovim on macOS
+- name: Install Neovim
   hosts: all
-  gather_facts: false
+  gather_facts: true
 
   tasks:
     - name: Install Neovim via Homebrew
       shell: /opt/homebrew/bin/brew install neovim
       args:
         creates: /opt/homebrew/bin/nvim
+      when: ansible_os_family == "Darwin"
+
+    - name: Install Neovim via apt
+      apt:
+        name: neovim
+        state: present
+      become: yes
+      when: ansible_os_family == "Debian"
 
     - name: Check if kickstart.nvim is installed
       stat:

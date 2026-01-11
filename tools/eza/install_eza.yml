@@ -1,10 +1,17 @@
 ---
-- name: Install eza on macOS
+- name: Install eza
   hosts: all
-  gather_facts: false
+  gather_facts: true
 
   tasks:
     - name: Install eza via Homebrew
       shell: /opt/homebrew/bin/brew install eza
       args:
         creates: /opt/homebrew/bin/eza
+      when: ansible_os_family == "Darwin"
+
+    - name: Install eza via cargo
+      shell: ~/.cargo/bin/cargo install eza
+      args:
+        creates: ~/.cargo/bin/eza
+      when: ansible_os_family == "Debian"
