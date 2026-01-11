@@ -1,0 +1,9 @@
+---
+- name: Configure zsh
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Verify zsh is installed
+      raw: which zsh
+      changed_when: false

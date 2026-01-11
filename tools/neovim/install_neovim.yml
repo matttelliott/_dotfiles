@@ -9,10 +9,14 @@
       args:
         creates: /opt/homebrew/bin/nvim
 
+    - name: Check if kickstart.nvim is installed
+      stat:
+        path: ~/.config/nvim/init.lua
+      register: kickstart_check
+
     - name: Install kickstart.nvim
       git:
         repo: https://github.com/nvim-lua/kickstart.nvim.git
         dest: ~/.config/nvim
         depth: 1
-      args:
-        creates: ~/.config/nvim/init.lua
+      when: not kickstart_check.stat.exists

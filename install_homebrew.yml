@@ -18,9 +18,8 @@
       register: homebrew_check
 
     - name: Install Homebrew
-      shell: |
-        echo "{{ ansible_ssh_pass }}" | sudo -S -v
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      shell: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
       environment:
         NONINTERACTIVE: "1"
+      become: yes
       when: not homebrew_check.stat.exists

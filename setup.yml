@@ -1,6 +1,15 @@
 ---
+- name: Prevent sleep during setup
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Disable sleep
+      command: pmset -a disablesleep 1
+      become: yes
+
 - import_playbook: install_homebrew.yml
 - import_playbook: install_ansible.yml
+- import_playbook: tools/zsh/install_zsh.yml
 - import_playbook: tools/node/install_node.yml
 - import_playbook: tools/python/install_python.yml
 - import_playbook: tools/rust/install_rust.yml
@@ -22,6 +31,7 @@
 - import_playbook: tools/pandoc/install_pandoc.yml
 - import_playbook: tools/asciiquarium/install_asciiquarium.yml
 - import_playbook: tools/lazygit/install_lazygit.yml
+- import_playbook: tools/wireguard/install_wireguard.yml
 - import_playbook: tools/1password_cli/install_1password_cli.yml
 - import_playbook: tools/doctl/install_doctl.yml
 - import_playbook: tools/awscli/install_awscli.yml
@@ -48,3 +58,11 @@
 - import_playbook: tools/orion/install_orion.yml
 - import_playbook: tools/mullvad/install_mullvad.yml
 - import_playbook: tools/min/install_min.yml
+
+- name: Allow sleep after setup
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Re-enable sleep
+      command: pmset -a disablesleep 0
+      become: yes

@@ -12,10 +12,19 @@
         path: /usr/local/go/bin/go
       register: go_binary
 
-    - name: Download and install Go
-      shell: |
-        curl -L https://go.dev/dl/go{{ go_version }}.darwin-arm64.tar.gz -o /tmp/go.tar.gz
-        sudo rm -rf /usr/local/go
-        sudo tar -C /usr/local -xzf /tmp/go.tar.gz
-        rm /tmp/go.tar.gz
+    - name: Download Go installer
+      get_url:
+        url: "https://go.dev/dl/go{{ go_version }}.darwin-arm64.pkg"
+        dest: /tmp/go.pkg
+      when: not go_binary.stat.exists
+
+    - name: Install Go
+      command: installer -pkg /tmp/go.pkg -target /
+      become: yes
+      when: not go_binary.stat.exists
+
+    - name: Clean up installer
+      file:
+        path: /tmp/go.pkg
+        state: absent
       when: not go_binary.stat.exists

@@ -10,7 +10,7 @@ all:
 
     with_login_tools:
       hosts:
-        # macbookair:
+        macbookair:
 
     with_gui_tools:
       hosts:
@@ -18,8 +18,8 @@ all:
 
     with_browsers:
       hosts:
-        # macbookair:
+        macbookair:
 
     with_ai_tools:
       hosts:
-        # macbookair:
+        macbookair:

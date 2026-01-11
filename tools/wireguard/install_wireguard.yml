@@ -1,0 +1,10 @@
+---
+- name: Install WireGuard on macOS
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Install WireGuard tools via Homebrew
+      shell: /opt/homebrew/bin/brew install wireguard-tools
+      args:
+        creates: /opt/homebrew/bin/wg

@@ -5,6 +5,6 @@
 
   tasks:
     - name: Install Firefox Developer Edition via Homebrew Cask
-      shell: /opt/homebrew/bin/brew install --cask firefox-developer-edition
+      shell: /opt/homebrew/bin/brew install --cask firefox@developer-edition
       args:
         creates: /Applications/Firefox Developer Edition.app
