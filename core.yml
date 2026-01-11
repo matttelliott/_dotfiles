@@ -1,6 +1,0 @@
----
-- name: Install core tools
-  hosts: macs
-  gather_facts: false
-  roles:
-    - core
