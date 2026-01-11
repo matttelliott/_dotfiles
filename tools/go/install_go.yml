@@ -47,3 +47,11 @@
         path: /tmp/go.tar.gz
         state: absent
       when: ansible_os_family == "Debian" and not go_binary.stat.exists
+
+    - name: Add Go to shell config
+      blockinfile:
+        path: ~/.zshrc
+        create: true
+        marker: "# {mark} GO"
+        block: |
+          export PATH=$PATH:/usr/local/go/bin

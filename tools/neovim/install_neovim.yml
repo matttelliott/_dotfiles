@@ -10,12 +10,22 @@
         creates: /opt/homebrew/bin/nvim
       when: ansible_os_family == "Darwin"
 
-    - name: Install Neovim via apt
-      apt:
-        name: neovim
-        state: present
-      become: yes
+    - name: Check if Neovim is installed
+      stat:
+        path: /usr/local/bin/nvim
+      register: nvim_check
       when: ansible_os_family == "Debian"
+
+    - name: Download and install Neovim from GitHub
+      shell: |
+        curl -LO https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz
+        tar xzf nvim-linux-x86_64.tar.gz
+        cp -r nvim-linux-x86_64/* /usr/local/
+        rm -rf nvim-linux-x86_64 nvim-linux-x86_64.tar.gz
+      args:
+        chdir: /tmp
+      become: yes
+      when: ansible_os_family == "Debian" and not nvim_check.stat.exists
 
     - name: Check if kickstart.nvim is installed
       stat:
