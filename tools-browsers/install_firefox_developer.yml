@@ -1,0 +1,10 @@
+---
+- name: Install Firefox Developer Edition on macOS
+  hosts: with_browsers
+  gather_facts: false
+
+  tasks:
+    - name: Install Firefox Developer Edition via Homebrew Cask
+      shell: /opt/homebrew/bin/brew install --cask firefox-developer-edition
+      args:
+        creates: /Applications/Firefox Developer Edition.app

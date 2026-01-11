@@ -1,0 +1,10 @@
+---
+- name: Install Degoogled Chromium on macOS
+  hosts: with_browsers
+  gather_facts: false
+
+  tasks:
+    - name: Install Eloston Chromium via Homebrew Cask
+      shell: /opt/homebrew/bin/brew install --cask eloston-chromium
+      args:
+        creates: /Applications/Chromium.app

@@ -1,0 +1,10 @@
+---
+- name: Install Brave on macOS
+  hosts: with_browsers
+  gather_facts: false
+
+  tasks:
+    - name: Install Brave via Homebrew Cask
+      shell: /opt/homebrew/bin/brew install --cask brave-browser
+      args:
+        creates: /Applications/Brave Browser.app

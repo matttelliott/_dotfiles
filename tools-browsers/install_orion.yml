@@ -1,0 +1,10 @@
+---
+- name: Install Orion on macOS
+  hosts: with_browsers
+  gather_facts: false
+
+  tasks:
+    - name: Install Orion via Homebrew Cask
+      shell: /opt/homebrew/bin/brew install --cask orion
+      args:
+        creates: /Applications/Orion.app

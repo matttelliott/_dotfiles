@@ -1,0 +1,10 @@
+---
+- name: Install Firefox on macOS
+  hosts: with_browsers
+  gather_facts: false
+
+  tasks:
+    - name: Install Firefox via Homebrew Cask
+      shell: /opt/homebrew/bin/brew install --cask firefox
+      args:
+        creates: /Applications/Firefox.app

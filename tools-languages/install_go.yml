@@ -1,0 +1,21 @@
+---
+- name: Install Go on macOS
+  hosts: macs
+  gather_facts: false
+
+  vars:
+    go_version: "1.23.4"
+
+  tasks:
+    - name: Check if Go is installed
+      stat:
+        path: /usr/local/go/bin/go
+      register: go_binary
+
+    - name: Download and install Go
+      shell: |
+        curl -L https://go.dev/dl/go{{ go_version }}.darwin-arm64.tar.gz -o /tmp/go.tar.gz
+        sudo rm -rf /usr/local/go
+        sudo tar -C /usr/local -xzf /tmp/go.tar.gz
+        rm /tmp/go.tar.gz
+      when: not go_binary.stat.exists

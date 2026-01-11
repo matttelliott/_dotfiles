@@ -1,0 +1,10 @@
+---
+- name: Install Microsoft Edge on macOS
+  hosts: with_browsers
+  gather_facts: false
+
+  tasks:
+    - name: Install Microsoft Edge via Homebrew Cask
+      shell: /opt/homebrew/bin/brew install --cask microsoft-edge
+      args:
+        creates: /Applications/Microsoft Edge.app

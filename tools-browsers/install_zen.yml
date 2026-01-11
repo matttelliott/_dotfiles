@@ -1,0 +1,10 @@
+---
+- name: Install Zen Browser on macOS
+  hosts: with_browsers
+  gather_facts: false
+
+  tasks:
+    - name: Install Zen Browser via Homebrew Cask
+      shell: /opt/homebrew/bin/brew install --cask zen-browser
+      args:
+        creates: /Applications/Zen Browser.app

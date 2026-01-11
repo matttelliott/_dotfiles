@@ -5,3 +5,15 @@ all:
       hosts:
         localhost:
           ansible_connection: local
+
+    with_login_tools:
+      hosts:
+        localhost:
+
+    with_gui_tools:
+      hosts:
+        localhost:
+
+    with_browsers:
+      hosts:
+        localhost:

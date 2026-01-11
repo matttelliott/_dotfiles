@@ -1,0 +1,10 @@
+---
+- name: Install LibreWolf on macOS
+  hosts: with_browsers
+  gather_facts: false
+
+  tasks:
+    - name: Install LibreWolf via Homebrew Cask
+      shell: /opt/homebrew/bin/brew install --cask librewolf
+      args:
+        creates: /Applications/LibreWolf.app

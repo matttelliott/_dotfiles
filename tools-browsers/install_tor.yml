@@ -1,0 +1,10 @@
+---
+- name: Install Tor Browser on macOS
+  hosts: with_browsers
+  gather_facts: false
+
+  tasks:
+    - name: Install Tor Browser via Homebrew Cask
+      shell: /opt/homebrew/bin/brew install --cask tor-browser
+      args:
+        creates: /Applications/Tor Browser.app

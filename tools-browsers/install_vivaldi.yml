@@ -1,0 +1,10 @@
+---
+- name: Install Vivaldi on macOS
+  hosts: with_browsers
+  gather_facts: false
+
+  tasks:
+    - name: Install Vivaldi via Homebrew Cask
+      shell: /opt/homebrew/bin/brew install --cask vivaldi
+      args:
+        creates: /Applications/Vivaldi.app

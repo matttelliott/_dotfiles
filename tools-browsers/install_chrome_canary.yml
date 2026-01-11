@@ -1,0 +1,10 @@
+---
+- name: Install Google Chrome Canary on macOS
+  hosts: with_browsers
+  gather_facts: false
+
+  tasks:
+    - name: Install Google Chrome Canary via Homebrew Cask
+      shell: /opt/homebrew/bin/brew install --cask google-chrome-canary
+      args:
+        creates: /Applications/Google Chrome Canary.app

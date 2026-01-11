@@ -1,0 +1,10 @@
+---
+- name: Install DigitalOcean CLI on macOS
+  hosts: with_login_tools
+  gather_facts: false
+
+  tasks:
+    - name: Install doctl via Homebrew
+      shell: /opt/homebrew/bin/brew install doctl
+      args:
+        creates: /opt/homebrew/bin/doctl

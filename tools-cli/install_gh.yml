@@ -1,0 +1,10 @@
+---
+- name: Install GitHub CLI on macOS
+  hosts: with_login_tools
+  gather_facts: false
+
+  tasks:
+    - name: Install GitHub CLI via Homebrew
+      shell: /opt/homebrew/bin/brew install gh
+      args:
+        creates: /opt/homebrew/bin/gh

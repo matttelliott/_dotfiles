@@ -1,0 +1,10 @@
+---
+- name: Install Mullvad Browser on macOS
+  hosts: with_browsers
+  gather_facts: false
+
+  tasks:
+    - name: Install Mullvad Browser via Homebrew Cask
+      shell: /opt/homebrew/bin/brew install --cask mullvad-browser
+      args:
+        creates: /Applications/Mullvad Browser.app

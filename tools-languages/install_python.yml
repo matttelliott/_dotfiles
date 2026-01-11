@@ -1,0 +1,10 @@
+---
+- name: Install uv (Python) on macOS
+  hosts: macs
+  gather_facts: false
+
+  tasks:
+    - name: Install uv via Homebrew
+      shell: /opt/homebrew/bin/brew install uv
+      args:
+        creates: /opt/homebrew/bin/uv

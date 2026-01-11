@@ -1,0 +1,10 @@
+---
+- name: Install Google Chrome on macOS
+  hosts: with_browsers
+  gather_facts: false
+
+  tasks:
+    - name: Install Google Chrome via Homebrew Cask
+      shell: /opt/homebrew/bin/brew install --cask google-chrome
+      args:
+        creates: /Applications/Google Chrome.app

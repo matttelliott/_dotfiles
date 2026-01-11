@@ -7,3 +7,15 @@ all:
           ansible_host: macbookair.home.lan
           ansible_user: matt
           ansible_ssh_timeout: 60
+
+    with_login_tools:
+      hosts:
+        # macbookair:
+
+    with_gui_tools:
+      hosts:
+        macbookair:
+
+    with_browsers:
+      hosts:
+        # macbookair:

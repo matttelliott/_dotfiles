@@ -1,0 +1,10 @@
+---
+- name: Install Min on macOS
+  hosts: with_browsers
+  gather_facts: false
+
+  tasks:
+    - name: Install Min via Homebrew Cask
+      shell: /opt/homebrew/bin/brew install --cask min
+      args:
+        creates: /Applications/Min.app

@@ -1,0 +1,10 @@
+---
+- name: Install Waterfox on macOS
+  hosts: with_browsers
+  gather_facts: false
+
+  tasks:
+    - name: Install Waterfox via Homebrew Cask
+      shell: /opt/homebrew/bin/brew install --cask waterfox
+      args:
+        creates: /Applications/Waterfox.app

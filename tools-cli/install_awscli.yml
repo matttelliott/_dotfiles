@@ -1,0 +1,10 @@
+---
+- name: Install AWS CLI on macOS
+  hosts: with_login_tools
+  gather_facts: false
+
+  tasks:
+    - name: Install AWS CLI via Homebrew
+      shell: /opt/homebrew/bin/brew install awscli
+      args:
+        creates: /opt/homebrew/bin/aws

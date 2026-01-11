@@ -1,0 +1,10 @@
+---
+- name: Install Arc on macOS
+  hosts: with_browsers
+  gather_facts: false
+
+  tasks:
+    - name: Install Arc via Homebrew Cask
+      shell: /opt/homebrew/bin/brew install --cask arc
+      args:
+        creates: /Applications/Arc.app
