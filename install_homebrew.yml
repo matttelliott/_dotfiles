@@ -1,0 +1,26 @@
+---
+- name: Install Homebrew on macOS
+  hosts: macs
+  gather_facts: false
+
+  tasks:
+    - name: Install Xcode Command Line Tools
+      raw: |
+        if [ ! -f /Library/Developer/CommandLineTools/usr/bin/git ]; then
+          touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
+          softwareupdate -l | grep -o 'Command Line Tools.*' | head -1 | xargs -I {} softwareupdate -i "{}"
+          rm -f /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
+        fi
+
+    - name: Check if Homebrew is installed
+      stat:
+        path: /opt/homebrew/bin/brew
+      register: homebrew_check
+
+    - name: Install Homebrew
+      shell: |
+        echo "{{ ansible_ssh_pass }}" | sudo -S -v
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      environment:
+        NONINTERACTIVE: "1"
+      when: not homebrew_check.stat.exists
