@@ -1,12 +1,12 @@
 ---
-- import_playbook: ../nvm/install_nvm.yml
+- import_playbook: ../node/install_node.yml
 
 - name: Install Claude Code on macOS
   hosts: with_ai_tools:&with_login_tools
   gather_facts: false
 
   vars_files:
-    - ../nvm/vars.yml
+    - ../node/vars.yml
 
   tasks:
     - name: Install Claude Code via npm

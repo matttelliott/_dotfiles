@@ -1,0 +1,10 @@
+---
+- name: Install asciiquarium on macOS
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Install asciiquarium via Homebrew
+      shell: /opt/homebrew/bin/brew install asciiquarium
+      args:
+        creates: /opt/homebrew/bin/asciiquarium

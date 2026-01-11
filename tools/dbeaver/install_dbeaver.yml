@@ -1,0 +1,10 @@
+---
+- name: Install DBeaver on macOS
+  hosts: with_gui_tools
+  gather_facts: false
+
+  tasks:
+    - name: Install DBeaver via Homebrew Cask
+      shell: /opt/homebrew/bin/brew install --cask dbeaver-community
+      args:
+        creates: /Applications/DBeaver.app

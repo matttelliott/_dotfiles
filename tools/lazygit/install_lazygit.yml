@@ -1,0 +1,10 @@
+---
+- name: Install lazygit on macOS
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Install lazygit via Homebrew
+      shell: /opt/homebrew/bin/brew install lazygit
+      args:
+        creates: /opt/homebrew/bin/lazygit
