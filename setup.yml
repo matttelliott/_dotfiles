@@ -4,16 +4,4 @@
 - import_playbook: install_ansible.yml
 - import_playbook: install_tmux.yml
 - import_playbook: install_neovim.yml
-- import_playbook: install_sd.yml
-- import_playbook: install_fd.yml
-- import_playbook: install_ripgrep.yml
-- import_playbook: install_fzf.yml
-- import_playbook: install_jq.yml
-- import_playbook: install_bat.yml
-- import_playbook: install_eza.yml
-- import_playbook: install_tree.yml
-- import_playbook: install_wget.yml
-- import_playbook: install_yt-dlp.yml
-- import_playbook: install_ffmpeg.yml
-- import_playbook: install_imagemagick.yml
-- import_playbook: install_pandoc.yml
+- import_playbook: core.yml
