@@ -1,3 +1,4 @@
 ---
 - import_playbook: install_homebrew.yml
 - import_playbook: install_nvm.yml
+- import_playbook: install_ansible.yml

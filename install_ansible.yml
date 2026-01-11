@@ -1,0 +1,10 @@
+---
+- name: Install Ansible on macOS
+  hosts: macs
+  gather_facts: false
+
+  tasks:
+    - name: Install Ansible via Homebrew
+      shell: /opt/homebrew/bin/brew install ansible
+      args:
+        creates: /opt/homebrew/bin/ansible
