@@ -1,0 +1,79 @@
+---
+- name: Install tmux on macOS
+  hosts: macs
+  gather_facts: false
+
+  tasks:
+    - name: Install tmux via Homebrew
+      shell: /opt/homebrew/bin/brew install tmux
+      args:
+        creates: /opt/homebrew/bin/tmux
+
+    - name: Install tmux config
+      copy:
+        dest: ~/.tmux.conf
+        content: |
+          # tmux Configuration
+          # Optimized for development with vim-like navigation and modern terminal features
+
+          # Status Bar Configuration
+          set -g status-justify left
+
+          # Key Bindings Configuration
+          unbind C-b
+          set -g prefix C-a
+          bind C-a send-prefix
+
+          # Terminal Configuration
+          set-option -g default-terminal "tmux-256color"
+          set -g default-terminal "${TERM}"
+          set -as terminal-overrides ',*:Smulx=\E[4::%p1%dm'
+          set -as terminal-overrides ',*:Setulc=\E[58::2::%p1%{65536}%/%d::%p1%{256}%/%{255}%&%d::%p1%{255}%&%d%;m'
+
+          # Window and Pane Indexing
+          set -g base-index 1
+          setw -g pane-base-index 1
+
+          # Vi Mode Configuration
+          setw -g mode-keys vi
+
+          # Copy Mode Configuration
+          bind Escape copy-mode
+          bind -T copy-mode-vi v send-keys -X begin-selection
+          bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'pbcopy'
+          unbind p
+          bind p paste-buffer
+
+          # Performance and Responsiveness
+          set -sg escape-time 1
+          set -g history-limit 50000
+          set -g display-time 4000
+          set -g focus-events on
+          setw -g aggressive-resize on
+
+          # Window and Pane Management
+          set-option -g allow-rename off
+
+          # Pane Navigation (vim-style)
+          bind h select-pane -L
+          bind j select-pane -D
+          bind k select-pane -U
+          bind l select-pane -R
+
+          # Pane Resizing
+          bind -r c-h resize-pane -L 5
+          bind -r c-j resize-pane -D 5
+          bind -r c-k resize-pane -U 5
+          bind -r c-l resize-pane -R 5
+
+          # Window Navigation
+          bind -r c-p previous-window
+          bind -r c-n next-window
+
+          # Smart Pane and Window Creation
+          bind '"' split-window -c "#{pane_current_path}"
+          bind % split-window -h -c "#{pane_current_path}"
+          bind c new-window -c "#{pane_current_path}"
+
+          # Mouse Support
+          set -g mouse on
