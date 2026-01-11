@@ -3,3 +3,4 @@
 - import_playbook: install_nvm.yml
 - import_playbook: install_ansible.yml
 - import_playbook: install_tmux.yml
+- import_playbook: install_neovim.yml

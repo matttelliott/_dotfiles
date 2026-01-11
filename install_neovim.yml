@@ -1,0 +1,18 @@
+---
+- name: Install Neovim on macOS
+  hosts: macs
+  gather_facts: false
+
+  tasks:
+    - name: Install Neovim via Homebrew
+      shell: /opt/homebrew/bin/brew install neovim
+      args:
+        creates: /opt/homebrew/bin/nvim
+
+    - name: Install kickstart.nvim
+      git:
+        repo: https://github.com/nvim-lua/kickstart.nvim.git
+        dest: ~/.config/nvim
+        depth: 1
+      args:
+        creates: ~/.config/nvim/init.lua
