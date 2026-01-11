@@ -3,6 +3,9 @@
   hosts: macs
   gather_facts: false
 
+  vars_files:
+    - vars.yml
+
   tasks:
     - name: Install nvm via Homebrew
       shell: /opt/homebrew/bin/brew install nvm
@@ -11,7 +14,7 @@
 
     - name: Create nvm directory
       file:
-        path: ~/.nvm
+        path: "{{ nvm_dir }}"
         state: directory
 
     - name: Add nvm to shell config
@@ -21,13 +24,12 @@
         marker: "# {mark} NVM"
         block: |
           export NVM_DIR="$HOME/.nvm"
-          [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
+          [ -s "{{ nvm_source }}" ] && \. "{{ nvm_source }}"
           [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
 
     - name: Install Node.js LTS
       shell: |
-        export NVM_DIR="$HOME/.nvm"
-        . /opt/homebrew/opt/nvm/nvm.sh
+        {{ nvm_init }}
         nvm install --lts
         nvm alias default lts/*
       args:

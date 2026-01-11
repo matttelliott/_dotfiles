@@ -1,0 +1,17 @@
+---
+- import_playbook: ../nvm/install_nvm.yml
+
+- name: Install Claude Code on macOS
+  hosts: with_ai_tools:&with_login_tools
+  gather_facts: false
+
+  vars_files:
+    - ../nvm/vars.yml
+
+  tasks:
+    - name: Install Claude Code via npm
+      shell: |
+        {{ nvm_init }}
+        npm install -g @anthropic-ai/claude-code
+      args:
+        creates: ~/.nvm/versions/node/*/bin/claude

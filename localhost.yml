@@ -17,3 +17,7 @@ all:
     with_browsers:
       hosts:
         localhost:
+
+    with_ai_tools:
+      hosts:
+        localhost:

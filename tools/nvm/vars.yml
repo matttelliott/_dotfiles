@@ -1,0 +1,5 @@
+nvm_dir: "{{ ansible_env.HOME }}/.nvm"
+nvm_source: "/opt/homebrew/opt/nvm/nvm.sh"
+nvm_init: |
+  export NVM_DIR="{{ nvm_dir }}"
+  . {{ nvm_source }}

@@ -19,3 +19,7 @@ all:
     with_browsers:
       hosts:
         # macbookair:
+
+    with_ai_tools:
+      hosts:
+        # macbookair:

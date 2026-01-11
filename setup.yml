@@ -25,6 +25,7 @@
 - import_playbook: tools/awscli/install_awscli.yml
 - import_playbook: tools/gh/install_gh.yml
 - import_playbook: tools/gcloud/install_gcloud.yml
+- import_playbook: tools/claude-code/install_claude-code.yml
 - import_playbook: tools/1password/install_1password.yml
 - import_playbook: tools/iterm2/install_iterm2.yml
 - import_playbook: tools/chrome/install_chrome.yml
