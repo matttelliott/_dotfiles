@@ -1,0 +1,35 @@
+---
+- name: Install and configure SSH
+  hosts: all
+  gather_facts: true
+
+  vars:
+    ssh_public_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCTYHnedXgtRbjwED6cxOlWOaDYzQ5LQK+8OFmMBeurC2O23GTvuNxb/aRcXdrahDRA8OU/VJi1Nvc/NxQRE6oyKxHxgGHJrFZvRWg1nhTwmlWghAusFDFirLFXInUodOuMIBIRtBs3dEnqCdSM2viRrX/SoLcCf8ustbWQikk/+wtEiqbv0eaOcaE1ecb120OJP4L1EpjiJHyP+V+vrIbJMM/OaMbganL5zwyosXqQmgoqm9ZKqLwNncK8quxRno+5GnZwENUnK7QkJgJZv8etfISZQ2ZfPDEifB/K+Qs7vtqEyPW1gR4XQUg2d4E6fHT1DCRM+9u2Fxo2CHW0/bAYPWKRxUAKgmE7dO/GTesZsW1mw24w/JkdaR0KkGldh6qmp7BwP1MKzmWV9ezLmL0cHuN9CziHC2uDChqLiTQfbLc24klQkDykER3fCpaU+Dj08k76zaRNHhSoWbWFOlFEdDOyPvoMuoPiwSFtKn9ed7dS68w74aoQQE6nzrvw6ZpE= matt@matttelliott.com"
+
+  tasks:
+    - name: Install openssh-server (Debian)
+      apt:
+        name: openssh-server
+        state: present
+      become: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Enable and start sshd (Debian)
+      systemd:
+        name: ssh
+        enabled: yes
+        state: started
+      become: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Ensure .ssh directory exists
+      file:
+        path: ~/.ssh
+        state: directory
+        mode: '0700'
+
+    - name: Add macbook public key to authorized_keys
+      authorized_key:
+        user: "{{ ansible_user }}"
+        key: "{{ ssh_public_key }}"
+        state: present

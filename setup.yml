@@ -17,6 +17,7 @@
       become: yes
 
 - import_playbook: install_essentials.yml
+- import_playbook: tools/ssh/install_ssh.yml
 - import_playbook: install_homebrew.yml
 - import_playbook: install_ansible.yml
 - import_playbook: tools/zsh/install_zsh.yml
