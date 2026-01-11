@@ -1,0 +1,10 @@
+---
+- name: Install ripgrep on macOS
+  hosts: macs
+  gather_facts: false
+
+  tasks:
+    - name: Install ripgrep via Homebrew
+      shell: /opt/homebrew/bin/brew install ripgrep
+      args:
+        creates: /opt/homebrew/bin/rg

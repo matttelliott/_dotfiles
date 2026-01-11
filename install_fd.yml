@@ -1,0 +1,10 @@
+---
+- name: Install fd on macOS
+  hosts: macs
+  gather_facts: false
+
+  tasks:
+    - name: Install fd via Homebrew
+      shell: /opt/homebrew/bin/brew install fd
+      args:
+        creates: /opt/homebrew/bin/fd

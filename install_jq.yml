@@ -1,0 +1,10 @@
+---
+- name: Install jq on macOS
+  hosts: macs
+  gather_facts: false
+
+  tasks:
+    - name: Install jq via Homebrew
+      shell: /opt/homebrew/bin/brew install jq
+      args:
+        creates: /opt/homebrew/bin/jq

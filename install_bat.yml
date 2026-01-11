@@ -1,0 +1,10 @@
+---
+- name: Install bat on macOS
+  hosts: macs
+  gather_facts: false
+
+  tasks:
+    - name: Install bat via Homebrew
+      shell: /opt/homebrew/bin/brew install bat
+      args:
+        creates: /opt/homebrew/bin/bat

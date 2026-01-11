@@ -1,0 +1,10 @@
+---
+- name: Install yt-dlp on macOS
+  hosts: macs
+  gather_facts: false
+
+  tasks:
+    - name: Install yt-dlp via Homebrew
+      shell: /opt/homebrew/bin/brew install yt-dlp
+      args:
+        creates: /opt/homebrew/bin/yt-dlp

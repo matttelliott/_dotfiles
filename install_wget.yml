@@ -1,0 +1,10 @@
+---
+- name: Install wget on macOS
+  hosts: macs
+  gather_facts: false
+
+  tasks:
+    - name: Install wget via Homebrew
+      shell: /opt/homebrew/bin/brew install wget
+      args:
+        creates: /opt/homebrew/bin/wget

@@ -1,0 +1,10 @@
+---
+- name: Install sd on macOS
+  hosts: macs
+  gather_facts: false
+
+  tasks:
+    - name: Install sd via Homebrew
+      shell: /opt/homebrew/bin/brew install sd
+      args:
+        creates: /opt/homebrew/bin/sd

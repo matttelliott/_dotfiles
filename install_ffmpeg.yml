@@ -1,0 +1,10 @@
+---
+- name: Install ffmpeg on macOS
+  hosts: macs
+  gather_facts: false
+
+  tasks:
+    - name: Install ffmpeg via Homebrew
+      shell: /opt/homebrew/bin/brew install ffmpeg
+      args:
+        creates: /opt/homebrew/bin/ffmpeg

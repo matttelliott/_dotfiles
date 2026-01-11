@@ -1,0 +1,10 @@
+---
+- name: Install pandoc on macOS
+  hosts: macs
+  gather_facts: false
+
+  tasks:
+    - name: Install pandoc via Homebrew
+      shell: /opt/homebrew/bin/brew install pandoc
+      args:
+        creates: /opt/homebrew/bin/pandoc

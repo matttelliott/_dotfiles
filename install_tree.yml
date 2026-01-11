@@ -1,0 +1,10 @@
+---
+- name: Install tree on macOS
+  hosts: macs
+  gather_facts: false
+
+  tasks:
+    - name: Install tree via Homebrew
+      shell: /opt/homebrew/bin/brew install tree
+      args:
+        creates: /opt/homebrew/bin/tree
