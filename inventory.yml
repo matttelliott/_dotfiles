@@ -8,12 +8,6 @@ all:
           ansible_user: matt
           ansible_ssh_timeout: 60
 
-    debian:
-      hosts:
-        debian:
-          ansible_host: 143.198.177.165
-          ansible_user: root
-
     with_login_tools:
       hosts:
         macbookair:
