@@ -143,9 +143,9 @@ echo
 # Run playbook
 echo "Running Ansible playbook..."
 if [[ "$OS" == "darwin" ]]; then
-  /opt/homebrew/bin/ansible-playbook -i localhost.yml setup.yml
+  /opt/homebrew/bin/ansible-playbook -i localhost.yml setup.yml --ask-become-pass
 else
-  ansible-playbook -i localhost.yml setup.yml
+  ansible-playbook -i localhost.yml setup.yml --ask-become-pass
 fi
 
 echo
