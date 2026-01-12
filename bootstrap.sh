@@ -60,6 +60,7 @@ fi
 # Clone dotfiles if not present
 if [ ! -d "$DOTFILES_DIR" ]; then
   echo "Cloning dotfiles..."
+  rm -rf $DOTFILES_DIR
   git clone https://github.com/matttelliott/dotphiles.git "$DOTFILES_DIR"
 fi
 
