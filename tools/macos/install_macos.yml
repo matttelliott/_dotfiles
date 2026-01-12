@@ -5,7 +5,7 @@
 
   tasks:
     - name: Set HostName
-      command: scutil --set HostName {{ inventory_hostname }}.home.lan
+      command: scutil --set HostName {{ ansible_host }}
       become: yes
       changed_when: false
 
