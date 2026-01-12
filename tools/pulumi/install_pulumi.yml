@@ -1,0 +1,25 @@
+---
+- name: Install Pulumi
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Install Pulumi via Homebrew
+      shell: /opt/homebrew/bin/brew install pulumi
+      args:
+        creates: /opt/homebrew/bin/pulumi
+      when: ansible_os_family == "Darwin"
+
+    - name: Install Pulumi via official installer
+      shell: curl -fsSL https://get.pulumi.com | sh
+      args:
+        creates: ~/.pulumi/bin/pulumi
+      when: ansible_os_family == "Debian"
+
+    - name: Add Pulumi to shell config
+      blockinfile:
+        path: ~/.zshrc
+        create: true
+        marker: "# {mark} PULUMI"
+        block: |
+          export PATH=$PATH:~/.pulumi/bin

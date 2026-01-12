@@ -46,6 +46,7 @@
 - import_playbook: tools/wireguard/install_wireguard.yml
 - import_playbook: tools/1password_cli/install_1password_cli.yml
 - import_playbook: tools/doctl/install_doctl.yml
+- import_playbook: tools/pulumi/install_pulumi.yml
 - import_playbook: tools/awscli/install_awscli.yml
 - import_playbook: tools/gh/install_gh.yml
 - import_playbook: tools/gcloud/install_gcloud.yml

@@ -1,10 +1,25 @@
 ---
-- name: Install Ansible on macOS
-  hosts: macs
-  gather_facts: false
+- name: Install Ansible
+  hosts: all
+  gather_facts: true
 
   tasks:
     - name: Install Ansible via Homebrew
       shell: /opt/homebrew/bin/brew install ansible
       args:
         creates: /opt/homebrew/bin/ansible
+      when: ansible_os_family == "Darwin"
+
+    - name: Install Ansible via uv
+      shell: ~/.local/bin/uv tool install ansible
+      args:
+        creates: ~/.local/share/uv/tools/ansible/bin/ansible
+      when: ansible_os_family == "Debian"
+
+    - name: Add Ansible to shell config
+      blockinfile:
+        path: ~/.zshrc
+        create: true
+        marker: "# {mark} ANSIBLE"
+        block: |
+          export PATH=$PATH:~/.local/share/uv/tools/ansible/bin
