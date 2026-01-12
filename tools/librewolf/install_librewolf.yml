@@ -1,6 +1,6 @@
 ---
 - name: Install LibreWolf on macOS
-  hosts: with_gui_tools:with_browsers
+  hosts: with_gui_tools
   gather_facts: false
 
   tasks:

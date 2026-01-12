@@ -1,0 +1,10 @@
+---
+- name: Install mas (Mac App Store CLI)
+  hosts: macs
+  gather_facts: false
+
+  tasks:
+    - name: Install mas via Homebrew
+      shell: /opt/homebrew/bin/brew install mas
+      args:
+        creates: /opt/homebrew/bin/mas

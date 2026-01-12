@@ -1,0 +1,11 @@
+---
+- name: Install WireGuard GUI
+  hosts: with_gui_tools
+  gather_facts: false
+
+  tasks:
+    - name: Install WireGuard app via mas (Mac App Store)
+      shell: /opt/homebrew/bin/mas install 1451685025
+      args:
+        creates: /Applications/WireGuard.app
+      become: yes

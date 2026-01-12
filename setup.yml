@@ -20,6 +20,7 @@
 - import_playbook: tools/ssh/install_ssh.yml
 - import_playbook: tools/mosh/install_mosh.yml
 - import_playbook: install_homebrew.yml
+- import_playbook: tools/mas/install_mas.yml
 - import_playbook: install_ansible.yml
 - import_playbook: tools/zsh/install_zsh.yml
 - import_playbook: tools/node/install_node.yml
@@ -44,6 +45,7 @@
 - import_playbook: tools/asciiquarium/install_asciiquarium.yml
 - import_playbook: tools/lazygit/install_lazygit.yml
 - import_playbook: tools/wireguard/install_wireguard.yml
+- import_playbook: tools/wireguard_gui/install_wireguard_gui.yml
 - import_playbook: tools/1password_cli/install_1password_cli.yml
 - import_playbook: tools/doctl/install_doctl.yml
 - import_playbook: tools/pulumi/install_pulumi.yml

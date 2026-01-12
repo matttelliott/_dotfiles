@@ -30,6 +30,6 @@
 
     - name: Add macbook public key to authorized_keys
       authorized_key:
-        user: "{{ ansible_user }}"
+        user: "{{ ansible_user_id }}"
         key: "{{ ssh_public_key }}"
         state: present
