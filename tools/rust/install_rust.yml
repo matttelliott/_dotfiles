@@ -8,3 +8,9 @@
       shell: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
       args:
         creates: ~/.cargo/bin/rustc
+
+    - name: Install Rust dev tools
+      shell: |
+        . ~/.cargo/env
+        rustup component add rustfmt clippy
+        rustup component add rust-analyzer

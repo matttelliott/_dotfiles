@@ -16,3 +16,15 @@
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install stylua via Homebrew
+      shell: /opt/homebrew/bin/brew install stylua
+      args:
+        creates: /opt/homebrew/bin/stylua
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install stylua via cargo
+      shell: ~/.cargo/bin/cargo install stylua
+      args:
+        creates: ~/.cargo/bin/stylua
+      when: ansible_facts['os_family'] == "Debian"
