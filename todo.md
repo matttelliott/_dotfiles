@@ -1,9 +1,1 @@
-- make sure pulumi + ansible is installed on all nodes
 - clone repo to login nodes
-- fix wireguard on mac
-- add zsh aliases
-- fork kickstart.nvm
-    - clone with ssh for login nodes, else https
-    - add customizations
-- set up iterm2
-- pick linux terminal
