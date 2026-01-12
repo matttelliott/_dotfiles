@@ -12,7 +12,7 @@
       shell: /opt/homebrew/bin/brew install nvm
       args:
         creates: /opt/homebrew/opt/nvm
-      when: ansible_os_family == "Darwin"
+      when: ansible_facts['os_family'] == "Darwin"
 
     - name: Create nvm directory
       file:
@@ -38,14 +38,14 @@
         nvm alias default lts/*
       args:
         creates: ~/.nvm/alias/default
-      when: ansible_os_family == "Darwin"
+      when: ansible_facts['os_family'] == "Darwin"
 
     # Debian: Install nvm from official script
     - name: Install nvm from official script
       shell: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
       args:
         creates: ~/.nvm/nvm.sh
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Node.js LTS (Debian)
       shell: |
@@ -55,4 +55,4 @@
         nvm alias default lts/*
       args:
         creates: ~/.nvm/alias/default
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"

@@ -8,11 +8,11 @@
       shell: /opt/homebrew/bin/brew install fzf
       args:
         creates: /opt/homebrew/bin/fzf
-      when: ansible_os_family == "Darwin"
+      when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install fzf via apt
       apt:
         name: fzf
         state: present
       become: yes
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"

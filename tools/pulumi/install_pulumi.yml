@@ -8,13 +8,13 @@
       shell: /opt/homebrew/bin/brew install pulumi
       args:
         creates: /opt/homebrew/bin/pulumi
-      when: ansible_os_family == "Darwin"
+      when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install Pulumi via official installer
       shell: curl -fsSL https://get.pulumi.com | sh
       args:
         creates: ~/.pulumi/bin/pulumi
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"
 
     - name: Add Pulumi to shell config
       blockinfile:

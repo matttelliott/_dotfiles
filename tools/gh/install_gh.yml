@@ -8,20 +8,20 @@
       shell: /opt/homebrew/bin/brew install gh
       args:
         creates: /opt/homebrew/bin/gh
-      when: ansible_os_family == "Darwin"
+      when: ansible_facts['os_family'] == "Darwin"
 
     - name: Check if gh is installed
       stat:
         path: /usr/bin/gh
       register: gh_check
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"
 
     - name: Add GitHub CLI apt repository
       shell: |
         curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
         echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
       become: yes
-      when: ansible_os_family == "Debian" and not gh_check.stat.exists
+      when: ansible_facts['os_family'] == "Debian" and not gh_check.stat.exists
 
     - name: Install GitHub CLI via apt
       apt:
@@ -29,4 +29,4 @@
         state: present
         update_cache: yes
       become: yes
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"

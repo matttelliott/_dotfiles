@@ -8,11 +8,11 @@
       shell: /opt/homebrew/bin/brew install bat
       args:
         creates: /opt/homebrew/bin/bat
-      when: ansible_os_family == "Darwin"
+      when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install bat via apt
       apt:
         name: bat
         state: present
       become: yes
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"

@@ -8,11 +8,11 @@
       shell: /opt/homebrew/bin/brew install wget
       args:
         creates: /opt/homebrew/bin/wget
-      when: ansible_os_family == "Darwin"
+      when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install wget via apt
       apt:
         name: wget
         state: present
       become: yes
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"

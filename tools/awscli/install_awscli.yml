@@ -8,13 +8,13 @@
       shell: /opt/homebrew/bin/brew install awscli
       args:
         creates: /opt/homebrew/bin/aws
-      when: ansible_os_family == "Darwin"
+      when: ansible_facts['os_family'] == "Darwin"
 
     - name: Check if AWS CLI is installed
       stat:
         path: /usr/local/bin/aws
       register: aws_check
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"
 
     - name: Download and install AWS CLI
       shell: |
@@ -23,4 +23,4 @@
         /tmp/aws/install --update
         rm -rf /tmp/aws /tmp/awscliv2.zip
       become: yes
-      when: ansible_os_family == "Debian" and not aws_check.stat.exists
+      when: ansible_facts['os_family'] == "Debian" and not aws_check.stat.exists

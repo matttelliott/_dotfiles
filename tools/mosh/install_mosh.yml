@@ -8,11 +8,11 @@
       shell: /opt/homebrew/bin/brew install mosh
       args:
         creates: /opt/homebrew/bin/mosh
-      when: ansible_os_family == "Darwin"
+      when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install mosh via apt
       apt:
         name: mosh
         state: present
       become: yes
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"

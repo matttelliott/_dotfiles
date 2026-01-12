@@ -8,10 +8,10 @@
       shell: /opt/homebrew/bin/brew install uv
       args:
         creates: /opt/homebrew/bin/uv
-      when: ansible_os_family == "Darwin"
+      when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install uv via official installer
       shell: curl -LsSf https://astral.sh/uv/install.sh | sh
       args:
         creates: ~/.local/bin/uv
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"

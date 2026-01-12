@@ -7,16 +7,16 @@
     - name: Verify zsh is installed (macOS)
       raw: which zsh
       changed_when: false
-      when: ansible_os_family == "Darwin"
+      when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install zsh via apt
       apt:
         name: zsh
         state: present
       become: yes
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"
 
     - name: Set zsh as default shell
       shell: chsh -s $(which zsh)
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"
       changed_when: false

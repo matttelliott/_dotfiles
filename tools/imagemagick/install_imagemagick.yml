@@ -8,11 +8,11 @@
       shell: /opt/homebrew/bin/brew install imagemagick
       args:
         creates: /opt/homebrew/bin/magick
-      when: ansible_os_family == "Darwin"
+      when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install imagemagick via apt
       apt:
         name: imagemagick
         state: present
       become: yes
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"

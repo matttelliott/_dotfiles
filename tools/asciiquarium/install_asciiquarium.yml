@@ -8,7 +8,7 @@
       shell: /opt/homebrew/bin/brew install asciiquarium
       args:
         creates: /opt/homebrew/bin/asciiquarium
-      when: ansible_os_family == "Darwin"
+      when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install asciiquarium dependencies via apt
       apt:
@@ -17,14 +17,14 @@
           - cpanminus
         state: present
       become: yes
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Term::Animation via cpan
       shell: cpanm Term::Animation
       args:
         creates: /usr/local/share/perl/*/Term/Animation.pm
       become: yes
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"
 
     - name: Download and install asciiquarium
       shell: |
@@ -34,4 +34,4 @@
       args:
         creates: /usr/local/bin/asciiquarium
       become: yes
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"

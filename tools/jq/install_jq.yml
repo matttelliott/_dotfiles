@@ -8,11 +8,11 @@
       shell: /opt/homebrew/bin/brew install jq
       args:
         creates: /opt/homebrew/bin/jq
-      when: ansible_os_family == "Darwin"
+      when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install jq via apt
       apt:
         name: jq
         state: present
       become: yes
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"

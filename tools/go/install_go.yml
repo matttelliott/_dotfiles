@@ -17,36 +17,36 @@
       get_url:
         url: "https://go.dev/dl/go{{ go_version }}.darwin-arm64.pkg"
         dest: /tmp/go.pkg
-      when: ansible_os_family == "Darwin" and not go_binary.stat.exists
+      when: ansible_facts['os_family'] == "Darwin" and not go_binary.stat.exists
 
     - name: Install Go (macOS)
       command: installer -pkg /tmp/go.pkg -target /
       become: yes
-      when: ansible_os_family == "Darwin" and not go_binary.stat.exists
+      when: ansible_facts['os_family'] == "Darwin" and not go_binary.stat.exists
 
     - name: Clean up installer (macOS)
       file:
         path: /tmp/go.pkg
         state: absent
-      when: ansible_os_family == "Darwin" and not go_binary.stat.exists
+      when: ansible_facts['os_family'] == "Darwin" and not go_binary.stat.exists
 
     # Debian: Use tarball
     - name: Download Go tarball (Debian)
       get_url:
         url: "https://go.dev/dl/go{{ go_version }}.linux-amd64.tar.gz"
         dest: /tmp/go.tar.gz
-      when: ansible_os_family == "Debian" and not go_binary.stat.exists
+      when: ansible_facts['os_family'] == "Debian" and not go_binary.stat.exists
 
     - name: Install Go (Debian)
       shell: rm -rf /usr/local/go && tar -C /usr/local -xzf /tmp/go.tar.gz
       become: yes
-      when: ansible_os_family == "Debian" and not go_binary.stat.exists
+      when: ansible_facts['os_family'] == "Debian" and not go_binary.stat.exists
 
     - name: Clean up tarball (Debian)
       file:
         path: /tmp/go.tar.gz
         state: absent
-      when: ansible_os_family == "Debian" and not go_binary.stat.exists
+      when: ansible_facts['os_family'] == "Debian" and not go_binary.stat.exists
 
     - name: Add Go to shell config
       blockinfile:

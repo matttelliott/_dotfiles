@@ -8,11 +8,11 @@
       shell: /opt/homebrew/bin/brew install yt-dlp
       args:
         creates: /opt/homebrew/bin/yt-dlp
-      when: ansible_os_family == "Darwin"
+      when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install yt-dlp via apt
       apt:
         name: yt-dlp
         state: present
       become: yes
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"

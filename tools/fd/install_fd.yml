@@ -8,11 +8,11 @@
       shell: /opt/homebrew/bin/brew install fd
       args:
         creates: /opt/homebrew/bin/fd
-      when: ansible_os_family == "Darwin"
+      when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install fd via apt
       apt:
         name: fd-find
         state: present
       become: yes
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"
