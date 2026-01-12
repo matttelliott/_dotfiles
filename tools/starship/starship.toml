@@ -1,4 +1,4 @@
-# Starship configuration
+# Starship configuration - TokyoNight theme with powerline style
 
 format = """
 $username\
@@ -6,56 +6,57 @@ $hostname\
 $directory\
 $git_branch\
 $git_status\
-$fill\
-$status\
 $line_break\
-$time\
-$character"""
+$time $character"""
+
+palette = "tokyonight"
+
+[palettes.tokyonight]
+blue = "#7aa2f7"
+cyan = "#7dcfff"
+green = "#9ece6a"
+magenta = "#bb9af7"
+red = "#f7768e"
+yellow = "#e0af68"
+grey = "#565f89"
+bg = "#24283b"
+fg = "#c0caf5"
 
 [username]
-style_user = "bold green"
-style_root = "bold red"
-format = "[$user]($style)"
+style_user = "fg:#1a1b26 bg:blue bold"
+style_root = "fg:#1a1b26 bg:red bold"
 show_always = true
+format = "[  $user ]($style)[](fg:blue bg:#3b4261)"
 
 [hostname]
 ssh_only = false
-format = "[@$hostname]($style):"
-style = "bold green"
+style = "fg:#c0caf5 bg:#3b4261"
+format = "[  $hostname ]($style)[](fg:#3b4261 bg:cyan)"
 
 [directory]
-format = "[$path]($style)"
-style = "bold blue"
-truncation_length = 5
+style = "fg:#1a1b26 bg:cyan bold"
+truncation_length = 3
+truncation_symbol = "…/"
+format = "[  $path ]($style)[](fg:cyan bg:magenta)"
 
 [git_branch]
-format = ":[$symbol$branch]($style)"
-symbol = " "
-style = "bold purple"
+style = "fg:#1a1b26 bg:magenta bold"
+symbol = " "
+format = "[ $symbol$branch ]($style)"
 
 [git_status]
-format = "[$all_status$ahead_behind]($style)"
-style = "bold yellow"
-
-[fill]
-symbol = " "
-
-[status]
-disabled = false
-format = "[$symbol$status]($style)"
-symbol = "✘ "
-success_symbol = ""
-style = "bold red"
+style = "fg:#1a1b26 bg:magenta"
+format = "[$all_status$ahead_behind]($style)[](fg:magenta)"
 
 [line_break]
 disabled = false
 
 [time]
 disabled = false
-format = "[$time]($style) "
+style = "fg:grey"
 time_format = "%H:%M:%S"
-style = "bold yellow"
+format = "[$time]($style)"
 
 [character]
-success_symbol = "[❯](bold green)"
-error_symbol = "[❯](bold red)"
+success_symbol = " [](bold green)"
+error_symbol = " [](bold red)"
