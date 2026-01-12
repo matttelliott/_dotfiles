@@ -24,10 +24,16 @@
   hosts: with_login_tools
   gather_facts: false
   tasks:
+    - name: Check if dotfiles exists
+      stat:
+        path: ~/_dotfiles
+      register: dotfiles_dir
+
     - name: Clone dotphiles to ~/_dotfiles
       git:
         repo: git@github.com:matttelliott/dotphiles.git
         dest: ~/_dotfiles
+      when: not dotfiles_dir.stat.exists
 
 - import_playbook: tools/mosh/install_mosh.yml
 - import_playbook: install_homebrew.yml
