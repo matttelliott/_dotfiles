@@ -917,13 +917,16 @@ require('lazy').setup({
 
       -- Custom highlight groups for blue/grey powerline look
       local function set_statusline_hl()
+        -- Left side: Mode(blue) > File(dark) > Git(grey)
         vim.api.nvim_set_hl(0, 'StMode', { fg = '#1a1b26', bg = '#7aa2f7', bold = true })
         vim.api.nvim_set_hl(0, 'StModeSep', { fg = '#7aa2f7', bg = '#24283b' })
         vim.api.nvim_set_hl(0, 'StFile', { fg = '#565f89', bg = '#24283b' })
-        vim.api.nvim_set_hl(0, 'StInfo', { fg = '#c0caf5', bg = '#3b4261' })
-        vim.api.nvim_set_hl(0, 'StInfoSepL', { fg = '#3b4261', bg = '#24283b' })
-        vim.api.nvim_set_hl(0, 'StInfoSepR', { fg = '#7aa2f7', bg = '#3b4261' })
-        vim.api.nvim_set_hl(0, 'StLoc', { fg = '#1a1b26', bg = '#7aa2f7', bold = true })
+        vim.api.nvim_set_hl(0, 'StGitSep', { fg = '#24283b', bg = '#3b4261' })
+        vim.api.nvim_set_hl(0, 'StGit', { fg = '#9aa5ce', bg = '#3b4261' })
+        -- Right side: copy StFile>StGitSep>StGit pattern exactly
+        vim.api.nvim_set_hl(0, 'StInfo', { fg = '#565f89', bg = '#24283b' })
+        vim.api.nvim_set_hl(0, 'StInfoSep', { fg = '#24283b', bg = '#3b4261' })
+        vim.api.nvim_set_hl(0, 'StLoc', { fg = '#9aa5ce', bg = '#3b4261' })
       end
       vim.api.nvim_create_autocmd('ColorScheme', { callback = set_statusline_hl })
       set_statusline_hl()
@@ -937,15 +940,29 @@ require('lazy').setup({
         return mode_map[vim.fn.mode()] or vim.fn.mode()
       end
 
-      -- Native statusline format (like tmux)
+      -- Git branch
+      function _G.get_git_branch()
+        local branch = vim.fn.system('git branch --show-current 2>/dev/null'):gsub('\n', '')
+        if branch ~= '' then
+          return '\u{e0a0} ' .. branch .. ' '
+        end
+        return ''
+      end
+
+      -- Powerline arrow characters
+      local arrow_right = vim.fn.nr2char(0xe0b0)  --
+      local arrow_left = vim.fn.nr2char(0xe0b2)   --
+
+      -- Native statusline format (matching left side style)
       vim.o.statusline = table.concat({
         '%#StMode# %{v:lua.get_mode_name()} ',
-        '%#StModeSep#\u{e0b0}',
+        '%#StModeSep#' .. arrow_right,
         '%#StFile# %f ',
+        '%#StGitSep#%{v:lua.get_git_branch()!=""?"' .. arrow_right .. '":""}',
+        '%#StGit#%{v:lua.get_git_branch()}',
         '%=',
-        '%#StInfoSepL#\u{e0b2}',
-        '%#StInfo# %{&fileencoding?&fileencoding:&encoding} ',
-        '%#StInfoSepR#\u{e0b2}',
+        '%#StInfo# %{&fenc!=""?&fenc:&enc} ',
+        '%#StInfoSep#' .. arrow_right,
         '%#StLoc# %l:%c ',
       })
     end,
