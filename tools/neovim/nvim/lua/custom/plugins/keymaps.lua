@@ -6,7 +6,8 @@ return {
     'nvim-telescope/telescope.nvim',
     keys = {
       { '<leader>o', '<cmd>Telescope find_files<cr>', desc = '[O]pen file' },
-      { '<leader>/', '<cmd>Telescope live_grep<cr>', desc = 'Grep project' },
+      { '<leader>/', '<cmd>Telescope live_grep<cr>', desc = '[/] Grep project' },
+      { '<leader>w', '<cmd>wa<cr>', desc = '[W]rite files' },
     },
   },
 
