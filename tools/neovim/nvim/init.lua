@@ -912,23 +912,42 @@ require('lazy').setup({
       --  - ci'  - [C]hange [I]nside [']quote
       require('mini.ai').setup { n_lines = 500 }
 
-      -- Simple and easy statusline.
-      --  You could remove this setup call if you don't like it,
-      --  and try some other statusline plugin
-      local statusline = require 'mini.statusline'
-      -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
+      -- Statusline with powerline style (blue/grey theme)
+      require('mini.statusline').setup { set_vim_settings = false }
 
-      -- You can configure sections in the statusline by overriding their
-      -- default behavior. For example, here we set the section for
-      -- cursor location to LINE:COLUMN
-      ---@diagnostic disable-next-line: duplicate-set-field
-      statusline.section_location = function()
-        return '%2l:%-2v'
+      -- Custom highlight groups for blue/grey powerline look
+      local function set_statusline_hl()
+        vim.api.nvim_set_hl(0, 'StMode', { fg = '#1a1b26', bg = '#7aa2f7', bold = true })
+        vim.api.nvim_set_hl(0, 'StModeSep', { fg = '#7aa2f7', bg = '#24283b' })
+        vim.api.nvim_set_hl(0, 'StFile', { fg = '#565f89', bg = '#24283b' })
+        vim.api.nvim_set_hl(0, 'StInfo', { fg = '#c0caf5', bg = '#3b4261' })
+        vim.api.nvim_set_hl(0, 'StInfoSepL', { fg = '#3b4261', bg = '#24283b' })
+        vim.api.nvim_set_hl(0, 'StInfoSepR', { fg = '#7aa2f7', bg = '#3b4261' })
+        vim.api.nvim_set_hl(0, 'StLoc', { fg = '#1a1b26', bg = '#7aa2f7', bold = true })
+      end
+      vim.api.nvim_create_autocmd('ColorScheme', { callback = set_statusline_hl })
+      set_statusline_hl()
+
+      -- Mode name mapping
+      local mode_map = {
+        n = 'Normal', i = 'Insert', v = 'Visual', V = 'V-Line',
+        ['\22'] = 'V-Block', c = 'Command', R = 'Replace', t = 'Terminal',
+      }
+      function _G.get_mode_name()
+        return mode_map[vim.fn.mode()] or vim.fn.mode()
       end
 
-      -- ... and there is more!
-      --  Check out: https://github.com/echasnovski/mini.nvim
+      -- Native statusline format (like tmux)
+      vim.o.statusline = table.concat({
+        '%#StMode# %{v:lua.get_mode_name()} ',
+        '%#StModeSep#\u{e0b0}',
+        '%#StFile# %f ',
+        '%=',
+        '%#StInfoSepL#\u{e0b2}',
+        '%#StInfo# %{&fileencoding?&fileencoding:&encoding} ',
+        '%#StInfoSepR#\u{e0b2}',
+        '%#StLoc# %l:%c ',
+      })
     end,
   },
   { -- Highlight, edit, and navigate code
