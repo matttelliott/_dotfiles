@@ -55,6 +55,7 @@
 - import_playbook: tools/claude-code/install_claude-code.yml
 - import_playbook: tools/1password/install_1password.yml
 - import_playbook: tools/iterm2/install_iterm2.yml
+- import_playbook: tools/wezterm/install_wezterm.yml
 - import_playbook: tools/dbeaver/install_dbeaver.yml
 - import_playbook: tools/chrome/install_chrome.yml
 - import_playbook: tools/chromium/install_chromium.yml
