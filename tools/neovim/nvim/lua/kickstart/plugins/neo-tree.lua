@@ -19,6 +19,7 @@ return {
       window = {
         mappings = {
           ['<leader>e'] = 'close_window',
+          ['/'] = 'none', -- Disable the fuzzy finder mapping
         },
       },
     },

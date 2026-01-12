@@ -438,13 +438,13 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
       -- Slightly advanced example of overriding default behavior and theme
-      vim.keymap.set('n', '<leader>/', function()
-        -- You can pass additional configuration to Telescope to change the theme, layout, etc.
-        builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-          winblend = 10,
-          previewer = false,
-        })
-      end, { desc = '[/] Fuzzily search in current buffer' })
+      -- vim.keymap.set('n', '<leader>/', function()
+      --   -- You can pass additional configuration to Telescope to change the theme, layout, etc.
+      --   builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+      --     winblend = 10,
+      --     previewer = false,
+      --   })
+      -- end, { desc = '[/] Fuzzily search in current buffer' })
 
       -- It's also possible to pass additional configuration options.
       --  See `:help telescope.builtin.live_grep()` for information about particular keys
@@ -933,8 +933,14 @@ require('lazy').setup({
 
       -- Mode name mapping
       local mode_map = {
-        n = 'Normal', i = 'Insert', v = 'Visual', V = 'V-Line',
-        ['\22'] = 'V-Block', c = 'Command', R = 'Replace', t = 'Terminal',
+        n = 'Normal',
+        i = 'Insert',
+        v = 'Visual',
+        V = 'V-Line',
+        ['\22'] = 'V-Block',
+        c = 'Command',
+        R = 'Replace',
+        t = 'Terminal',
       }
       function _G.get_mode_name()
         return mode_map[vim.fn.mode()] or vim.fn.mode()
@@ -950,11 +956,11 @@ require('lazy').setup({
       end
 
       -- Powerline arrow characters
-      local arrow_right = vim.fn.nr2char(0xe0b0)  --
-      local arrow_left = vim.fn.nr2char(0xe0b2)   --
+      local arrow_right = vim.fn.nr2char(0xe0b0) --
+      local arrow_left = vim.fn.nr2char(0xe0b2) --
 
       -- Native statusline format (matching left side style)
-      vim.o.statusline = table.concat({
+      vim.o.statusline = table.concat {
         '%#StMode# %{v:lua.get_mode_name()} ',
         '%#StModeSep#' .. arrow_right,
         '%#StFile# %f ',
@@ -964,7 +970,7 @@ require('lazy').setup({
         '%#StInfo# %{&fenc!=""?&fenc:&enc} ',
         '%#StInfoSep#' .. arrow_right,
         '%#StLoc# %l:%c ',
-      })
+      }
     end,
   },
   { -- Highlight, edit, and navigate code

@@ -1,1 +1,3 @@
 - clone repo to login nodes
+- prompt for hostname on bootstrap
+- fix starship prompt

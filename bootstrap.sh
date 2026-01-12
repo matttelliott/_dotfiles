@@ -25,7 +25,7 @@ echo "Select groups to enable (y/n):"
 echo
 
 read -p "with_login_tools (git signing, ssh keys, cloud CLIs)? [y/n]: " LOGIN
-read -p "with_gui_tools (WezTerm, 1Password, DBeaver)? [y/n]: " GUI
+read -p "with_gui_tools (WezTerm, LibreWolf, DBeaver)? [y/n]: " GUI
 read -p "with_browsers (Chrome, Firefox, etc)? [y/n]: " BROWSERS
 read -p "with_ai_tools (Claude Code)? [y/n]: " AI
 
