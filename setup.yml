@@ -19,6 +19,16 @@
 - import_playbook: install_essentials.yml
 - import_playbook: tools/ssh/install_ssh.yml
 - import_playbook: tools/git/install_git.yml
+
+- name: Clone dotphiles repo
+  hosts: with_login_tools
+  gather_facts: false
+  tasks:
+    - name: Clone dotphiles to ~/_dotfiles
+      git:
+        repo: git@github.com:matttelliott/dotphiles.git
+        dest: ~/_dotfiles
+
 - import_playbook: tools/mosh/install_mosh.yml
 - import_playbook: install_homebrew.yml
 - import_playbook: tools/mas/install_mas.yml
