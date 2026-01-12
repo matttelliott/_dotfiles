@@ -35,6 +35,10 @@
         dest: ~/_dotfiles
       when: not dotfiles_dir.stat.exists
 
+    - name: Ensure dotfiles remote uses SSH
+      command: git -C ~/_dotfiles remote set-url origin git@github.com:matttelliott/dotphiles.git
+      changed_when: false
+
 - import_playbook: tools/mosh/install_mosh.yml
 - import_playbook: install_homebrew.yml
 - import_playbook: tools/mas/install_mas.yml
