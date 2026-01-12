@@ -177,8 +177,8 @@ return {
   -- Treesitter: ensure languages are installed
   {
     'nvim-treesitter/nvim-treesitter',
-    opts = {
-      ensure_installed = {
+    config = function()
+      local parsers = {
         -- Web
         'javascript',
         'typescript',
@@ -245,7 +245,8 @@ return {
         'cmake',
         'ninja',
         'proto',
-      },
-    },
+      }
+      require('nvim-treesitter').install(parsers)
+    end,
   },
 }
