@@ -1,0 +1,6 @@
+- make sure pulumi + ansible is installed on all nodes
+- clone repo to login nodes
+- fix wireguard on mac
+- add mosh
+- fork kickstart.nvm
+    - clone with ssh for login nodes, else https
