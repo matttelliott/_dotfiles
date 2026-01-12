@@ -5,6 +5,6 @@
 
   tasks:
     - name: Install LibreWolf via Homebrew Cask
-      shell: /opt/homebrew/bin/brew install --cask librewolf
+      shell: /opt/homebrew/bin/brew install --cask --no-quarantine librewolf
       args:
         creates: /Applications/LibreWolf.app
