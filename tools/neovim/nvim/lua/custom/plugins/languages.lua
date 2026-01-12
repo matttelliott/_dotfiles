@@ -14,6 +14,8 @@ return {
         jsonls = {},
         svelte = {},
         angularls = {},
+        volar = {},
+        tailwindcss = {},
         -- Python
         pyright = {},
         -- Go
@@ -22,6 +24,35 @@ return {
         rust_analyzer = {},
         -- Lua
         lua_ls = {},
+        -- C/C++
+        clangd = {},
+        -- Shell
+        bashls = {},
+        -- Docker
+        dockerls = {},
+        docker_compose_language_service = {},
+        -- YAML
+        yamlls = {},
+        -- Terraform
+        terraformls = {},
+        -- SQL
+        sqlls = {},
+        -- Ruby
+        solargraph = {},
+        -- PHP
+        intelephense = {},
+        -- Java
+        jdtls = {},
+        -- Kotlin
+        kotlin_language_server = {},
+        -- Swift
+        sourcekit = {},
+        -- Zig
+        zls = {},
+        -- Haskell
+        hls = {},
+        -- Elixir
+        elixirls = {},
         -- Django
         djlsp = {},
       },
@@ -43,6 +74,8 @@ return {
         'json-lsp',
         'svelte-language-server',
         'angular-language-server',
+        'vue-language-server',
+        'tailwindcss-language-server',
         'djlint',
         -- Python
         'pyright',
@@ -59,6 +92,37 @@ return {
         -- Lua
         'lua-language-server',
         'stylua',
+        -- C/C++
+        'clangd',
+        'clang-format',
+        -- Shell
+        'bash-language-server',
+        'shfmt',
+        'shellcheck',
+        -- Docker
+        'dockerfile-language-server',
+        'docker-compose-language-service',
+        -- YAML
+        'yaml-language-server',
+        -- Terraform
+        'terraform-ls',
+        -- SQL
+        'sqlls',
+        'sql-formatter',
+        -- Ruby
+        'solargraph',
+        -- PHP
+        'intelephense',
+        -- Java
+        'jdtls',
+        -- Kotlin
+        'kotlin-language-server',
+        -- Zig
+        'zls',
+        -- Haskell
+        'haskell-language-server',
+        -- Elixir
+        'elixir-ls',
       },
     },
   },
@@ -73,6 +137,7 @@ return {
         javascriptreact = { 'prettierd' },
         typescript = { 'prettierd' },
         typescriptreact = { 'prettierd' },
+        vue = { 'prettierd' },
         json = { 'prettierd' },
         jsonc = { 'prettierd' },
         css = { 'prettierd' },
@@ -93,6 +158,18 @@ return {
         rust = { 'rustfmt' },
         -- Lua
         lua = { 'stylua' },
+        -- C/C++
+        c = { 'clang-format' },
+        cpp = { 'clang-format' },
+        -- Shell
+        sh = { 'shfmt' },
+        bash = { 'shfmt' },
+        zsh = { 'shfmt' },
+        -- SQL
+        sql = { 'sql_formatter' },
+        -- Terraform
+        terraform = { 'terraform_fmt' },
+        hcl = { 'terraform_fmt' },
       },
     },
   },
@@ -112,6 +189,7 @@ return {
         'scss',
         'html',
         'svelte',
+        'vue',
         'yaml',
         'graphql',
         'angular',
@@ -129,6 +207,44 @@ return {
         -- Lua
         'lua',
         'luadoc',
+        -- C/C++
+        'c',
+        'cpp',
+        -- Shell
+        'bash',
+        -- Docker
+        'dockerfile',
+        -- SQL
+        'sql',
+        -- Terraform
+        'terraform',
+        'hcl',
+        -- Ruby
+        'ruby',
+        -- PHP
+        'php',
+        -- Java
+        'java',
+        -- Kotlin
+        'kotlin',
+        -- Swift
+        'swift',
+        -- Zig
+        'zig',
+        -- Haskell
+        'haskell',
+        -- Elixir
+        'elixir',
+        -- Misc
+        'xml',
+        'regex',
+        'gitcommit',
+        'gitignore',
+        'git_rebase',
+        'make',
+        'cmake',
+        'ninja',
+        'proto',
       },
     },
   },
