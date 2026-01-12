@@ -1,0 +1,30 @@
+---
+- name: Install and configure Git
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Install git via apt
+      apt:
+        name: git
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install gitconfig (macOS with login)
+      copy:
+        src: gitconfig.darwin
+        dest: ~/.gitconfig
+      when: ansible_facts['os_family'] == "Darwin" and 'with_login_tools' in group_names
+
+    - name: Install gitconfig (Debian with login)
+      copy:
+        src: gitconfig.debian
+        dest: ~/.gitconfig
+      when: ansible_facts['os_family'] == "Debian" and 'with_login_tools' in group_names
+
+    - name: Install gitconfig (minimal)
+      copy:
+        src: gitconfig.minimal
+        dest: ~/.gitconfig
+      when: "'with_login_tools' not in group_names"
