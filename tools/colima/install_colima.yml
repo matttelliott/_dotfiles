@@ -1,0 +1,28 @@
+---
+- name: Install Colima
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Install Colima via Homebrew (macOS)
+      shell: /opt/homebrew/bin/brew install colima docker
+      args:
+        creates: /opt/homebrew/bin/colima
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install Docker via apt (Debian)
+      apt:
+        name:
+          - docker.io
+          - docker-compose
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Add user to docker group (Debian)
+      user:
+        name: "{{ ansible_user_id }}"
+        groups: docker
+        append: yes
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"

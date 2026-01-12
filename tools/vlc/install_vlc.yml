@@ -1,0 +1,18 @@
+---
+- name: Install VLC
+  hosts: with_gui_tools
+  gather_facts: true
+
+  tasks:
+    - name: Install VLC via Homebrew (macOS)
+      shell: /opt/homebrew/bin/brew install --cask vlc
+      args:
+        creates: /Applications/VLC.app
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install VLC via apt (Debian)
+      apt:
+        name: vlc
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"

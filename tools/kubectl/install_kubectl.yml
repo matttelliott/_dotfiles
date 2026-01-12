@@ -1,0 +1,18 @@
+---
+- name: Install kubectl
+  hosts: with_login_tools
+  gather_facts: true
+
+  tasks:
+    - name: Install kubectl via Homebrew (macOS)
+      shell: /opt/homebrew/bin/brew install kubectl
+      args:
+        creates: /opt/homebrew/bin/kubectl
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install kubectl via apt (Debian)
+      apt:
+        name: kubectl
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"
