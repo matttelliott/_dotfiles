@@ -1,0 +1,11 @@
+Host desktop
+    HostName desktop.home.lan
+    User matt
+
+Host macmini
+    HostName macmini.home.lan
+    User matt
+
+Host macbookair
+    HostName macbookair.home.lan
+    User matt

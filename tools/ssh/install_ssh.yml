@@ -33,3 +33,9 @@
         user: "{{ ansible_facts['user_id'] }}"
         key: "{{ ssh_public_key }}"
         state: present
+
+    - name: Install SSH config
+      copy:
+        src: config
+        dest: ~/.ssh/config
+        mode: '0600'
