@@ -12,14 +12,14 @@ set -g status-right-length 100
 set -g status-justify left
 
 # Left: hostname with powerline arrow
-set -g status-left "#[fg=#1a1b26,bg=#7aa2f7,bold]  #h #[fg=#7aa2f7,bg=#24283b] "
+set -g status-left "#[fg=#1a1b26,bg=#7aa2f7,bold]  #h #[fg=#7aa2f7,bg=#24283b] "
 
 # Right: date/time, battery with powerline arrows
-set -g status-right "#[fg=#3b4261,bg=#24283b]#[fg=#9aa5ce,bg=#3b4261]  %Y-%m-%d  %H:%M #[fg=#7aa2f7,bg=#3b4261]#[fg=#1a1b26,bg=#7aa2f7,bold]  #(pmset -g batt 2>/dev/null | grep -Eo '[0-9]+%%' | head -1 || cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -1 || echo '100')%% "
+set -g status-right "#[fg=#3b4261,bg=#24283b]#[fg=#9aa5ce,bg=#3b4261]  %Y-%m-%d  %H:%M #[fg=#7aa2f7,bg=#3b4261]#[fg=#1a1b26,bg=#7aa2f7,bold]  #(pmset -g batt 2>/dev/null | grep -Eo '[0-9]+%%' | head -1 || cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -1 || echo '100')%% "
 
 # Window tabs
-setw -g window-status-format "#[fg=#565f89,bg=#24283b]  #I #W "
-setw -g window-status-current-format "#[fg=#24283b,bg=#7aa2f7]#[fg=#1a1b26,bg=#7aa2f7,bold]  #I #W #[fg=#7aa2f7,bg=#24283b]"
+setw -g window-status-format "#[fg=#565f89,bg=#24283b]  #I #W "
+setw -g window-status-current-format "#[fg=#24283b,bg=#7aa2f7]#[fg=#1a1b26,bg=#7aa2f7,bold]  #I #W #[fg=#7aa2f7,bg=#24283b]"
 setw -g window-status-separator ""
 
 # Pane borders
