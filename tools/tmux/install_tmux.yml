@@ -24,6 +24,10 @@
           # tmux Configuration
           # Optimized for development with vim-like navigation and modern terminal features
 
+          # UTF-8 support
+          set -q -g status-utf8 on
+          setw -q -g utf8 on
+
           # TokyoNight Storm colors
           set -g status-style "bg=#24283b,fg=#c0caf5"
           set -g status-position bottom
@@ -31,15 +35,15 @@
           set -g status-right-length 100
           set -g status-justify left
 
-          # Left: hostname, session
-          set -g status-left "#[bg=#7aa2f7,fg=#1a1b26,bold]  #h #[bg=#3b4261,fg=#7aa2f7]#[bg=#3b4261,fg=#c0caf5]  #S #[bg=#24283b,fg=#3b4261]"
+          # Left: hostname
+          set -g status-left "#[fg=#1a1b26,bg=#7aa2f7,bold]  #h #[fg=#7aa2f7,bg=#24283b]"
 
           # Right: date/time, battery
-          set -g status-right "#[fg=#3b4261]#[bg=#3b4261,fg=#9aa5ce]  %Y-%m-%d  %H:%M #[fg=#7aa2f7,bg=#3b4261]#[bg=#7aa2f7,fg=#1a1b26,bold]  #(pmset -g batt 2>/dev/null | grep -Eo '[0-9]+%%' | head -1 || cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -1 || echo '100')%% "
+          set -g status-right "#[fg=#3b4261,bg=#24283b]#[fg=#9aa5ce,bg=#3b4261]  %Y-%m-%d   %H:%M #[fg=#7aa2f7,bg=#3b4261]#[fg=#1a1b26,bg=#7aa2f7,bold]  #(pmset -g batt 2>/dev/null | grep -Eo '[0-9]+%%' | head -1 || cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -1 || echo '100')%% "
 
           # Window tabs
-          setw -g window-status-format "#[fg=#24283b,bg=#24283b]#[fg=#565f89,bg=#24283b] #I  #W #[fg=#24283b,bg=#24283b]"
-          setw -g window-status-current-format "#[fg=#24283b,bg=#3b4261]#[fg=#7aa2f7,bg=#3b4261,bold] #I  #W #[fg=#3b4261,bg=#24283b]"
+          setw -g window-status-format "#[fg=#565f89,bg=#24283b]  #I #W "
+          setw -g window-status-current-format "#[fg=#7aa2f7,bg=#24283b]#[fg=#1a1b26,bg=#7aa2f7,bold]  #I #W #[fg=#7aa2f7,bg=#24283b]"
           setw -g window-status-separator ""
 
           # Pane borders
