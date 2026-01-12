@@ -1,0 +1,42 @@
+---
+- name: Install Starship
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Install Starship via Homebrew
+      shell: /opt/homebrew/bin/brew install starship
+      args:
+        creates: /opt/homebrew/bin/starship
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Check if Starship is installed
+      stat:
+        path: /usr/local/bin/starship
+      register: starship_check
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install Starship via curl
+      shell: curl -sS https://starship.rs/install.sh | sh -s -- -y
+      when: ansible_facts['os_family'] == "Debian" and not starship_check.stat.exists
+
+    - name: Create zsh config directory
+      file:
+        path: ~/.config/zsh
+        state: directory
+
+    - name: Install starship zsh config
+      copy:
+        src: starship.zsh
+        dest: ~/.config/zsh/starship.zsh
+
+    - name: Source starship in zshrc
+      lineinfile:
+        path: ~/.zshrc
+        line: 'source ~/.config/zsh/starship.zsh'
+        create: yes
+
+    - name: Install starship config
+      copy:
+        src: starship.toml
+        dest: ~/.config/starship.toml

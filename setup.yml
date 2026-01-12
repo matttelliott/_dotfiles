@@ -34,6 +34,7 @@
 - import_playbook: tools/mas/install_mas.yml
 - import_playbook: install_ansible.yml
 - import_playbook: tools/zsh/install_zsh.yml
+- import_playbook: tools/starship/install_starship.yml
 - import_playbook: tools/node/install_node.yml
 - import_playbook: tools/python/install_python.yml
 - import_playbook: tools/rust/install_rust.yml
