@@ -61,7 +61,7 @@ fi
 if [ ! -d "$DOTFILES_DIR" ]; then
   echo "Cloning dotfiles..."
   rm -rf $DOTFILES_DIR
-  git clone https://github.com/matttelliott/dotphiles.git "$DOTFILES_DIR"
+  git clone https://github.com/matttelliott/_dotfiles.git "$DOTFILES_DIR"
 fi
 
 cd "$DOTFILES_DIR"

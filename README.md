@@ -1,4 +1,4 @@
-# dotphiles
+# _dotfiles
 
 Dotfiles and development environment management using Ansible. Supports macOS and Debian-based systems with 50+ tools and applications.
 
@@ -9,7 +9,7 @@ Dotfiles and development environment management using Ansible. Supports macOS an
 Run this on a fresh macOS or Debian installation:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/matttelliott/dotphiles/master/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/matttelliott/_dotfiles/master/bootstrap.sh | bash
 ```
 
 The interactive script will:
@@ -181,7 +181,7 @@ ansible-playbook setup.yml --limit myserver
 ## Project Structure
 
 ```
-dotphiles/
+_dotfiles/
 ├── bootstrap.sh          # Interactive bootstrap script
 ├── setup.yml             # Main playbook
 ├── localhost.yml         # Local machine inventory

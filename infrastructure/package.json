@@ -1,5 +1,5 @@
 {
-    "name": "dotphiles-infra",
+    "name": "dotfiles-infra",
     "main": "index.ts",
     "devDependencies": {
         "@types/node": "^18",

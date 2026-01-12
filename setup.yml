@@ -21,7 +21,7 @@
 - import_playbook: tools/git/install_git.yml
 - import_playbook: tools/keyboard/install_keyboard.yml
 
-- name: Clone dotphiles repo
+- name: Clone dotfiles repo
   hosts: with_login_tools
   gather_facts: false
   tasks:
@@ -30,14 +30,14 @@
         path: ~/_dotfiles
       register: dotfiles_dir
 
-    - name: Clone dotphiles to ~/_dotfiles
+    - name: Clone dotfiles to ~/_dotfiles
       git:
-        repo: git@github.com:matttelliott/dotphiles.git
+        repo: git@github.com:matttelliott/_dotfiles.git
         dest: ~/_dotfiles
       when: not dotfiles_dir.stat.exists
 
     - name: Ensure dotfiles remote uses SSH
-      command: git -C ~/_dotfiles remote set-url origin git@github.com:matttelliott/dotphiles.git
+      command: git -C ~/_dotfiles remote set-url origin git@github.com:matttelliott/_dotfiles.git
       changed_when: false
 
 - import_playbook: tools/mosh/install_mosh.yml

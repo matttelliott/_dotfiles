@@ -1,5 +1,5 @@
-name: dotphiles-infra
-description: DigitalOcean infrastructure for dotphiles
+name: dotfiles-infra
+description: DigitalOcean infrastructure for dotfiles
 runtime: nodejs
 config:
   pulumi:tags:
