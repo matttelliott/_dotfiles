@@ -16,10 +16,12 @@
       become: yes
       when: ansible_facts['os_family'] == "Debian"
 
-    - name: Set zsh as default shell
-      shell: chsh -s $(which zsh)
+    - name: Set zsh as default shell (Debian)
+      user:
+        name: "{{ ansible_user_id }}"
+        shell: /usr/bin/zsh
+      become: yes
       when: ansible_facts['os_family'] == "Debian"
-      changed_when: false
 
     - name: Install zshrc
       copy:
