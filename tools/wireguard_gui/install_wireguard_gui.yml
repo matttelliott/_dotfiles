@@ -1,6 +1,6 @@
 ---
 - name: Install WireGuard GUI
-  hosts: with_gui_tools
+  hosts: with_login_tools:&with_gui_tools
   gather_facts: false
 
   tasks:
@@ -9,3 +9,4 @@
       args:
         creates: /Applications/WireGuard.app
       become: yes
+      when: ansible_facts['os_family'] == "Darwin"
