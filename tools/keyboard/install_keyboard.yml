@@ -1,0 +1,42 @@
+---
+- name: Configure keyboard (remap Caps Lock to Ctrl)
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Create LaunchAgents directory (macOS)
+      file:
+        path: ~/Library/LaunchAgents
+        state: directory
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install Caps Lock to Ctrl remap LaunchAgent (macOS)
+      copy:
+        src: com.local.KeyRemapping.plist
+        dest: ~/Library/LaunchAgents/com.local.KeyRemapping.plist
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Load keyboard remap LaunchAgent (macOS)
+      command: launchctl load ~/Library/LaunchAgents/com.local.KeyRemapping.plist
+      changed_when: false
+      failed_when: false
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Apply keyboard remap immediately (macOS)
+      command: hidutil property --set '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x7000000E0}]}'
+      changed_when: false
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Remap Caps Lock to Ctrl (Debian)
+      lineinfile:
+        path: /etc/default/keyboard
+        regexp: '^XKBOPTIONS='
+        line: 'XKBOPTIONS="ctrl:nocaps"'
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Apply keyboard configuration (Debian)
+      command: dpkg-reconfigure -f noninteractive keyboard-configuration
+      become: yes
+      changed_when: false
+      when: ansible_facts['os_family'] == "Debian"

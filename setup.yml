@@ -19,6 +19,7 @@
 - import_playbook: install_essentials.yml
 - import_playbook: tools/ssh/install_ssh.yml
 - import_playbook: tools/git/install_git.yml
+- import_playbook: tools/keyboard/install_keyboard.yml
 
 - name: Clone dotphiles repo
   hosts: with_login_tools
