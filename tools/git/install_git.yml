@@ -28,3 +28,19 @@
         src: gitconfig.minimal
         dest: ~/.gitconfig
       when: "'with_login_tools' not in group_names"
+
+    - name: Create zsh config directory
+      file:
+        path: ~/.config/zsh
+        state: directory
+
+    - name: Install git aliases
+      copy:
+        src: git.zsh
+        dest: ~/.config/zsh/git.zsh
+
+    - name: Source git aliases in zshrc
+      lineinfile:
+        path: ~/.zshrc
+        line: 'source ~/.config/zsh/git.zsh'
+        create: yes

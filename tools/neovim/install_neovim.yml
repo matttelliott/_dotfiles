@@ -45,3 +45,19 @@
         dest: ~/.config/nvim
         depth: 1
       when: not kickstart_check.stat.exists and 'with_login_tools' not in group_names
+
+    - name: Create zsh config directory
+      file:
+        path: ~/.config/zsh
+        state: directory
+
+    - name: Install neovim environment
+      copy:
+        src: neovim.zsh
+        dest: ~/.config/zsh/neovim.zsh
+
+    - name: Source neovim environment in zshrc
+      lineinfile:
+        path: ~/.zshrc
+        line: 'source ~/.config/zsh/neovim.zsh'
+        create: yes

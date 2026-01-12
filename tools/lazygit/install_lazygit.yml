@@ -27,3 +27,19 @@
         rm -f /tmp/lazygit /tmp/lazygit.tar.gz
       become: yes
       when: ansible_facts['os_family'] == "Debian" and not lazygit_check.stat.exists
+
+    - name: Create zsh config directory
+      file:
+        path: ~/.config/zsh
+        state: directory
+
+    - name: Install lazygit aliases
+      copy:
+        src: lazygit.zsh
+        dest: ~/.config/zsh/lazygit.zsh
+
+    - name: Source lazygit aliases in zshrc
+      lineinfile:
+        path: ~/.zshrc
+        line: 'source ~/.config/zsh/lazygit.zsh'
+        create: yes
