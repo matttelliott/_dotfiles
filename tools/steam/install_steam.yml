@@ -1,0 +1,30 @@
+---
+- name: Install Steam
+  hosts: with_gui_tools:&with_login_tools
+  gather_facts: true
+
+  tasks:
+    - name: Install Steam via Homebrew (macOS)
+      shell: /opt/homebrew/bin/brew install --cask steam
+      args:
+        creates: /Applications/Steam.app
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Add i386 architecture (Debian)
+      command: dpkg --add-architecture i386
+      become: yes
+      changed_when: false
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Update apt cache (Debian)
+      apt:
+        update_cache: yes
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install Steam via apt (Debian)
+      apt:
+        name: steam
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"

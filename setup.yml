@@ -98,6 +98,7 @@
 - import_playbook: tools/orion/install_orion.yml
 - import_playbook: tools/mullvad/install_mullvad.yml
 - import_playbook: tools/min/install_min.yml
+- import_playbook: tools/steam/install_steam.yml
 
 - name: Allow sleep after setup (macOS)
   hosts: macs
