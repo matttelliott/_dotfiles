@@ -20,3 +20,8 @@
       shell: chsh -s $(which zsh)
       when: ansible_facts['os_family'] == "Debian"
       changed_when: false
+
+    - name: Install zshrc
+      copy:
+        src: zshrc
+        dest: ~/.zshrc
