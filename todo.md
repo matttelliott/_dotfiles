@@ -1,7 +1,7 @@
-- clone repo to login nodes
 - prompt for hostname on bootstrap
 - fix starship prompt
 - ensure mason plugins auto installed
 - remove unwanted language support
 - prevent treesitter from recompiling every time
 - fix zsh/git aliases
+- set default wezterm font size
