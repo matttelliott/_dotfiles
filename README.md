@@ -4,44 +4,133 @@ Dotfiles and development environment management using Ansible. Supports macOS an
 
 ## Quick Start
 
-### Bootstrap a New macOS Machine
+### Bootstrap a New Machine
 
-Run the bootstrap script on a fresh macOS installation:
+Run this on a fresh macOS or Debian installation:
 
 ```bash
-git clone https://github.com/matttelliott/dotphiles.git
-cd dotphiles
-./bootstrap.sh
+curl -fsSL https://raw.githubusercontent.com/matttelliott/dotphiles/master/bootstrap.sh | bash
 ```
 
-The script will:
-1. Install Xcode Command Line Tools
-2. Install Homebrew
-3. Install Ansible
-4. Run the full setup playbook
+The interactive script will:
+1. Detect your OS (macOS or Debian)
+2. Prompt you to select which groups to enable
+3. Install dependencies (Xcode CLT, Homebrew, Ansible)
+4. Clone the repo to `~/_dotfiles`
+5. Generate your `localhost.yml` inventory
+6. Run the Ansible playbook
 
-### Set Up Against Localhost
-
-For running against your local machine (useful after initial bootstrap or for updates):
+### Update an Existing Installation
 
 ```bash
+cd ~/_dotfiles
+git pull
 ansible-playbook -i localhost.yml setup.yml
 ```
 
-Or to run specific tools only:
+### Run Specific Tools
 
 ```bash
 ansible-playbook -i localhost.yml tools/neovim/install_neovim.yml
 ```
 
-### Set Up Other Machines in the Inventory
+## Host Groups
+
+Hosts are added to groups to control which tools are installed:
+
+| Group | Description |
+|-------|-------------|
+| `macs` | macOS machines |
+| `debian` | Debian/Ubuntu machines |
+| `with_login_tools` | Git signing, SSH keys, cloud CLIs, dotfiles repo clone |
+| `with_gui_tools` | WezTerm, 1Password, DBeaver |
+| `with_browsers` | Chrome, Firefox, Brave, Arc, etc. |
+| `with_ai_tools` | Claude Code |
+
+## What's Included
+
+### Shell & Terminal
+- **zsh** - Z shell with case-insensitive completion
+- **starship** - Cross-shell prompt with nerd font icons
+- **wezterm** - GPU-accelerated terminal with TokyoNight theme
+- **tmux** - Terminal multiplexer with vim-style navigation
+- **mosh** - Mobile shell for roaming connections
+
+### Programming Languages
+- **node** - JavaScript runtime via nvm + prettierd, eslint_d, typescript
+- **python** - Python via uv + ruff, black, isort
+- **rust** - Rust via rustup + rustfmt, clippy, rust-analyzer
+- **go** - Go + gofumpt, goimports, gopls
+- **lua** - Lua + stylua
+
+### Editor
+- **neovim** - Kickstart.nvim config with:
+  - TokyoNight colorscheme
+  - Neo-tree file explorer (`<leader>e`)
+  - Telescope fuzzy finder (`<leader>o`, `<leader>/`)
+  - LSP support for TypeScript, Python, Go, Rust, Lua
+  - prettierd/eslint_d formatting
+  - gitsigns
+
+### CLI Utilities
+- **fd** - Fast file finder
+- **fzf** - Fuzzy finder
+- **ripgrep** - Fast grep alternative
+- **bat** - cat with syntax highlighting
+- **eza** - Modern ls replacement (aliased to `ls`, `l`)
+- **jq** - JSON processor
+- **sd** - sed alternative
+- **lazygit** - Terminal UI for git (aliased to `gg`)
+
+### Cloud & DevOps
+- **awscli** - AWS CLI
+- **gcloud** - Google Cloud CLI
+- **doctl** - DigitalOcean CLI
+- **gh** - GitHub CLI
+- **pulumi** - Infrastructure as Code
+- **1password_cli** - 1Password CLI
+
+### Git
+- Git config with SSH commit signing via 1Password
+- Aliases: `g`, `gac`, `gacm`, `gl`, `glg`
+
+### Browsers
+Chrome, Chromium, Firefox, Brave, Arc, Edge, Opera, Vivaldi, LibreWolf, Waterfox, Zen, Orion, Min, Tor
+
+## Shell Aliases
+
+| Alias | Command |
+|-------|---------|
+| `q` | `exit` |
+| `e` | `$EDITOR` (nvim) |
+| `g` | `git status` |
+| `gac` | `git add . && git commit` |
+| `gacm` | `git add . && git commit -m` |
+| `gl` | `git log --oneline` |
+| `glg` | `git log --oneline --graph` |
+| `gg` | `lazygit` |
+| `ls` | `eza` |
+| `l` | `eza -lah` |
+
+## Neovim Keymaps
+
+| Keymap | Action |
+|--------|--------|
+| `jk` / `kj` | Exit insert mode |
+| `<leader>e` | Toggle Neo-tree |
+| `<leader>E` | Reveal current file in Neo-tree |
+| `<leader>o` | Find files (Telescope) |
+| `<leader>/` | Grep project (Telescope) |
+| `<leader>f` | Format buffer |
+
+## Remote Machine Setup
 
 1. Add the machine to `inventory.yml`:
 
 ```yaml
 all:
   children:
-    debian:  # or macs:
+    debian:
       hosts:
         myserver:
           ansible_host: 192.168.1.100
@@ -50,178 +139,56 @@ all:
     with_login_tools:
       hosts:
         myserver:
-
-    # Add to other groups as needed:
-    # with_gui_tools, with_browsers, with_ai_tools
 ```
 
-2. Run the playbook against the inventory:
-
-```bash
-ansible-playbook setup.yml
-```
-
-Or target specific hosts:
+2. Run the playbook:
 
 ```bash
 ansible-playbook setup.yml --limit myserver
 ```
 
-### Set Up Debian Machines
+## Adding a New Tool
 
-For Debian systems, ensure SSH access is configured and Python is installed, then run:
+1. Create `tools/mytool/install_mytool.yml`:
 
-```bash
-ansible-playbook setup.yml --limit debian
+```yaml
+---
+- name: Install mytool
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Install mytool via Homebrew
+      shell: /opt/homebrew/bin/brew install mytool
+      args:
+        creates: /opt/homebrew/bin/mytool
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install mytool via apt
+      apt:
+        name: mytool
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"
 ```
 
-## Host Groups
+2. Import in `setup.yml`:
 
-Hosts can be added to groups to control which tools are installed:
-
-| Group | Description |
-|-------|-------------|
-| `macs` | macOS machines |
-| `debian` | Debian/Ubuntu machines |
-| `with_login_tools` | CLI tools (aws, gcloud, gh, doctl, claude-code) |
-| `with_gui_tools` | GUI applications (1password, iterm2, dbeaver) |
-| `with_browsers` | Web browsers |
-| `with_ai_tools` | AI tools (claude-code) |
-
-## Infrastructure
-
-The `infrastructure/` directory contains Pulumi code for provisioning cloud infrastructure:
-
-```bash
-cd infrastructure
-npm install
-pulumi up
+```yaml
+- import_playbook: tools/mytool/install_mytool.yml
 ```
-
-This provisions a DigitalOcean Debian droplet that can be configured with the Ansible playbooks.
-
-## Tools
-
-### Shell & Terminal
-- [zsh](tools/zsh/) - Z shell with plugins and configuration
-- [tmux](tools/tmux/) - Terminal multiplexer
-- [mosh](tools/mosh/) - Mobile shell for roaming connections
-- [ssh](tools/ssh/) - Secure Shell configuration
-- [iterm2](tools/iterm2/) - macOS terminal emulator
-
-### Programming Languages
-- [node](tools/node/) - JavaScript runtime via nvm
-- [python](tools/python/) - Python via pyenv
-- [rust](tools/rust/) - Rust via rustup
-- [go](tools/go/) - Go programming language
-
-### Editors
-- [neovim](tools/neovim/) - Vim-based text editor
-
-### CLI Utilities
-- [fd](tools/fd/) - Fast file finder
-- [fzf](tools/fzf/) - Fuzzy finder
-- [ripgrep](tools/ripgrep/) - Fast grep alternative
-- [bat](tools/bat/) - cat with syntax highlighting
-- [eza](tools/eza/) - Modern ls replacement
-- [jq](tools/jq/) - JSON processor
-- [sd](tools/sd/) - sed alternative
-- [tree](tools/tree/) - Directory tree viewer
-- [wget](tools/wget/) - File downloader
-- [lazygit](tools/lazygit/) - Terminal UI for git
-
-### Cloud & DevOps
-- [awscli](tools/awscli/) - AWS CLI
-- [gcloud](tools/gcloud/) - Google Cloud CLI
-- [doctl](tools/doctl/) - DigitalOcean CLI
-- [gh](tools/gh/) - GitHub CLI
-- [pulumi](tools/pulumi/) - Infrastructure as Code
-- [1password_cli](tools/1password_cli/) - 1Password CLI
-
-### Media
-- [ffmpeg](tools/ffmpeg/) - Video/audio processing
-- [imagemagick](tools/imagemagick/) - Image manipulation
-- [yt-dlp](tools/yt-dlp/) - Video downloader
-- [pandoc](tools/pandoc/) - Document converter
-- [asciiquarium](tools/asciiquarium/) - ASCII art aquarium
-
-### Security & Privacy
-- [wireguard](tools/wireguard/) - VPN
-- [tor](tools/tor/) - Tor Browser
-- [mullvad](tools/mullvad/) - Mullvad VPN
-- [1password](tools/1password/) - Password manager
-
-### Browsers
-- [chrome](tools/chrome/), [chromium](tools/chromium/), [chrome_canary](tools/chrome_canary/)
-- [firefox](tools/firefox/), [firefox_developer](tools/firefox_developer/)
-- [brave](tools/brave/), [arc](tools/arc/), [edge](tools/edge/)
-- [opera](tools/opera/), [vivaldi](tools/vivaldi/)
-- [librewolf](tools/librewolf/), [waterfox](tools/waterfox/), [zen](tools/zen/), [orion](tools/orion/), [min](tools/min/)
-
-### Database
-- [dbeaver](tools/dbeaver/) - Universal database tool
-
-### AI
-- [claude-code](tools/claude-code/) - Claude CLI assistant
 
 ## Project Structure
 
 ```
 dotphiles/
-├── bootstrap.sh          # macOS initial setup script
-├── setup.yml             # Main playbook (imports all tool playbooks)
-├── ansible.cfg           # Ansible configuration
-├── localhost.yml         # Inventory for local machine
-├── inventory.yml         # Inventory for remote machines
-├── install_homebrew.yml  # Homebrew installation
-├── install_ansible.yml   # Ansible installation
-├── install_essentials.yml # Essential packages for Debian
-├── infrastructure/       # Pulumi IaC for cloud provisioning
-└── tools/                # Individual tool configurations
+├── bootstrap.sh          # Interactive bootstrap script
+├── setup.yml             # Main playbook
+├── localhost.yml         # Local machine inventory
+├── inventory.yml         # Remote machines inventory
+├── infrastructure/       # Pulumi IaC
+└── tools/
     └── <tool>/
-        ├── install_<tool>.yml  # Ansible playbook
-        └── README.md           # Tool documentation
+        ├── install_<tool>.yml
+        └── <tool>.zsh      # Shell config (optional)
 ```
-
-## Adding a New Tool
-
-1. Create a directory in `tools/`:
-   ```bash
-   mkdir tools/mytool
-   ```
-
-2. Create the install playbook `tools/mytool/install_mytool.yml`:
-   ```yaml
-   ---
-   - name: Install mytool
-     hosts: all
-     gather_facts: true
-
-     tasks:
-       - name: Install mytool via Homebrew
-         shell: /opt/homebrew/bin/brew install mytool
-         args:
-           creates: /opt/homebrew/bin/mytool
-         when: ansible_os_family == "Darwin"
-
-       - name: Install mytool via apt
-         apt:
-           name: mytool
-           state: present
-         become: yes
-         when: ansible_os_family == "Debian"
-   ```
-
-3. Create `tools/mytool/README.md`:
-   ```markdown
-   # mytool
-
-   Brief description of what the tool does.
-
-   https://mytool.example.com/
-   ```
-
-4. Import the playbook in `setup.yml`:
-   ```yaml
-   - import_playbook: tools/mytool/install_mytool.yml
-   ```
