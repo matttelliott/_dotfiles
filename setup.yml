@@ -39,6 +39,7 @@
 - import_playbook: tools/python/install_python.yml
 - import_playbook: tools/rust/install_rust.yml
 - import_playbook: tools/go/install_go.yml
+- import_playbook: tools/lua/install_lua.yml
 - import_playbook: tools/tmux/install_tmux.yml
 - import_playbook: tools/neovim/install_neovim.yml
 - import_playbook: tools/sd/install_sd.yml
