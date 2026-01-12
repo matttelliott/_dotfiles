@@ -1,0 +1,25 @@
+---
+- name: Install and configure fail2ban
+  hosts: debian
+  gather_facts: false
+
+  tasks:
+    - name: Install fail2ban
+      apt:
+        name: fail2ban
+        state: present
+      become: yes
+
+    - name: Create jail.local config
+      copy:
+        src: jail.local
+        dest: /etc/fail2ban/jail.local
+        mode: '0644'
+      become: yes
+
+    - name: Enable and start fail2ban
+      systemd:
+        name: fail2ban
+        enabled: yes
+        state: started
+      become: yes
