@@ -1,0 +1,21 @@
+---
+- name: Configure macOS system preferences
+  hosts: macs
+  gather_facts: false
+
+  tasks:
+    - name: Auto-hide Dock
+      command: defaults write com.apple.dock autohide -bool true
+      changed_when: false
+
+    - name: Show hidden files in Finder
+      command: defaults write com.apple.finder AppleShowAllFiles -bool true
+      changed_when: false
+
+    - name: Restart Dock to apply changes
+      command: killall Dock
+      changed_when: false
+
+    - name: Restart Finder to apply changes
+      command: killall Finder
+      changed_when: false

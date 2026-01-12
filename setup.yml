@@ -16,6 +16,7 @@
         update_cache: yes
       become: yes
 
+- import_playbook: tools/macos/install_macos.yml
 - import_playbook: install_essentials.yml
 - import_playbook: tools/ssh/install_ssh.yml
 - import_playbook: tools/git/install_git.yml
