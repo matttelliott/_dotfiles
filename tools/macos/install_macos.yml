@@ -4,6 +4,12 @@
   gather_facts: false
 
   tasks:
+    - name: Install Rosetta 2 for Intel app compatibility
+      command: softwareupdate --install-rosetta --agree-to-license
+      args:
+        creates: /Library/Apple/usr/share/rosetta/rosetta
+      become: yes
+
     - name: Auto-hide Dock
       command: defaults write com.apple.dock autohide -bool true
       changed_when: false
