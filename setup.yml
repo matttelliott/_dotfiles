@@ -85,6 +85,7 @@
 - import_playbook: tools/1password/install_1password.yml
 - import_playbook: tools/wezterm/install_wezterm.yml
 - import_playbook: tools/dbeaver/install_dbeaver.yml
+- import_playbook: tools/raycast/install_raycast.yml
 - import_playbook: tools/obsidian/install_obsidian.yml
 - import_playbook: tools/vlc/install_vlc.yml
 - import_playbook: tools/chrome/install_chrome.yml
