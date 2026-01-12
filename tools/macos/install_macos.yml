@@ -4,6 +4,21 @@
   gather_facts: false
 
   tasks:
+    - name: Set HostName
+      command: scutil --set HostName {{ inventory_hostname }}.home.lan
+      become: yes
+      changed_when: false
+
+    - name: Set LocalHostName
+      command: scutil --set LocalHostName {{ inventory_hostname }}
+      become: yes
+      changed_when: false
+
+    - name: Set ComputerName
+      command: scutil --set ComputerName {{ inventory_hostname }}
+      become: yes
+      changed_when: false
+
     - name: Install Rosetta 2 for Intel app compatibility
       command: softwareupdate --install-rosetta --agree-to-license
       args:
