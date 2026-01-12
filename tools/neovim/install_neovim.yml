@@ -32,9 +32,16 @@
         path: ~/.config/nvim/init.lua
       register: kickstart_check
 
-    - name: Install kickstart.nvim
+    - name: Install kickstart.nvim (SSH)
       git:
-        repo: https://github.com/nvim-lua/kickstart.nvim.git
+        repo: git@github.com:matttelliott/kickstart.nvim.git
         dest: ~/.config/nvim
         depth: 1
-      when: not kickstart_check.stat.exists
+      when: not kickstart_check.stat.exists and 'with_login_tools' in group_names
+
+    - name: Install kickstart.nvim (HTTPS)
+      git:
+        repo: https://github.com/matttelliott/kickstart.nvim.git
+        dest: ~/.config/nvim
+        depth: 1
+      when: not kickstart_check.stat.exists and 'with_login_tools' not in group_names
