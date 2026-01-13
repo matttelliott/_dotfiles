@@ -247,7 +247,7 @@ rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
+  { 'NMAC427/guess-indent.nvim', event = 'BufReadPost' }, -- Detect tabstop and shiftwidth automatically
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -273,6 +273,7 @@ require('lazy').setup({
   -- See `:help gitsigns` to understand what the configuration keys do
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
+    event = 'BufReadPre',
     opts = {
       signs = {
         add = { text = '+' },
@@ -717,7 +718,11 @@ require('lazy').setup({
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
       })
-      require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+      require('mason-tool-installer').setup {
+        ensure_installed = ensure_installed,
+        run_on_start = true,
+        start_delay = 3000, -- 3 second delay so it doesn't block startup
+      }
 
       require('mason-lspconfig').setup {
         ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
@@ -946,13 +951,33 @@ require('lazy').setup({
         return mode_map[vim.fn.mode()] or vim.fn.mode()
       end
 
-      -- Git branch
+      -- Git branch (cached to avoid constant shell spawns)
+      local git_branch_cache = ''
+      local function update_git_branch()
+        vim.fn.jobstart({ 'git', 'branch', '--show-current' }, {
+          stdout_buffered = true,
+          on_stdout = function(_, data)
+            if data and data[1] and data[1] ~= '' then
+              git_branch_cache = '\u{e0a0} ' .. data[1] .. ' '
+            else
+              git_branch_cache = ''
+            end
+            vim.cmd 'redrawstatus'
+          end,
+          on_exit = function(_, code)
+            if code ~= 0 then
+              git_branch_cache = ''
+            end
+          end,
+        })
+      end
+      -- Update on buffer/dir change, not every redraw
+      vim.api.nvim_create_autocmd({ 'BufEnter', 'FocusGained', 'DirChanged' }, {
+        callback = update_git_branch,
+      })
+      update_git_branch()
       function _G.get_git_branch()
-        local branch = vim.fn.system('git branch --show-current 2>/dev/null'):gsub('\n', '')
-        if branch ~= '' then
-          return '\u{e0a0} ' .. branch .. ' '
-        end
-        return ''
+        return git_branch_cache
       end
 
       -- Powerline arrow characters
@@ -975,19 +1000,26 @@ require('lazy').setup({
   },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
+    version = false,
     build = ':TSUpdate',
-    -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
+    branch = 'master',
+    lazy = false,
     config = function()
-      -- Ensure parsers are installed
-      local ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
-      require('nvim-treesitter').install(ensure_installed)
-
-      -- Enable treesitter-based highlighting
-      vim.api.nvim_create_autocmd('FileType', {
-        callback = function(args)
-          pcall(vim.treesitter.start, args.buf)
-        end,
-      })
+      local ok, configs = pcall(require, 'nvim-treesitter.configs')
+      if ok then
+        configs.setup {
+          ensure_installed = {
+            'bash', 'lua', 'luadoc', 'vim', 'vimdoc', 'query', 'diff',
+            'javascript', 'typescript', 'tsx', 'html', 'css', 'scss', 'json', 'yaml',
+            'python', 'rust', 'toml',
+            'gitcommit', 'gitignore', 'git_rebase', 'markdown', 'markdown_inline', 'regex',
+          },
+          auto_install = false,
+          sync_install = false,
+          highlight = { enable = true },
+          indent = { enable = true },
+        }
+      end
     end,
     -- There are additional nvim-treesitter modules that you can use to interact
     -- with nvim-treesitter. You should go explore a few and see what interests you:

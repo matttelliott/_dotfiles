@@ -9,7 +9,7 @@ return {
     'nvim-tree/nvim-web-devicons',
     'MunifTanjim/nui.nvim',
   },
-  lazy = false,
+  cmd = 'Neotree',
   keys = {
     { '<leader>e', ':Neotree toggle<CR>', desc = 'NeoTree toggle', silent = true },
     { '<leader>E', ':Neotree reveal<CR>', desc = 'NeoTree reveal current file', silent = true },
