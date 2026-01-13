@@ -55,6 +55,16 @@
         src: agents/
         dest: ~/.claude/agents/
 
+    - name: Create Claude output-styles directory
+      file:
+        path: ~/.claude/output-styles
+        state: directory
+
+    - name: Install Claude Code output styles
+      copy:
+        src: output-styles/
+        dest: ~/.claude/output-styles/
+
     - name: Add Sequential Thinking MCP server (user level)
       shell: |
         export NVM_DIR="$HOME/.nvm"
