@@ -4,4 +4,3 @@
 - remove unwanted language support
 - prevent treesitter from recompiling every time
 - fix zsh/git aliases
-- set default wezterm font size

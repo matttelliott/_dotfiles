@@ -9,7 +9,6 @@
         name:
           - build-essential
           - curl
-          - git
           - unzip
         state: present
       become: yes
