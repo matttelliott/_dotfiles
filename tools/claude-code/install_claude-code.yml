@@ -54,3 +54,16 @@
       copy:
         src: agents/
         dest: ~/.claude/agents/
+
+    - name: Add Sequential Thinking MCP server (user level)
+      shell: |
+        export NVM_DIR="$HOME/.nvm"
+        {% if ansible_facts['os_family'] == "Darwin" %}
+        . /opt/homebrew/opt/nvm/nvm.sh
+        {% else %}
+        . ~/.nvm/nvm.sh
+        {% endif %}
+        claude mcp add --scope user --transport stdio thinking -- npx -y @modelcontextprotocol/server-sequential-thinking
+      register: mcp_result
+      changed_when: "'Added' in mcp_result.stdout"
+      failed_when: false

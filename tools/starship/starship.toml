@@ -29,7 +29,7 @@ format = "[  $hostname ]($style)[](fg:#3b4261 bg:#565f89)"
 style = "fg:#c0caf5 bg:#565f89 bold"
 truncation_length = 3
 truncation_symbol = "…/"
-format = "[  $path ]($style)[](fg:#565f89)"
+format = "[  $path ]($style)"
 
 [git_branch]
 style = "fg:#c0caf5 bg:#3b4261 bold"
