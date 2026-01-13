@@ -18,7 +18,7 @@ symbol = " "
 style_user = "fg:#1a1b26 bg:#7aa2f7 bold"
 style_root = "fg:#1a1b26 bg:#f7768e bold"
 show_always = true
-format = "[  $user ]($style)[](fg:#7aa2f7 bg:#3b4261)"
+format = "[  $user ]($style)[](fg:#7aa2f7)"
 
 [hostname]
 ssh_only = false
@@ -29,12 +29,12 @@ format = "[  $hostname ]($style)[](fg:#3b4261 bg:#565f89)"
 style = "fg:#c0caf5 bg:#565f89 bold"
 truncation_length = 3
 truncation_symbol = "…/"
-format = "[  $path ]($style)[](fg:#565f89 bg:#3b4261)"
+format = "[  $path ]($style)[](fg:#565f89)"
 
 [git_branch]
 style = "fg:#c0caf5 bg:#3b4261 bold"
 symbol = " "
-format = "[ $symbol$branch ]($style)"
+format = "[](fg:#565f89 bg:#3b4261)[ $symbol$branch ]($style)"
 
 [git_status]
 style = "fg:#c0caf5 bg:#3b4261"

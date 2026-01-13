@@ -1,7 +1,2 @@
-- update browsers + gui apps for debian
 - prompt for hostname for localhost
 - fix starship prompt
-- ensure mason plugins auto installed
-- remove unwanted language support
-- prevent treesitter from recompiling every time
-- add devsec hardening https://galaxy.ansible.com/ui/repo/published/devsec/hardening/docs/
