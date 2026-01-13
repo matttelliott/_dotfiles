@@ -1,0 +1,30 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "for f in $CLAUDE_FILE_PATHS; do case \"$f\" in *.lua) stylua \"$f\" ;; *.yml|*.yaml) yamlfmt \"$f\" ;; esac; done"
+          },
+          {
+            "type": "command",
+            "command": "for f in $CLAUDE_FILE_PATHS; do case \"$f\" in *.yml|*.yaml) ansible-lint \"$f\" 2>/dev/null || true ;; esac; done"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'git commit'; then if git diff --cached --name-only 2>/dev/null | xargs grep -l -E '(password|secret|api_key|token)\\s*=' 2>/dev/null; then echo 'ERROR: Possible secrets detected in staged files' >&2; exit 1; fi; fi"
+          }
+        ]
+      }
+    ]
+  }
+}

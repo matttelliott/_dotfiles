@@ -10,15 +10,34 @@
         creates: /opt/homebrew/bin/ansible
       when: ansible_facts['os_family'] == "Darwin"
 
+    - name: Install ansible-lint via Homebrew
+      shell: /opt/homebrew/bin/brew install ansible-lint
+      args:
+        creates: /opt/homebrew/bin/ansible-lint
+      when: ansible_facts['os_family'] == "Darwin"
+
     - name: Install Ansible via uv (Debian)
       shell: ~/.local/bin/uv tool install ansible
       args:
         creates: ~/.local/share/uv/tools/ansible/bin/ansible
       when: ansible_facts['os_family'] == "Debian"
 
+    - name: Install ansible-lint via uv (Debian)
+      shell: ~/.local/bin/uv tool install ansible-lint
+      args:
+        creates: ~/.local/share/uv/tools/ansible-lint/bin/ansible-lint
+      when: ansible_facts['os_family'] == "Debian"
+
     - name: Install Ansible via pacman (Arch)
       pacman:
         name: ansible
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
+
+    - name: Install ansible-lint via pacman (Arch)
+      pacman:
+        name: ansible-lint
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Archlinux"
@@ -29,4 +48,4 @@
         create: true
         marker: "# {mark} ANSIBLE"
         block: |
-          export PATH=$PATH:~/.local/share/uv/tools/ansible/bin
+          export PATH=$PATH:~/.local/share/uv/tools/ansible/bin:~/.local/share/uv/tools/ansible-lint/bin
