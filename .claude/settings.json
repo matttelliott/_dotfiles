@@ -13,15 +13,6 @@
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/lint-ansible.sh"
           }
         ]
-      },
-      {
-        "matcher": "TodoWrite",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node ~/_dotfiles/tools/claude-code/hooks/sync-todos.js"
-          }
-        ]
       }
     ],
     "PreToolUse": [
