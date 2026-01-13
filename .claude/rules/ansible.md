@@ -1,9 +1,9 @@
 ---
 globs: ["**/*.yml", "**/*.yaml", "!infrastructure/**"]
 ---
+
 # Ansible Playbook Rules
 
-- Use 2-space indentation for YAML
 - Every task must have a descriptive `name:`
 - Use OS family detection for cross-platform support:
   - macOS: `ansible_facts['os_family'] == "Darwin"`
