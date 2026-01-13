@@ -22,7 +22,7 @@
 
           if [ "$LOCAL" != "$REMOTE" ]; then
             echo "=== Sync started at $(date) ===" >> {{ sync_log }}
-            git pull origin master >> {{ sync_log }} 2>&1
+            git reset --hard origin/master >> {{ sync_log }} 2>&1
             ansible-playbook setup.yml --connection=local --limit {{ inventory_hostname }} >> {{ sync_log }} 2>&1
             echo "=== Sync completed at $(date) ===" >> {{ sync_log }}
           fi
