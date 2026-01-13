@@ -6,15 +6,15 @@
     <string>com.matttelliott.dotfiles-sync</string>
     <key>ProgramArguments</key>
     <array>
-        <string>$HOME/_dotfiles/sync.sh</string>
+        <string>{{ dotfiles_dir }}/sync.sh</string>
     </array>
     <key>StartInterval</key>
     <integer>3600</integer>
     <key>RunAtLoad</key>
     <true/>
     <key>StandardOutPath</key>
-    <string>$HOME/.dotfiles-sync.log</string>
+    <string>{{ sync_log }}</string>
     <key>StandardErrorPath</key>
-    <string>$HOME/.dotfiles-sync.log</string>
+    <string>{{ sync_log }}</string>
 </dict>
 </plist>
