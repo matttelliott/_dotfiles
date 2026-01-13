@@ -1,6 +1,7 @@
-- prompt for hostname on bootstrap
+- update browsers + gui apps for debian
+- prompt for hostname for localhost
 - fix starship prompt
 - ensure mason plugins auto installed
 - remove unwanted language support
 - prevent treesitter from recompiling every time
-- fix zsh/git aliases
+- add devsec hardening https://galaxy.ansible.com/ui/repo/published/devsec/hardening/docs/
