@@ -4,4 +4,3 @@ localhost.yml
 
 # Claude Code personal overrides (team hooks are in .claude/settings.json)
 .claude/settings.local.json
-.claude/memory.json

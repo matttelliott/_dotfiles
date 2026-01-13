@@ -1,0 +1,31 @@
+- name: Setup dotfiles auto-sync
+  hosts: all
+  gather_facts: true
+  vars:
+    dotfiles_dir: "{{ ansible_facts['env']['HOME'] }}/_dotfiles"
+    sync_log: "{{ ansible_facts['env']['HOME'] }}/.dotfiles-sync.log"
+  tasks:
+    - name: Create sync script
+      ansible.builtin.copy:
+        dest: "{{ dotfiles_dir }}/sync.sh"
+        mode: "0755"
+        content: |
+          #!/bin/bash
+          cd {{ dotfiles_dir }}
+
+          # Fetch and check for changes
+          git fetch origin master
+          LOCAL=$(git rev-parse HEAD)
+          REMOTE=$(git rev-parse origin/master)
+
+          if [ "$LOCAL" != "$REMOTE" ]; then
+            echo "=== Sync started at $(date) ===" >> {{ sync_log }}
+            git pull origin master >> {{ sync_log }} 2>&1
+            ansible-playbook setup.yml --connection=local --limit {{ inventory_hostname }} >> {{ sync_log }} 2>&1
+            echo "=== Sync completed at $(date) ===" >> {{ sync_log }}
+          fi
+    - name: Schedule hourly dotfiles sync
+      ansible.builtin.cron:
+        name: "dotfiles sync"
+        minute: "0"
+        job: "{{ dotfiles_dir }}/sync.sh"

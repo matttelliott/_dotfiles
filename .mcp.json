@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "memory": {
-      "command": "bash",
-      "args": ["-c", "MEMORY_FILE_PATH=\"$PWD/.claude/memory.json\" npx -y @modelcontextprotocol/server-memory"]
-    }
-  }
-}
