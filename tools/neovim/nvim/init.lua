@@ -992,9 +992,10 @@ require('lazy').setup({
         '%#StGitSep#%{v:lua.get_git_branch()!=""?"' .. arrow_right .. '":""}',
         '%#StGit#%{v:lua.get_git_branch()}',
         '%=',
-        '%#StInfo# %{&fenc!=""?&fenc:&enc} ',
-        '%#StInfoSep#' .. arrow_right,
-        '%#StLoc# %l:%c ',
+        '%#StGitSepL#' .. arrow_left,
+        '%#StGit# %{&fenc!=""?&fenc:&enc} ',
+        '%#StModeSepR#' .. arrow_left,
+        '%#StMode# %l:%c ',
       }
     end,
   },
