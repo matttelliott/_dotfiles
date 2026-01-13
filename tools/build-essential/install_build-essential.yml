@@ -1,0 +1,11 @@
+---
+- name: Install build-essential
+  hosts: debian
+  gather_facts: false
+
+  tasks:
+    - name: Install build-essential via apt
+      apt:
+        name: build-essential
+        state: present
+      become: yes

@@ -18,7 +18,9 @@
 
 - import_playbook: tools/macos/install_macos.yml
 - import_playbook: tools/debian/install_debian.yml
-- import_playbook: install_essentials.yml
+- import_playbook: tools/build-essential/install_build-essential.yml
+- import_playbook: tools/curl/install_curl.yml
+- import_playbook: tools/unzip/install_unzip.yml
 - import_playbook: tools/zsh/install_zsh.yml
 - import_playbook: tools/ssh/install_ssh.yml
 - import_playbook: tools/git/install_git.yml
@@ -44,9 +46,9 @@
       changed_when: false
 
 - import_playbook: tools/mosh/install_mosh.yml
-- import_playbook: install_homebrew.yml
+- import_playbook: tools/homebrew/install_homebrew.yml
 - import_playbook: tools/mas/install_mas.yml
-- import_playbook: install_ansible.yml
+- import_playbook: tools/ansible/install_ansible.yml
 - import_playbook: tools/starship/install_starship.yml
 - import_playbook: tools/node/install_node.yml
 - import_playbook: tools/python/install_python.yml

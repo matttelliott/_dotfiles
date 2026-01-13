@@ -1,0 +1,18 @@
+---
+- name: Install unzip
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Install unzip via Homebrew (macOS)
+      shell: /opt/homebrew/bin/brew install unzip
+      args:
+        creates: /opt/homebrew/bin/unzip
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install unzip via apt (Debian)
+      apt:
+        name: unzip
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"
