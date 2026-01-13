@@ -69,7 +69,7 @@
     # Linux: Add user to docker group for rootless access
     - name: Add user to docker group (Linux)
       user:
-        name: "{{ ansible_user_id }}"
+        name: "{{ ansible_facts['user_id'] }}"
         groups: docker
         append: yes
       become: yes
