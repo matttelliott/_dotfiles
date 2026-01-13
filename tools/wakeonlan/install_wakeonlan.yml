@@ -1,0 +1,59 @@
+# Wake-on-LAN Configuration
+#
+# Enables wake-on-LAN on the target machine so it can be woken remotely.
+#
+# macOS: Uses pmset to enable wake on magic packet (no BIOS config needed)
+# Linux: Uses ethtool + systemd service to persist across reboots
+#        Note: BIOS/UEFI must also have WOL enabled on Linux machines
+- name: Configure Wake-on-LAN
+  hosts: all
+  gather_facts: true
+  tasks:
+    # macOS: Enable wake on magic packet via pmset
+    - name: Enable Wake-on-LAN (macOS)
+      command: pmset -a womp 1
+      become: yes
+      changed_when: false
+      when: ansible_facts['os_family'] == "Darwin"
+    # Debian: Install ethtool
+    - name: Install ethtool (Debian)
+      apt:
+        name: ethtool
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"
+    # Arch: Install ethtool
+    - name: Install ethtool (Arch)
+      pacman:
+        name: ethtool
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
+    # Linux: Create systemd service to enable WOL on boot
+    - name: Create WOL systemd service (Linux)
+      copy:
+        dest: /etc/systemd/system/wol.service
+        content: |
+          [Unit]
+          Description=Enable Wake-on-LAN
+          After=network.target
+
+          [Service]
+          Type=oneshot
+          ExecStart=/usr/sbin/ethtool -s {{ ansible_facts['default_ipv4']['interface'] }} wol g
+          RemainAfterExit=yes
+
+          [Install]
+          WantedBy=multi-user.target
+        mode: "0644"
+      become: yes
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
+    # Linux: Enable and start WOL service
+    - name: Enable and start WOL service (Linux)
+      systemd:
+        name: wol
+        enabled: yes
+        state: started
+        daemon_reload: yes
+      become: yes
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"]

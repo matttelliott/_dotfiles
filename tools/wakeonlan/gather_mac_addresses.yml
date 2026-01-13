@@ -1,0 +1,27 @@
+# Gather MAC Addresses
+#
+# Connects to all hosts and saves their MAC addresses to wol_mac_addresses.yml
+# Run this once to populate the file, then use it for wake-on-lan
+- name: Gather MAC addresses from hosts
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Store MAC address
+      set_fact:
+        host_mac: "{{ ansible_facts['default_ipv4']['macaddress'] }}"
+- name: Write MAC addresses to local file
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Create wol_mac_addresses.yml
+      copy:
+        dest: "{{ playbook_dir }}/../../wol_mac_addresses.yml"
+        content: |
+          # Wake-on-LAN MAC addresses (auto-generated, gitignored)
+          # Re-run tools/wakeonlan/gather_mac_addresses.yml to update
+          wol_mac_addresses:
+          {% for host in groups['all'] if hostvars[host]['host_mac'] is defined %}
+            {{ host }}: "{{ hostvars[host]['host_mac'] }}"
+          {% endfor %}
+        mode: "0644"

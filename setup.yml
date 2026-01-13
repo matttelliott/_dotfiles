@@ -1,4 +1,6 @@
 ---
+- import_playbook: tools/sudoers/install_sudoers.yml
+
 - name: Prevent sleep during setup (macOS)
   hosts: macs
   gather_facts: false
@@ -85,7 +87,7 @@
 - import_playbook: tools/pandoc/install_pandoc.yml
 - import_playbook: tools/asciiquarium/install_asciiquarium.yml
 - import_playbook: tools/lazygit/install_lazygit.yml
-- import_playbook: tools/colima/install_colima.yml
+- import_playbook: tools/docker/install_docker.yml
 - import_playbook: tools/wireguard/install_wireguard.yml
 - import_playbook: tools/wireguard_gui/install_wireguard_gui.yml
 - import_playbook: tools/fail2ban/install_fail2ban.yml

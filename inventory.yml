@@ -1,4 +1,3 @@
----
 all:
   children:
     macs:
@@ -13,7 +12,6 @@ all:
           ansible_user: matt
           ansible_ssh_timeout: 60
           ansible_python_interpreter: /opt/homebrew/bin/python3
-
     debian:
       hosts:
         desktop:
@@ -21,29 +19,24 @@ all:
           ansible_user: matt
           ansible_ssh_timeout: 60
           ansible_python_interpreter: /usr/bin/python3
-
     arch:
       hosts:
-        # archbox:
-
+      # archbox:
     with_login_tools:
       hosts:
         macbookair:
         desktop:
         macmini:
-
     with_gui_tools:
       hosts:
         macbookair:
         desktop:
         macmini:
-
     with_browsers:
       hosts:
         macbookair:
         desktop:
         macmini:
-
     with_ai_tools:
       hosts:
         macbookair:

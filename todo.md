@@ -1,2 +1,0 @@
-- prompt for hostname for localhost
-- fix starship prompt

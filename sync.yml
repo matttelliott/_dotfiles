@@ -1,0 +1,80 @@
+- name: Setup dotfiles auto-sync
+  hosts: all
+  gather_facts: true
+  vars:
+    dotfiles_dir: "{{ ansible_facts['env']['HOME'] }}/_dotfiles"
+    sync_log: "{{ ansible_facts['env']['HOME'] }}/.dotfiles-sync.log"
+    launch_agents_dir: "{{ ansible_facts['env']['HOME'] }}/Library/LaunchAgents"
+    plist_name: "com.matttelliott.dotfiles-sync"
+  tasks:
+    - name: Create sync script
+      ansible.builtin.copy:
+        dest: "{{ dotfiles_dir }}/sync.sh"
+        mode: "0755"
+        content: |
+          #!/bin/bash
+          export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+          cd {{ dotfiles_dir }}
+
+          # Only sync if on master branch
+          CURRENT_BRANCH=$(git branch --show-current)
+          if [ "$CURRENT_BRANCH" != "master" ]; then
+            exit 0
+          fi
+
+          # Fetch and check for changes
+          git fetch origin master
+          LOCAL=$(git rev-parse HEAD)
+          REMOTE=$(git rev-parse origin/master)
+
+          if [ "$LOCAL" != "$REMOTE" ]; then
+            echo "=== Sync started at $(date) ===" >> {{ sync_log }}
+
+            # Check for local changes (uncommitted or ahead of remote)
+            if ! git diff --quiet || ! git diff --cached --quiet || [ "$(git rev-list origin/master..HEAD)" ]; then
+              BACKUP_BRANCH="{{ inventory_hostname }}-backup-$(date +%Y%m%d-%H%M%S)"
+              echo "Backing up local changes to $BACKUP_BRANCH" >> {{ sync_log }}
+              git stash --include-untracked >> {{ sync_log }} 2>&1
+              git checkout -b "$BACKUP_BRANCH" >> {{ sync_log }} 2>&1
+              git stash pop >> {{ sync_log }} 2>&1 || true
+              git add -A >> {{ sync_log }} 2>&1
+              git commit -m "Backup from {{ inventory_hostname }} before sync" >> {{ sync_log }} 2>&1 || true
+              git push origin "$BACKUP_BRANCH" >> {{ sync_log }} 2>&1
+              git checkout master >> {{ sync_log }} 2>&1
+            fi
+
+            git reset --hard origin/master >> {{ sync_log }} 2>&1
+            ansible-playbook setup.yml --connection=local --limit {{ inventory_hostname }} >> {{ sync_log }} 2>&1
+            echo "=== Sync completed at $(date) ===" >> {{ sync_log }}
+          fi
+    - name: Remove old cron job if exists (macOS)
+      ansible.builtin.cron:
+        name: "dotfiles sync"
+        state: absent
+      when: ansible_facts['os_family'] == "Darwin"
+    - name: Install Launch Agent plist (macOS)
+      ansible.builtin.template:
+        src: "{{ dotfiles_dir }}/{{ plist_name }}.plist.j2"
+        dest: "{{ launch_agents_dir }}/{{ plist_name }}.plist"
+        mode: "0644"
+      when: ansible_facts['os_family'] == "Darwin"
+      register: plist_installed
+    - name: Unload Launch Agent if changed (macOS)
+      ansible.builtin.command:
+        cmd: launchctl unload {{ launch_agents_dir }}/{{ plist_name }}.plist
+      when:
+        - ansible_facts['os_family'] == "Darwin"
+        - plist_installed.changed
+      ignore_errors: true
+    - name: Load Launch Agent (macOS)
+      ansible.builtin.command:
+        cmd: launchctl load {{ launch_agents_dir }}/{{ plist_name }}.plist
+      when:
+        - ansible_facts['os_family'] == "Darwin"
+        - plist_installed.changed
+    - name: Schedule hourly dotfiles sync (Linux)
+      ansible.builtin.cron:
+        name: "dotfiles sync"
+        minute: "0"
+        job: "{{ dotfiles_dir }}/sync.sh"
+      when: ansible_facts['os_family'] != "Darwin"
