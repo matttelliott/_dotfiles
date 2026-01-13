@@ -10,6 +10,9 @@ echo
 if [[ "$OSTYPE" == "darwin"* ]]; then
   OS="darwin"
   echo "Detected: macOS"
+elif [[ -f /etc/arch-release ]]; then
+  OS="arch"
+  echo "Detected: Arch Linux"
 elif [[ -f /etc/debian_version ]]; then
   OS="debian"
   echo "Detected: Debian/Ubuntu"
@@ -57,6 +60,11 @@ if [[ "$OS" == "debian" ]]; then
   sudo apt install -y git ansible
 fi
 
+if [[ "$OS" == "arch" ]]; then
+  echo "Installing dependencies..."
+  sudo pacman -Sy --noconfirm git ansible
+fi
+
 # Clone dotfiles if not present
 if [ ! -d "$DOTFILES_DIR" ]; then
   echo "Cloning dotfiles..."
@@ -97,6 +105,19 @@ cat >> localhost.yml << EOF
 EOF
 
 if [[ "$OS" == "debian" ]]; then
+  cat >> localhost.yml << EOF
+        $HOSTNAME:
+          ansible_connection: local
+EOF
+fi
+
+cat >> localhost.yml << EOF
+
+    arch:
+      hosts:
+EOF
+
+if [[ "$OS" == "arch" ]]; then
   cat >> localhost.yml << EOF
         $HOSTNAME:
           ansible_connection: local

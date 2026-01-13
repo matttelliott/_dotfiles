@@ -1,14 +1,22 @@
 ---
 - name: Install and configure fail2ban
-  hosts: debian
-  gather_facts: false
+  hosts: all
+  gather_facts: true
 
   tasks:
-    - name: Install fail2ban
+    - name: Install fail2ban via apt (Debian)
       apt:
         name: fail2ban
         state: present
       become: yes
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install fail2ban via pacman (Arch)
+      pacman:
+        name: fail2ban
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Create jail.local config
       copy:
@@ -16,6 +24,7 @@
         dest: /etc/fail2ban/jail.local
         mode: '0644'
       become: yes
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
 
     - name: Enable and start fail2ban
       systemd:
@@ -23,3 +32,4 @@
         enabled: yes
         state: started
       become: yes
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"]

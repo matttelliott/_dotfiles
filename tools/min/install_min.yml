@@ -33,3 +33,9 @@
         path: /tmp/min.deb
         state: absent
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install Min via yay (Arch)
+      shell: yay -S --noconfirm min
+      args:
+        creates: /usr/bin/min
+      when: ansible_facts['os_family'] == "Archlinux"

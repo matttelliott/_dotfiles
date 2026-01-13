@@ -13,13 +13,13 @@
         creates: /opt/homebrew/bin/lazygit
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Check if lazygit is installed
+    - name: Check if lazygit is installed (Debian)
       stat:
         path: /usr/local/bin/lazygit
       register: lazygit_check
       when: ansible_facts['os_family'] == "Debian"
 
-    - name: Download and install lazygit
+    - name: Download and install lazygit (Debian)
       shell: |
         curl -Lo /tmp/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v{{ lazygit_version }}/lazygit_{{ lazygit_version }}_Linux_x86_64.tar.gz"
         tar xf /tmp/lazygit.tar.gz -C /tmp lazygit
@@ -27,6 +27,13 @@
         rm -f /tmp/lazygit /tmp/lazygit.tar.gz
       become: yes
       when: ansible_facts['os_family'] == "Debian" and not lazygit_check.stat.exists
+
+    - name: Install lazygit via pacman (Arch)
+      pacman:
+        name: lazygit
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Create zsh config directory
       file:

@@ -43,3 +43,9 @@
         path: /tmp/mullvad-browser.tar.xz
         state: absent
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install Mullvad Browser via yay (Arch)
+      shell: yay -S --noconfirm mullvad-browser-bin
+      args:
+        creates: /usr/bin/mullvad-browser
+      when: ansible_facts['os_family'] == "Archlinux"

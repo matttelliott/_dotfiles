@@ -30,3 +30,10 @@
         update_cache: yes
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install Vivaldi via pacman (Arch)
+      pacman:
+        name: vivaldi
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"

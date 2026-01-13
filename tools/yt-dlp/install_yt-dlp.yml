@@ -10,9 +10,16 @@
         creates: /opt/homebrew/bin/yt-dlp
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install yt-dlp via apt
+    - name: Install yt-dlp via apt (Debian)
       apt:
         name: yt-dlp
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install yt-dlp via pacman (Arch)
+      pacman:
+        name: yt-dlp
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"

@@ -10,9 +10,16 @@
         creates: /opt/homebrew/bin/bat
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install bat via apt
+    - name: Install bat via apt (Debian)
       apt:
         name: bat
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install bat via pacman (Arch)
+      pacman:
+        name: bat
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"

@@ -1,21 +1,21 @@
 # _dotfiles
 
-Dotfiles and development environment management using Ansible. Supports macOS and Debian-based systems with 50+ tools and applications.
+Dotfiles and development environment management using Ansible. Supports macOS, Debian/Ubuntu, and Arch Linux with 50+ tools and applications.
 
 ## Quick Start
 
 ### Bootstrap a New Machine
 
-Run this on a fresh macOS or Debian installation:
+Run this on a fresh macOS, Debian, or Arch installation:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/matttelliott/_dotfiles/master/bootstrap.sh | bash
 ```
 
 The interactive script will:
-1. Detect your OS (macOS or Debian)
+1. Detect your OS (macOS, Debian, or Arch)
 2. Prompt you to select which groups to enable
-3. Install dependencies (Xcode CLT, Homebrew, Ansible)
+3. Install dependencies (Xcode CLT + Homebrew on macOS, apt packages on Debian, pacman packages on Arch)
 4. Clone the repo to `~/_dotfiles`
 5. Generate your `localhost.yml` inventory
 6. Run the Ansible playbook
@@ -42,6 +42,7 @@ Hosts are added to groups to control which tools are installed:
 |-------|-------------|
 | `macs` | macOS machines |
 | `debian` | Debian/Ubuntu machines |
+| `arch` | Arch Linux machines |
 | `with_login_tools` | Git signing, SSH keys, cloud CLIs, dotfiles repo clone |
 | `with_gui_tools` | WezTerm, 1Password, DBeaver |
 | `with_browsers` | Chrome, Firefox, Brave, Arc, etc. |
@@ -158,18 +159,25 @@ ansible-playbook setup.yml --limit myserver
   gather_facts: true
 
   tasks:
-    - name: Install mytool via Homebrew
+    - name: Install mytool via Homebrew (macOS)
       shell: /opt/homebrew/bin/brew install mytool
       args:
         creates: /opt/homebrew/bin/mytool
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install mytool via apt
+    - name: Install mytool via apt (Debian)
       apt:
         name: mytool
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install mytool via pacman (Arch)
+      pacman:
+        name: mytool
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
 ```
 
 2. Import in `setup.yml`:
@@ -184,11 +192,15 @@ ansible-playbook setup.yml --limit myserver
 _dotfiles/
 ├── bootstrap.sh          # Interactive bootstrap script
 ├── setup.yml             # Main playbook
-├── localhost.yml         # Local machine inventory
+├── localhost.yml         # Local machine inventory (generated)
 ├── inventory.yml         # Remote machines inventory
 ├── infrastructure/       # Pulumi IaC
 └── tools/
+    ├── arch/             # Arch-specific setup
+    ├── debian/           # Debian-specific setup
+    ├── macos/            # macOS-specific setup
+    ├── yay/              # AUR helper for Arch
     └── <tool>/
         ├── install_<tool>.yml
-        └── <tool>.zsh      # Shell config (optional)
+        └── <tool>.zsh    # Shell config (optional)
 ```

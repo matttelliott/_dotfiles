@@ -16,3 +16,10 @@
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install curl via pacman (Arch)
+      pacman:
+        name: curl
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"

@@ -10,21 +10,35 @@
         creates: /opt/homebrew/bin/lua
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install Lua via apt
+    - name: Install Lua via apt (Debian)
       apt:
         name: lua5.4
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Debian"
 
-    - name: Install stylua via Homebrew
+    - name: Install Lua via pacman (Arch)
+      pacman:
+        name: lua
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
+
+    - name: Install stylua via Homebrew (macOS)
       shell: /opt/homebrew/bin/brew install stylua
       args:
         creates: /opt/homebrew/bin/stylua
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install stylua via cargo
+    - name: Install stylua via cargo (Debian)
       shell: ~/.cargo/bin/cargo install stylua
       args:
         creates: ~/.cargo/bin/stylua
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install stylua via pacman (Arch)
+      pacman:
+        name: stylua
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"

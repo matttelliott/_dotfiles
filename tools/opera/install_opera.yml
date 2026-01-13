@@ -30,3 +30,9 @@
         update_cache: yes
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install Opera via yay (Arch)
+      shell: yay -S --noconfirm opera
+      args:
+        creates: /usr/bin/opera
+      when: ansible_facts['os_family'] == "Archlinux"

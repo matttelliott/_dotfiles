@@ -10,23 +10,29 @@
         creates: /opt/homebrew/Caskroom/google-cloud-sdk
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Check if gcloud is installed
+    - name: Check if gcloud is installed (Debian)
       stat:
         path: /usr/bin/gcloud
       register: gcloud_check
       when: ansible_facts['os_family'] == "Debian"
 
-    - name: Add Google Cloud apt repository
+    - name: Add Google Cloud apt repository (Debian)
       shell: |
         curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
         echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee /etc/apt/sources.list.d/google-cloud-sdk.list
       become: yes
       when: ansible_facts['os_family'] == "Debian" and not gcloud_check.stat.exists
 
-    - name: Install Google Cloud CLI via apt
+    - name: Install Google Cloud CLI via apt (Debian)
       apt:
         name: google-cloud-cli
         state: present
         update_cache: yes
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install Google Cloud CLI via yay (Arch)
+      shell: yay -S --noconfirm google-cloud-cli
+      args:
+        creates: /usr/bin/gcloud
+      when: ansible_facts['os_family'] == "Archlinux"

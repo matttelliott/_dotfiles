@@ -47,13 +47,27 @@
       register: dejavu_font_check
       when: ansible_facts['os_family'] == "Debian"
 
-    - name: Install DejaVu Nerd Font
+    - name: Install DejaVu Nerd Font (Debian)
       shell: |
         curl -fLo /tmp/DejaVuSansMono.tar.xz https://github.com/ryanoasis/nerd-fonts/releases/latest/download/DejaVuSansMono.tar.xz
         tar -xf /tmp/DejaVuSansMono.tar.xz -C ~/.local/share/fonts
         fc-cache -fv
         rm /tmp/DejaVuSansMono.tar.xz
       when: ansible_facts['os_family'] == "Debian" and not dejavu_font_check.stat.exists
+
+    - name: Install WezTerm via pacman (Arch)
+      pacman:
+        name: wezterm
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
+
+    - name: Install DejaVu Nerd Font via pacman (Arch)
+      pacman:
+        name: ttf-dejavu-nerd
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Install WezTerm config
       copy:

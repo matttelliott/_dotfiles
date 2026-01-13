@@ -10,7 +10,7 @@
         creates: /opt/homebrew/bin/asciiquarium
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install asciiquarium dependencies via apt
+    - name: Install asciiquarium dependencies via apt (Debian)
       apt:
         name:
           - libcurses-perl
@@ -19,14 +19,14 @@
       become: yes
       when: ansible_facts['os_family'] == "Debian"
 
-    - name: Install Term::Animation via cpan
+    - name: Install Term::Animation via cpan (Debian)
       shell: cpanm Term::Animation
       args:
         creates: /usr/local/share/perl/*/Term/Animation.pm
       become: yes
       when: ansible_facts['os_family'] == "Debian"
 
-    - name: Download and install asciiquarium
+    - name: Download and install asciiquarium (Debian)
       shell: |
         curl -sL https://robobunny.com/projects/asciiquarium/asciiquarium.tar.gz | tar xz -C /tmp
         install /tmp/asciiquarium_1.1/asciiquarium /usr/local/bin/
@@ -35,3 +35,9 @@
         creates: /usr/local/bin/asciiquarium
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install asciiquarium via yay (Arch)
+      shell: yay -S --noconfirm asciiquarium
+      args:
+        creates: /usr/bin/asciiquarium
+      when: ansible_facts['os_family'] == "Archlinux"

@@ -48,3 +48,9 @@
         path: /tmp/firefox-developer.tar.bz2
         state: absent
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install Firefox Developer Edition via yay (Arch)
+      shell: yay -S --noconfirm firefox-developer-edition
+      args:
+        creates: /usr/bin/firefox-developer-edition
+      when: ansible_facts['os_family'] == "Archlinux"

@@ -10,9 +10,16 @@
         creates: /opt/homebrew/bin/tree
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install tree via apt
+    - name: Install tree via apt (Debian)
       apt:
         name: tree
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install tree via pacman (Arch)
+      pacman:
+        name: tree
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"

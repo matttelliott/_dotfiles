@@ -16,8 +16,19 @@
         update_cache: yes
       become: yes
 
+- name: Update pacman cache (Arch)
+  hosts: arch
+  gather_facts: false
+  tasks:
+    - name: Update pacman cache
+      pacman:
+        update_cache: yes
+      become: yes
+
 - import_playbook: tools/macos/install_macos.yml
 - import_playbook: tools/debian/install_debian.yml
+- import_playbook: tools/arch/install_arch.yml
+- import_playbook: tools/yay/install_yay.yml
 - import_playbook: tools/build-essential/install_build-essential.yml
 - import_playbook: tools/curl/install_curl.yml
 - import_playbook: tools/unzip/install_unzip.yml

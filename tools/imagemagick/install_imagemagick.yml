@@ -10,9 +10,16 @@
         creates: /opt/homebrew/bin/magick
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install imagemagick via apt
+    - name: Install imagemagick via apt (Debian)
       apt:
         name: imagemagick
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install imagemagick via pacman (Arch)
+      pacman:
+        name: imagemagick
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"

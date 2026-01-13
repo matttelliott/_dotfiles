@@ -17,3 +17,10 @@
         mode: '0755'
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install Obsidian via pacman (Arch)
+      pacman:
+        name: obsidian
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"

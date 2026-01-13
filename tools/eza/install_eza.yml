@@ -10,11 +10,18 @@
         creates: /opt/homebrew/bin/eza
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install eza via cargo
+    - name: Install eza via cargo (Debian)
       shell: ~/.cargo/bin/cargo install eza
       args:
         creates: ~/.cargo/bin/eza
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install eza via pacman (Arch)
+      pacman:
+        name: eza
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Create zsh config directory
       file:

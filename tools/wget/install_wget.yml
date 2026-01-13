@@ -10,9 +10,16 @@
         creates: /opt/homebrew/bin/wget
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install wget via apt
+    - name: Install wget via apt (Debian)
       apt:
         name: wget
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install wget via pacman (Arch)
+      pacman:
+        name: wget
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"

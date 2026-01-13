@@ -30,3 +30,9 @@
         update_cache: yes
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install LibreWolf via yay (Arch)
+      shell: yay -S --noconfirm librewolf-bin
+      args:
+        creates: /usr/bin/librewolf
+      when: ansible_facts['os_family'] == "Archlinux"

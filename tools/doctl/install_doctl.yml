@@ -13,16 +13,22 @@
         creates: /opt/homebrew/bin/doctl
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Check if doctl is installed
+    - name: Check if doctl is installed (Debian)
       stat:
         path: /usr/local/bin/doctl
       register: doctl_check
       when: ansible_facts['os_family'] == "Debian"
 
-    - name: Download and install doctl
+    - name: Download and install doctl (Debian)
       shell: |
         curl -sL https://github.com/digitalocean/doctl/releases/download/v{{ doctl_version }}/doctl-{{ doctl_version }}-linux-amd64.tar.gz | tar xz -C /tmp
         install /tmp/doctl /usr/local/bin
         rm -f /tmp/doctl
       become: yes
       when: ansible_facts['os_family'] == "Debian" and not doctl_check.stat.exists
+
+    - name: Install doctl via yay (Arch)
+      shell: yay -S --noconfirm doctl
+      args:
+        creates: /usr/bin/doctl
+      when: ansible_facts['os_family'] == "Archlinux"

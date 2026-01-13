@@ -10,9 +10,16 @@
         creates: /opt/homebrew/bin/rg
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install ripgrep via apt
+    - name: Install ripgrep via apt (Debian)
       apt:
         name: ripgrep
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install ripgrep via pacman (Arch)
+      pacman:
+        name: ripgrep
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"

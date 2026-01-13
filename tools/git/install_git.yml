@@ -4,12 +4,19 @@
   gather_facts: true
 
   tasks:
-    - name: Install git via apt
+    - name: Install git via apt (Debian)
       apt:
         name: git
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install git via pacman (Arch)
+      pacman:
+        name: git
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Install gitconfig (macOS with login)
       copy:
@@ -17,11 +24,11 @@
         dest: ~/.gitconfig
       when: ansible_facts['os_family'] == "Darwin" and 'with_login_tools' in group_names
 
-    - name: Install gitconfig (Debian with login)
+    - name: Install gitconfig (Linux with login)
       copy:
         src: gitconfig.debian
         dest: ~/.gitconfig
-      when: ansible_facts['os_family'] == "Debian" and 'with_login_tools' in group_names
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and 'with_login_tools' in group_names
 
     - name: Install gitconfig (minimal)
       copy:

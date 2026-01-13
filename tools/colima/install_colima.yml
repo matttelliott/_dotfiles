@@ -19,10 +19,27 @@
       become: yes
       when: ansible_facts['os_family'] == "Debian"
 
-    - name: Add user to docker group (Debian)
+    - name: Install Docker via pacman (Arch)
+      pacman:
+        name:
+          - docker
+          - docker-compose
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
+
+    - name: Add user to docker group (Linux)
       user:
         name: "{{ ansible_user_id }}"
         groups: docker
         append: yes
       become: yes
-      when: ansible_facts['os_family'] == "Debian"
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
+
+    - name: Enable and start Docker service (Arch)
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"

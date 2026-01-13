@@ -10,15 +10,22 @@
         creates: /opt/homebrew/bin/starship
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Check if Starship is installed
+    - name: Check if Starship is installed (Debian)
       stat:
         path: /usr/local/bin/starship
       register: starship_check
       when: ansible_facts['os_family'] == "Debian"
 
-    - name: Install Starship via curl
+    - name: Install Starship via curl (Debian)
       shell: curl -sS https://starship.rs/install.sh | sh -s -- -y
       when: ansible_facts['os_family'] == "Debian" and not starship_check.stat.exists
+
+    - name: Install Starship via pacman (Arch)
+      pacman:
+        name: starship
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Create zsh config directory
       file:

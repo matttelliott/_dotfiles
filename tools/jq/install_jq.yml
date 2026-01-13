@@ -10,9 +10,16 @@
         creates: /opt/homebrew/bin/jq
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install jq via apt
+    - name: Install jq via apt (Debian)
       apt:
         name: jq
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install jq via pacman (Arch)
+      pacman:
+        name: jq
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"

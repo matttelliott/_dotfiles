@@ -10,11 +10,18 @@
         creates: /opt/homebrew/bin/ansible
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install Ansible via uv
+    - name: Install Ansible via uv (Debian)
       shell: ~/.local/bin/uv tool install ansible
       args:
         creates: ~/.local/share/uv/tools/ansible/bin/ansible
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install Ansible via pacman (Arch)
+      pacman:
+        name: ansible
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Add Ansible to shell config
       blockinfile:

@@ -10,9 +10,16 @@
         creates: /opt/homebrew/bin/pandoc
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install pandoc via apt
+    - name: Install pandoc via apt (Debian)
       apt:
         name: pandoc
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install pandoc via pacman (Arch)
+      pacman:
+        name: pandoc
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"

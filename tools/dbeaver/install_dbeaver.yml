@@ -33,3 +33,10 @@
         path: /tmp/dbeaver.deb
         state: absent
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install DBeaver via pacman (Arch)
+      pacman:
+        name: dbeaver
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"

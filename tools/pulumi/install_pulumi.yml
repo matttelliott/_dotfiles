@@ -10,11 +10,11 @@
         creates: /opt/homebrew/bin/pulumi
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install Pulumi via official installer
+    - name: Install Pulumi via official installer (Linux)
       shell: curl -fsSL https://get.pulumi.com | sh
       args:
         creates: ~/.pulumi/bin/pulumi
-      when: ansible_facts['os_family'] == "Debian"
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
 
     - name: Add Pulumi to shell config
       blockinfile:

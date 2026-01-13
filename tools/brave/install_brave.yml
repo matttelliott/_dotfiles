@@ -30,3 +30,9 @@
         update_cache: yes
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install Brave via yay (Arch)
+      shell: yay -S --noconfirm brave-bin
+      args:
+        creates: /usr/bin/brave
+      when: ansible_facts['os_family'] == "Archlinux"

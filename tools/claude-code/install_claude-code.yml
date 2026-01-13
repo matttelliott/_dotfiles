@@ -15,11 +15,11 @@
         creates: ~/.nvm/versions/node/*/bin/claude
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install Claude Code via npm (Debian)
+    - name: Install Claude Code via npm (Linux)
       shell: |
         export NVM_DIR="$HOME/.nvm"
         . ~/.nvm/nvm.sh
         npm install -g @anthropic-ai/claude-code
       args:
         creates: ~/.nvm/versions/node/*/bin/claude
-      when: ansible_facts['os_family'] == "Debian"
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"]

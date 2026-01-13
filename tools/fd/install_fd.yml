@@ -10,9 +10,16 @@
         creates: /opt/homebrew/bin/fd
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install fd via apt
+    - name: Install fd via apt (Debian)
       apt:
         name: fd-find
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install fd via pacman (Arch)
+      pacman:
+        name: fd
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"

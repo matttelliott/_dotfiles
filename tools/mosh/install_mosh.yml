@@ -10,9 +10,16 @@
         creates: /opt/homebrew/bin/mosh
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install mosh via apt
+    - name: Install mosh via apt (Debian)
       apt:
         name: mosh
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install mosh via pacman (Arch)
+      pacman:
+        name: mosh
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"

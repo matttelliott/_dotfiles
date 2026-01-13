@@ -9,19 +9,26 @@
       changed_when: false
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install zsh via apt
+    - name: Install zsh via apt (Debian)
       apt:
         name: zsh
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Debian"
 
-    - name: Set zsh as default shell (Debian)
+    - name: Install zsh via pacman (Arch)
+      pacman:
+        name: zsh
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
+
+    - name: Set zsh as default shell (Linux)
       user:
         name: "{{ ansible_user_id }}"
         shell: /usr/bin/zsh
       become: yes
-      when: ansible_facts['os_family'] == "Debian"
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
 
     - name: Install zshrc
       copy:

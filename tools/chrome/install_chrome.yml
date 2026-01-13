@@ -33,3 +33,9 @@
         path: /tmp/google-chrome.deb
         state: absent
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install Google Chrome via yay (Arch)
+      shell: yay -S --noconfirm google-chrome
+      args:
+        creates: /usr/bin/google-chrome-stable
+      when: ansible_facts['os_family'] == "Archlinux"

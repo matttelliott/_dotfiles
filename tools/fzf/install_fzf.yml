@@ -10,9 +10,16 @@
         creates: /opt/homebrew/bin/fzf
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install fzf via apt
+    - name: Install fzf via apt (Debian)
       apt:
         name: fzf
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install fzf via pacman (Arch)
+      pacman:
+        name: fzf
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"

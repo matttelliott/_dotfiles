@@ -30,3 +30,9 @@
         update_cache: yes
       become: yes
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install Microsoft Edge via yay (Arch)
+      shell: yay -S --noconfirm microsoft-edge-stable-bin
+      args:
+        creates: /usr/bin/microsoft-edge-stable
+      when: ansible_facts['os_family'] == "Archlinux"
