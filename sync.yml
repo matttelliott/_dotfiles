@@ -22,6 +22,20 @@
 
           if [ "$LOCAL" != "$REMOTE" ]; then
             echo "=== Sync started at $(date) ===" >> {{ sync_log }}
+
+            # Check for local changes (uncommitted or ahead of remote)
+            if ! git diff --quiet || ! git diff --cached --quiet || [ "$(git rev-list origin/master..HEAD)" ]; then
+              BACKUP_BRANCH="{{ inventory_hostname }}-backup-$(date +%Y%m%d-%H%M%S)"
+              echo "Backing up local changes to $BACKUP_BRANCH" >> {{ sync_log }}
+              git stash --include-untracked >> {{ sync_log }} 2>&1
+              git checkout -b "$BACKUP_BRANCH" >> {{ sync_log }} 2>&1
+              git stash pop >> {{ sync_log }} 2>&1 || true
+              git add -A >> {{ sync_log }} 2>&1
+              git commit -m "Backup from {{ inventory_hostname }} before sync" >> {{ sync_log }} 2>&1 || true
+              git push origin "$BACKUP_BRANCH" >> {{ sync_log }} 2>&1
+              git checkout master >> {{ sync_log }} 2>&1
+            fi
+
             git reset --hard origin/master >> {{ sync_log }} 2>&1
             ansible-playbook setup.yml --connection=local --limit {{ inventory_hostname }} >> {{ sync_log }} 2>&1
             echo "=== Sync completed at $(date) ===" >> {{ sync_log }}
