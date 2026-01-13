@@ -1,0 +1,11 @@
+---
+- name: Install Claude Desktop
+  hosts: with_gui_tools:&with_login_tools:&with_ai_tools
+  gather_facts: true
+
+  tasks:
+    - name: Install Claude Desktop via Homebrew (macOS)
+      shell: /opt/homebrew/bin/brew install --cask claude
+      args:
+        creates: /Applications/Claude.app
+      when: ansible_facts['os_family'] == "Darwin"
