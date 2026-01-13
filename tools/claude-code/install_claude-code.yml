@@ -39,10 +39,10 @@
         src: settings.json
         dest: ~/.claude/settings.json
 
-    - name: Install Claude Code auto-checkpoint hook
+    - name: Install Claude Code auto-commit hook
       copy:
-        src: hooks/auto-checkpoint.sh
-        dest: ~/.claude/hooks/auto-checkpoint.sh
+        src: hooks/auto-commit.sh
+        dest: ~/.claude/hooks/auto-commit.sh
         mode: '0755'
 
     - name: Create Claude agents directory
