@@ -4,7 +4,7 @@
       "matcher": "Edit|Write",
       "hooks": [{
         "type": "command",
-        "command": "~/.claude/hooks/auto-checkpoint.sh"
+        "command": "~/.claude/hooks/auto-commit.sh"
       }]
     }]
   }
