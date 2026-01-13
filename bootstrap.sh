@@ -66,8 +66,12 @@ fi
 
 cd "$DOTFILES_DIR"
 
-# Generate inventory
-HOSTNAME=$(hostname -s)
+# Get hostname
+CURRENT_HOSTNAME=$(hostname -s)
+read -p "Hostname [$CURRENT_HOSTNAME]: " INPUT_HOSTNAME
+HOSTNAME=${INPUT_HOSTNAME:-$CURRENT_HOSTNAME}
+
+echo
 echo "Generating inventory for $HOSTNAME..."
 
 cat > localhost.yml << EOF
@@ -80,7 +84,7 @@ EOF
 
 if [[ "$OS" == "darwin" ]]; then
   cat >> localhost.yml << EOF
-        localhost:
+        $HOSTNAME:
           ansible_connection: local
           ansible_python_interpreter: /opt/homebrew/bin/python3
 EOF
@@ -94,7 +98,7 @@ EOF
 
 if [[ "$OS" == "debian" ]]; then
   cat >> localhost.yml << EOF
-        localhost:
+        $HOSTNAME:
           ansible_connection: local
 EOF
 fi
@@ -105,7 +109,7 @@ if [[ "$LOGIN" =~ ^[Yy]$ ]]; then
 
     with_login_tools:
       hosts:
-        localhost:
+        $HOSTNAME:
 EOF
 fi
 
@@ -114,7 +118,7 @@ if [[ "$GUI" =~ ^[Yy]$ ]]; then
 
     with_gui_tools:
       hosts:
-        localhost:
+        $HOSTNAME:
 EOF
 fi
 
@@ -123,7 +127,7 @@ if [[ "$BROWSERS" =~ ^[Yy]$ ]]; then
 
     with_browsers:
       hosts:
-        localhost:
+        $HOSTNAME:
 EOF
 fi
 
@@ -132,7 +136,7 @@ if [[ "$AI" =~ ^[Yy]$ ]]; then
 
     with_ai_tools:
       hosts:
-        localhost:
+        $HOSTNAME:
 EOF
 fi
 
