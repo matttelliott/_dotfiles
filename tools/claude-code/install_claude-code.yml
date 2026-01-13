@@ -23,3 +23,24 @@
       args:
         creates: ~/.nvm/versions/node/*/bin/claude
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
+
+    - name: Create Claude config directory
+      file:
+        path: ~/.claude
+        state: directory
+
+    - name: Create Claude hooks directory
+      file:
+        path: ~/.claude/hooks
+        state: directory
+
+    - name: Install Claude Code settings
+      copy:
+        src: settings.json
+        dest: ~/.claude/settings.json
+
+    - name: Install Claude Code auto-checkpoint hook
+      copy:
+        src: hooks/auto-checkpoint.sh
+        dest: ~/.claude/hooks/auto-checkpoint.sh
+        mode: '0755'
