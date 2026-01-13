@@ -76,13 +76,15 @@ diff_content=$(git diff "$base_commit" HEAD 2>/dev/null)
 [ -z "$diff_content" ] && exit 0
 
 # Use Claude Code CLI to generate summary
-squash_summary=$(echo "$diff_content" | claude -p "Summarize these changes in a single line commit message (max 72 chars). Be specific about what was changed. Output only the commit message, nothing else." 2>/dev/null)
+squash_summary=$(echo "$diff_content" | claude -p "Summarize these changes in a single line (max 60 chars). Be specific about what was changed. Output only the summary, nothing else." 2>/dev/null)
 
 # Fallback if claude fails
-if [ -z "$squash_summary" ] || [ ${#squash_summary} -gt 100 ]; then
+if [ -z "$squash_summary" ] || [ ${#squash_summary} -gt 80 ]; then
     squash_file_count=$(git diff --name-only "$base_commit" HEAD 2>/dev/null | wc -l | tr -d ' ')
-    squash_summary="Claude session: $squash_file_count files changed"
+    squash_summary="$squash_file_count files changed"
 fi
+
+squash_summary="Claude squashed auto-commits - $squash_summary"
 
 # Perform soft reset and recommit
 git reset --soft "$base_commit" 2>/dev/null || exit 0

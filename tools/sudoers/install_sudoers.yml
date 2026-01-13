@@ -1,0 +1,19 @@
+---
+# Passwordless sudo for Ansible
+#
+# Enables NOPASSWD sudo for the current user.
+# Run with -K (--ask-become-pass) the first time:
+#   ansible-playbook tools/sudoers/install_sudoers.yml --connection=local --limit macbookair -K
+
+- name: Configure passwordless sudo
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Enable passwordless sudo for user
+      copy:
+        content: "{{ ansible_user_id }} ALL=(ALL) NOPASSWD: ALL\n"
+        dest: "/etc/sudoers.d/{{ ansible_user_id }}"
+        mode: "0440"
+        validate: "visudo -cf %s"
+      become: yes

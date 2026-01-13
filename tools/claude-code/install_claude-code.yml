@@ -45,6 +45,16 @@
         dest: ~/.claude/hooks/auto-commit.sh
         mode: '0755'
 
+    - name: Create Claude commands directory
+      file:
+        path: ~/.claude/commands
+        state: directory
+
+    - name: Install Claude Code commands
+      copy:
+        src: commands/
+        dest: ~/.claude/commands/
+
     - name: Create Claude agents directory
       file:
         path: ~/.claude/agents

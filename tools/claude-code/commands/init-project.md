@@ -9,33 +9,36 @@ Set up Claude Code configuration for this project using templates and project an
 
 Copy these files from `~/_dotfiles/tools/claude-code/templates/` to the project:
 
-| Template | Destination | Action |
-|----------|-------------|--------|
-| `mcp.json` | `.mcp.json` | Copy exactly |
-| `settings.json` | `.claude/settings.json` | Copy, then customize hooks |
+| Template             | Destination                  | Action                                 |
+| -------------------- | ---------------------------- | -------------------------------------- |
+| `mcp.json`           | `.mcp.json`                  | Copy exactly                           |
+| `settings.json`      | `.claude/settings.json`      | Copy, then customize hooks             |
 | `agents/reviewer.md` | `.claude/agents/reviewer.md` | Copy, then add project-specific checks |
-| `commands/dev.md` | `.claude/commands/dev.md` | Copy, then customize commands |
-| `rules/tests.md` | `.claude/rules/tests.md` | Copy exactly |
-| `CLAUDE.md` | `CLAUDE.md` | Copy skeleton, then fill in |
-| `gitignore` | Append to `.gitignore` | Append if entries missing |
+| `commands/dev.md`    | `.claude/commands/dev.md`    | Copy, then customize commands          |
+| `rules/tests.md`     | `.claude/rules/tests.md`     | Copy exactly                           |
+| `CLAUDE.md`          | `CLAUDE.md`                  | Copy skeleton, then fill in            |
+| `gitignore`          | Append to `.gitignore`       | Append if entries missing              |
 
 Create directories first: `.claude/commands/`, `.claude/agents/`, `.claude/rules/`
 
 ## Step 2: Detect Project Type
 
 Look for these indicators (or use hint: $ARGUMENTS):
+
 - **Node.js**: package.json
 - **Python**: pyproject.toml, setup.py, requirements.txt
 - **Go**: go.mod
 - **Rust**: Cargo.toml
-- **Lua**: *.lua files, .luacheckrc
+- **Lua**: \*.lua files, .luacheckrc
 - **Ansible**: playbook.yml, ansible.cfg, roles/
-- **Terraform**: *.tf files
+- **Terraform**: \*.tf files
 
 ## Step 3: Customize Templates (AI-generated parts)
 
 ### CLAUDE.md
+
 Fill in the skeleton with:
+
 - Project name and description (from README or manifest)
 - Actual tech stack and dependencies
 - Real directory structure
@@ -43,13 +46,17 @@ Fill in the skeleton with:
 - Code style from existing linter configs
 
 ### .claude/settings.json
+
 Add PostToolUse hooks based on detected tools (only if installed):
+
 - **Formatters**: prettier, black, gofmt, rustfmt, stylua, yamlfmt
 - **Linters**: eslint, ruff, golangci-lint, clippy, luacheck, ansible-lint
 - **Tests**: npm test, pytest, go test, cargo test, busted
 
 ### .claude/agents/reviewer.md
+
 Add project-specific checklist items:
+
 - Ansible: YAML syntax, idempotency, vault usage, OS detection
 - Lua: nil checks, global variables, stylua conventions
 - Node: async/await, error handling, TypeScript types
@@ -57,7 +64,9 @@ Add project-specific checklist items:
 - Go: error handling, goroutine safety
 
 ### .claude/commands/dev.md
+
 Replace placeholder commands with actual commands:
+
 - Node: `npm run dev`, `npm test`
 - Python: `python main.py`, `pytest`
 - Ansible: `ansible-playbook -i localhost.yml setup.yml --check`
@@ -66,6 +75,7 @@ Replace placeholder commands with actual commands:
 ## Step 4: Verify
 
 After creating files, verify:
+
 1. `.mcp.json` is valid JSON
 2. Agent frontmatter has: name, description, tools, model
 3. Rules frontmatter has: globs array

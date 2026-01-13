@@ -1,0 +1,85 @@
+---
+# Docker Installation
+#
+# macOS: Uses Colima + docker CLI (free alternative to Docker Desktop)
+#   - Colima provides a lightweight VM since Docker needs Linux kernel
+#   - No license restrictions unlike Docker Desktop for large companies
+#
+# Linux: Uses docker-ce (Docker Community Edition)
+#   - Official Docker packages, latest versions, frequent updates
+#   - Free and open source (Apache 2.0), no account or license needed
+#   - docker.io (distro packages) is older and less maintained
+
+- name: Install Docker
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    # macOS: Colima + docker CLI + docker-compose
+    - name: Install Colima and Docker via Homebrew (macOS)
+      shell: /opt/homebrew/bin/brew install colima docker docker-compose
+      args:
+        creates: /opt/homebrew/bin/colima
+      when: ansible_facts['os_family'] == "Darwin"
+
+    # Debian: docker-ce from official Docker repo
+    - name: Check if Docker CE is installed (Debian)
+      command: dpkg -l docker-ce
+      register: docker_ce_check
+      changed_when: false
+      failed_when: false
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Add Docker GPG key (Debian)
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian" and docker_ce_check.rc != 0
+
+    - name: Add Docker repository (Debian)
+      apt_repository:
+        repo: "deb https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian" and docker_ce_check.rc != 0
+
+    - name: Install Docker CE (Debian)
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+        update_cache: yes
+      become: yes
+      when: ansible_facts['os_family'] == "Debian" and docker_ce_check.rc != 0
+
+    # Arch: docker from official repos
+    - name: Install Docker via pacman (Arch)
+      pacman:
+        name:
+          - docker
+          - docker-compose
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
+
+    # Linux: Add user to docker group for rootless access
+    - name: Add user to docker group (Linux)
+      user:
+        name: "{{ ansible_user_id }}"
+        groups: docker
+        append: yes
+      become: yes
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
+
+    # Linux: Enable Docker service
+    - name: Enable and start Docker service (Linux)
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+      become: yes
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
