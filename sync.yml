@@ -4,6 +4,8 @@
   vars:
     dotfiles_dir: "{{ ansible_facts['env']['HOME'] }}/_dotfiles"
     sync_log: "{{ ansible_facts['env']['HOME'] }}/.dotfiles-sync.log"
+    launch_agents_dir: "{{ ansible_facts['env']['HOME'] }}/Library/LaunchAgents"
+    plist_name: "com.matttelliott.dotfiles-sync"
   tasks:
     - name: Create sync script
       ansible.builtin.copy:
@@ -24,8 +26,34 @@
             ansible-playbook setup.yml --connection=local --limit {{ inventory_hostname }} >> {{ sync_log }} 2>&1
             echo "=== Sync completed at $(date) ===" >> {{ sync_log }}
           fi
-    - name: Schedule hourly dotfiles sync
+    - name: Remove old cron job if exists (macOS)
+      ansible.builtin.cron:
+        name: "dotfiles sync"
+        state: absent
+      when: ansible_facts['os_family'] == "Darwin"
+    - name: Install Launch Agent plist (macOS)
+      ansible.builtin.template:
+        src: "{{ dotfiles_dir }}/{{ plist_name }}.plist.j2"
+        dest: "{{ launch_agents_dir }}/{{ plist_name }}.plist"
+        mode: "0644"
+      when: ansible_facts['os_family'] == "Darwin"
+      register: plist_installed
+    - name: Unload Launch Agent if changed (macOS)
+      ansible.builtin.command:
+        cmd: launchctl unload {{ launch_agents_dir }}/{{ plist_name }}.plist
+      when:
+        - ansible_facts['os_family'] == "Darwin"
+        - plist_installed.changed
+      ignore_errors: true
+    - name: Load Launch Agent (macOS)
+      ansible.builtin.command:
+        cmd: launchctl load {{ launch_agents_dir }}/{{ plist_name }}.plist
+      when:
+        - ansible_facts['os_family'] == "Darwin"
+        - plist_installed.changed
+    - name: Schedule hourly dotfiles sync (Linux)
       ansible.builtin.cron:
         name: "dotfiles sync"
         minute: "0"
         job: "{{ dotfiles_dir }}/sync.sh"
+      when: ansible_facts['os_family'] != "Darwin"
