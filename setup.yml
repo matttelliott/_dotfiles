@@ -97,6 +97,8 @@
 - import_playbook: tools/gcloud/install_gcloud.yml
 - import_playbook: tools/kubectl/install_kubectl.yml
 - import_playbook: tools/claude-code/install_claude-code.yml
+- import_playbook: tools/claude-desktop/install_claude-desktop.yml
+- import_playbook: tools/chatgpt-desktop/install_chatgpt-desktop.yml
 - import_playbook: tools/1password/install_1password.yml
 - import_playbook: tools/wezterm/install_wezterm.yml
 - import_playbook: tools/dbeaver/install_dbeaver.yml
