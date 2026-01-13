@@ -44,3 +44,13 @@
         src: hooks/auto-checkpoint.sh
         dest: ~/.claude/hooks/auto-checkpoint.sh
         mode: '0755'
+
+    - name: Create Claude agents directory
+      file:
+        path: ~/.claude/agents
+        state: directory
+
+    - name: Install Claude Code custom agents
+      copy:
+        src: agents/
+        dest: ~/.claude/agents/
