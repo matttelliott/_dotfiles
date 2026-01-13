@@ -1,10 +1,12 @@
 ---
-- name: Install Arc on macOS
+# Arc Browser is macOS-only (no Linux version available)
+- name: Install Arc
   hosts: with_browsers
-  gather_facts: false
+  gather_facts: true
 
   tasks:
-    - name: Install Arc via Homebrew Cask
+    - name: Install Arc via Homebrew Cask (macOS only)
       shell: /opt/homebrew/bin/brew install --cask arc
       args:
         creates: /Applications/Arc.app
+      when: ansible_facts['os_family'] == "Darwin"

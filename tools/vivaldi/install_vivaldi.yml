@@ -1,10 +1,32 @@
 ---
-- name: Install Vivaldi on macOS
+- name: Install Vivaldi
   hosts: with_browsers
-  gather_facts: false
+  gather_facts: true
 
   tasks:
-    - name: Install Vivaldi via Homebrew Cask
+    - name: Install Vivaldi via Homebrew Cask (macOS)
       shell: /opt/homebrew/bin/brew install --cask vivaldi
       args:
         creates: /Applications/Vivaldi.app
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Check if Vivaldi is installed (Debian)
+      stat:
+        path: /usr/bin/vivaldi
+      register: vivaldi_check
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Add Vivaldi apt repository (Debian)
+      shell: |
+        curl -fsSL https://repo.vivaldi.com/archive/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/vivaldi.gpg
+        echo "deb [signed-by=/usr/share/keyrings/vivaldi.gpg] https://repo.vivaldi.com/archive/deb/ stable main" | tee /etc/apt/sources.list.d/vivaldi.list > /dev/null
+      become: yes
+      when: ansible_facts['os_family'] == "Debian" and not vivaldi_check.stat.exists
+
+    - name: Install Vivaldi via apt (Debian)
+      apt:
+        name: vivaldi-stable
+        state: present
+        update_cache: yes
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"

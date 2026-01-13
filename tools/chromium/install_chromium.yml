@@ -1,10 +1,18 @@
 ---
-- name: Install Degoogled Chromium on macOS
+- name: Install Chromium
   hosts: with_browsers
-  gather_facts: false
+  gather_facts: true
 
   tasks:
-    - name: Install Eloston Chromium via Homebrew Cask
+    - name: Install Eloston Chromium via Homebrew Cask (macOS)
       shell: /opt/homebrew/bin/brew install --cask eloston-chromium
       args:
         creates: /Applications/Chromium.app
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install Chromium via apt (Debian)
+      apt:
+        name: chromium
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"

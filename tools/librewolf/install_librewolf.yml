@@ -1,10 +1,32 @@
 ---
-- name: Install LibreWolf on macOS
+- name: Install LibreWolf
   hosts: with_gui_tools
-  gather_facts: false
+  gather_facts: true
 
   tasks:
-    - name: Install LibreWolf via Homebrew Cask
+    - name: Install LibreWolf via Homebrew Cask (macOS)
       shell: /opt/homebrew/bin/brew install --cask --no-quarantine librewolf
       args:
         creates: /Applications/LibreWolf.app
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Check if LibreWolf is installed (Debian)
+      stat:
+        path: /usr/bin/librewolf
+      register: librewolf_check
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Add LibreWolf apt repository (Debian)
+      shell: |
+        apt-get update && apt-get install -y extrepo
+        extrepo enable librewolf
+      become: yes
+      when: ansible_facts['os_family'] == "Debian" and not librewolf_check.stat.exists
+
+    - name: Install LibreWolf via apt (Debian)
+      apt:
+        name: librewolf
+        state: present
+        update_cache: yes
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"

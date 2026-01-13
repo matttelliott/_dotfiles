@@ -1,10 +1,35 @@
 ---
-- name: Install DBeaver on macOS
+- name: Install DBeaver
   hosts: with_gui_tools
-  gather_facts: false
+  gather_facts: true
 
   tasks:
-    - name: Install DBeaver via Homebrew Cask
+    - name: Install DBeaver via Homebrew Cask (macOS)
       shell: /opt/homebrew/bin/brew install --cask dbeaver-community
       args:
         creates: /Applications/DBeaver.app
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Check if DBeaver is installed (Debian)
+      stat:
+        path: /usr/bin/dbeaver
+      register: dbeaver_check
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Download DBeaver deb package (Debian)
+      get_url:
+        url: https://dbeaver.io/files/dbeaver-ce_latest_amd64.deb
+        dest: /tmp/dbeaver.deb
+      when: ansible_facts['os_family'] == "Debian" and not dbeaver_check.stat.exists
+
+    - name: Install DBeaver (Debian)
+      apt:
+        deb: /tmp/dbeaver.deb
+      become: yes
+      when: ansible_facts['os_family'] == "Debian" and not dbeaver_check.stat.exists
+
+    - name: Clean up DBeaver deb package (Debian)
+      file:
+        path: /tmp/dbeaver.deb
+        state: absent
+      when: ansible_facts['os_family'] == "Debian"

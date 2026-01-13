@@ -1,10 +1,35 @@
 ---
-- name: Install Google Chrome on macOS
+- name: Install Google Chrome
   hosts: with_gui_tools:with_browsers
-  gather_facts: false
+  gather_facts: true
 
   tasks:
-    - name: Install Google Chrome via Homebrew Cask
+    - name: Install Google Chrome via Homebrew Cask (macOS)
       shell: /opt/homebrew/bin/brew install --cask google-chrome
       args:
         creates: /Applications/Google Chrome.app
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Check if Chrome is installed (Debian)
+      stat:
+        path: /usr/bin/google-chrome
+      register: chrome_check
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Download Google Chrome deb package (Debian)
+      get_url:
+        url: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        dest: /tmp/google-chrome.deb
+      when: ansible_facts['os_family'] == "Debian" and not chrome_check.stat.exists
+
+    - name: Install Google Chrome (Debian)
+      apt:
+        deb: /tmp/google-chrome.deb
+      become: yes
+      when: ansible_facts['os_family'] == "Debian" and not chrome_check.stat.exists
+
+    - name: Clean up Chrome deb package (Debian)
+      file:
+        path: /tmp/google-chrome.deb
+        state: absent
+      when: ansible_facts['os_family'] == "Debian"

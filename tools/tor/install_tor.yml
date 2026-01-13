@@ -1,10 +1,18 @@
 ---
-- name: Install Tor Browser on macOS
+- name: Install Tor Browser
   hosts: with_browsers
-  gather_facts: false
+  gather_facts: true
 
   tasks:
-    - name: Install Tor Browser via Homebrew Cask
+    - name: Install Tor Browser via Homebrew Cask (macOS)
       shell: /opt/homebrew/bin/brew install --cask tor-browser
       args:
         creates: /Applications/Tor Browser.app
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install Tor Browser Launcher via apt (Debian)
+      apt:
+        name: torbrowser-launcher
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"

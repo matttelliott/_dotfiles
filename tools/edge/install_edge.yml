@@ -1,10 +1,32 @@
 ---
-- name: Install Microsoft Edge on macOS
+- name: Install Microsoft Edge
   hosts: with_browsers
-  gather_facts: false
+  gather_facts: true
 
   tasks:
-    - name: Install Microsoft Edge via Homebrew Cask
+    - name: Install Microsoft Edge via Homebrew Cask (macOS)
       shell: /opt/homebrew/bin/brew install --cask microsoft-edge
       args:
         creates: /Applications/Microsoft Edge.app
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Check if Edge is installed (Debian)
+      stat:
+        path: /usr/bin/microsoft-edge
+      register: edge_check
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Add Microsoft Edge apt repository (Debian)
+      shell: |
+        curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-edge.gpg
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-edge.gpg] https://packages.microsoft.com/repos/edge stable main" | tee /etc/apt/sources.list.d/microsoft-edge.list > /dev/null
+      become: yes
+      when: ansible_facts['os_family'] == "Debian" and not edge_check.stat.exists
+
+    - name: Install Microsoft Edge via apt (Debian)
+      apt:
+        name: microsoft-edge-stable
+        state: present
+        update_cache: yes
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"

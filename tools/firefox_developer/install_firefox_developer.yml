@@ -1,10 +1,50 @@
 ---
-- name: Install Firefox Developer Edition on macOS
+- name: Install Firefox Developer Edition
   hosts: with_browsers
-  gather_facts: false
+  gather_facts: true
 
   tasks:
-    - name: Install Firefox Developer Edition via Homebrew Cask
+    - name: Install Firefox Developer Edition via Homebrew Cask (macOS)
       shell: /opt/homebrew/bin/brew install --cask firefox@developer-edition
       args:
         creates: /Applications/Firefox Developer Edition.app
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Check if Firefox Developer Edition is installed (Debian)
+      stat:
+        path: /opt/firefox-developer
+      register: firefox_dev_check
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Download Firefox Developer Edition (Debian)
+      get_url:
+        url: https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US
+        dest: /tmp/firefox-developer.tar.bz2
+      when: ansible_facts['os_family'] == "Debian" and not firefox_dev_check.stat.exists
+
+    - name: Extract Firefox Developer Edition (Debian)
+      unarchive:
+        src: /tmp/firefox-developer.tar.bz2
+        dest: /opt
+        remote_src: yes
+      become: yes
+      when: ansible_facts['os_family'] == "Debian" and not firefox_dev_check.stat.exists
+
+    - name: Rename Firefox Developer Edition directory (Debian)
+      command: mv /opt/firefox /opt/firefox-developer
+      become: yes
+      when: ansible_facts['os_family'] == "Debian" and not firefox_dev_check.stat.exists
+
+    - name: Create symlink for Firefox Developer Edition (Debian)
+      file:
+        src: /opt/firefox-developer/firefox
+        dest: /usr/local/bin/firefox-developer
+        state: link
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Clean up Firefox Developer Edition archive (Debian)
+      file:
+        path: /tmp/firefox-developer.tar.bz2
+        state: absent
+      when: ansible_facts['os_family'] == "Debian"

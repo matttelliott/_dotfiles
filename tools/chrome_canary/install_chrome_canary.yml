@@ -1,10 +1,12 @@
 ---
-- name: Install Google Chrome Canary on macOS
+# Chrome Canary is macOS-only (no stable Linux version available)
+- name: Install Google Chrome Canary
   hosts: with_browsers
-  gather_facts: false
+  gather_facts: true
 
   tasks:
-    - name: Install Google Chrome Canary via Homebrew Cask
+    - name: Install Google Chrome Canary via Homebrew Cask (macOS only)
       shell: /opt/homebrew/bin/brew install --cask google-chrome@canary
       args:
         creates: /Applications/Google Chrome Canary.app
+      when: ansible_facts['os_family'] == "Darwin"

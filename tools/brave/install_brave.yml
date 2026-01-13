@@ -1,10 +1,32 @@
 ---
-- name: Install Brave on macOS
+- name: Install Brave
   hosts: with_browsers
-  gather_facts: false
+  gather_facts: true
 
   tasks:
-    - name: Install Brave via Homebrew Cask
+    - name: Install Brave via Homebrew Cask (macOS)
       shell: /opt/homebrew/bin/brew install --cask brave-browser
       args:
         creates: /Applications/Brave Browser.app
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Check if Brave is installed (Debian)
+      stat:
+        path: /usr/bin/brave-browser
+      register: brave_check
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Add Brave apt repository (Debian)
+      shell: |
+        curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" | tee /etc/apt/sources.list.d/brave-browser-release.list > /dev/null
+      become: yes
+      when: ansible_facts['os_family'] == "Debian" and not brave_check.stat.exists
+
+    - name: Install Brave via apt (Debian)
+      apt:
+        name: brave-browser
+        state: present
+        update_cache: yes
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"

@@ -1,10 +1,18 @@
 ---
-- name: Install Firefox on macOS
+- name: Install Firefox
   hosts: with_browsers
-  gather_facts: false
+  gather_facts: true
 
   tasks:
-    - name: Install Firefox via Homebrew Cask
+    - name: Install Firefox via Homebrew Cask (macOS)
       shell: /opt/homebrew/bin/brew install --cask firefox
       args:
         creates: /Applications/Firefox.app
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install Firefox via apt (Debian)
+      apt:
+        name: firefox-esr
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"
