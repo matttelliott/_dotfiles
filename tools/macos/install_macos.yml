@@ -10,7 +10,7 @@
       changed_when: false
 
     - name: Set LocalHostName
-      command: scutil --set LocalHostName {{ inventory_hostname }}
+      command: scutil --set LocalHostName {{ inventory_hostname_short }}
       become: yes
       changed_when: false
 
