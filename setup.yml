@@ -1,4 +1,6 @@
 ---
+- import_playbook: tools/sudoers/install_sudoers.yml
+
 - name: Prevent sleep during setup (macOS)
   hosts: macs
   gather_facts: false

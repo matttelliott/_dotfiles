@@ -1,0 +1,22 @@
+{
+  "name": "@dotfiles/mcp-todo",
+  "version": "1.0.0",
+  "description": "Simple JSON-based todo MCP server",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "mcp-todo": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}
