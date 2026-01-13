@@ -929,9 +929,9 @@ require('lazy').setup({
         vim.api.nvim_set_hl(0, 'StGitSep', { fg = '#24283b', bg = '#3b4261' })
         vim.api.nvim_set_hl(0, 'StGit', { fg = '#9aa5ce', bg = '#3b4261' })
         -- Right side: copy StFile>StGitSep>StGit pattern exactly
-        vim.api.nvim_set_hl(0, 'StInfo', { fg = '#565f89', bg = '#24283b' })
-        vim.api.nvim_set_hl(0, 'StInfoSep', { fg = '#24283b', bg = '#3b4261' })
-        vim.api.nvim_set_hl(0, 'StLoc', { fg = '#9aa5ce', bg = '#3b4261' })
+        -- Right side separators for inward-facing arrows (mirroring left side)
+        vim.api.nvim_set_hl(0, 'StGitSepL', { fg = '#3b4261', bg = '#1a1b26' }) -- arrow into grey from statusline bg
+        vim.api.nvim_set_hl(0, 'StModeSepR', { fg = '#7aa2f7', bg = '#3b4261' }) -- arrow into blue from grey
       end
       vim.api.nvim_create_autocmd('ColorScheme', { callback = set_statusline_hl })
       set_statusline_hl()
