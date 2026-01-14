@@ -1,21 +1,17 @@
----
 - name: Install Neovim
   hosts: all
   gather_facts: true
-
   tasks:
     - name: Install Neovim via Homebrew
       shell: /opt/homebrew/bin/brew install neovim
       args:
         creates: /opt/homebrew/bin/nvim
       when: ansible_facts['os_family'] == "Darwin"
-
     - name: Check if Neovim is installed (Debian)
       stat:
         path: /usr/local/bin/nvim
       register: nvim_check
       when: ansible_facts['os_family'] == "Debian"
-
     - name: Download and install Neovim from GitHub (Debian)
       shell: |
         curl -LO https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz
@@ -26,34 +22,28 @@
         chdir: /tmp
       become: yes
       when: ansible_facts['os_family'] == "Debian" and not nvim_check.stat.exists
-
     - name: Install Neovim via pacman (Arch)
       pacman:
         name: neovim
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Archlinux"
-
     - name: Remove existing neovim config
       file:
         path: ~/.config/nvim
         state: absent
-
     - name: Install neovim config
       copy:
         src: nvim/
         dest: ~/.config/nvim/
-
     - name: Create zsh config directory
       file:
         path: ~/.config/zsh
         state: directory
-
     - name: Install neovim environment
       copy:
         src: neovim.zsh
         dest: ~/.config/zsh/neovim.zsh
-
     - name: Source neovim environment in zshrc
       lineinfile:
         path: ~/.zshrc
