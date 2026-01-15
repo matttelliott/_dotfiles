@@ -1,0 +1,21 @@
+- name: Install age
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Install age via Homebrew
+      shell: /opt/homebrew/bin/brew install age
+      args:
+        creates: /opt/homebrew/bin/age
+      when: ansible_facts['os_family'] == "Darwin"
+    - name: Install age via apt (Debian)
+      apt:
+        name: age
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"
+    - name: Install age via pacman (Arch)
+      pacman:
+        name: age
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
