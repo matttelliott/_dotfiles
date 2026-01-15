@@ -1,0 +1,27 @@
+- name: Install k9s
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Install k9s via Homebrew
+      shell: /opt/homebrew/bin/brew install k9s
+      args:
+        creates: /opt/homebrew/bin/k9s
+      when: ansible_facts['os_family'] == "Darwin"
+    - name: Check if k9s is installed (Debian)
+      stat:
+        path: /usr/local/bin/k9s
+      register: k9s_check
+      when: ansible_facts['os_family'] == "Debian"
+    - name: Download and install k9s (Debian)
+      shell: |
+        curl -Lo /tmp/k9s.tar.gz "https://github.com/derailed/k9s/releases/latest/download/k9s_Linux_amd64.tar.gz"
+        tar xf /tmp/k9s.tar.gz -C /tmp k9s
+        install /tmp/k9s /usr/local/bin
+        rm -f /tmp/k9s /tmp/k9s.tar.gz
+      become: yes
+      when: ansible_facts['os_family'] == "Debian" and not k9s_check.stat.exists
+    - name: Install k9s via yay (Arch)
+      shell: yay -S --noconfirm k9s
+      args:
+        creates: /usr/bin/k9s
+      when: ansible_facts['os_family'] == "Archlinux"
