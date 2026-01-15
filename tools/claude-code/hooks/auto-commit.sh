@@ -38,6 +38,7 @@ else
 fi
 
 git commit --no-gpg-sign --no-verify -m "$msg" 2>/dev/null || true
+git push
 
 # --- Squash check ---
 
@@ -89,3 +90,4 @@ squash_summary="Claude squashed auto-commits - $squash_summary"
 # Perform soft reset and recommit
 git reset --soft "$base_commit" 2>/dev/null || exit 0
 git commit --no-gpg-sign --no-verify -m "$squash_summary" 2>/dev/null || true
+git push
