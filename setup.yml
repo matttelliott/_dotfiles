@@ -1,6 +1,4 @@
----
 - import_playbook: tools/sudoers/install_sudoers.yml
-
 - name: Prevent sleep during setup (macOS)
   hosts: macs
   gather_facts: false
@@ -8,7 +6,6 @@
     - name: Disable sleep
       command: pmset -a disablesleep 1
       become: yes
-
 - name: Update apt cache (Debian)
   hosts: debian
   gather_facts: false
@@ -17,7 +14,6 @@
       apt:
         update_cache: yes
       become: yes
-
 - name: Update pacman cache (Arch)
   hosts: arch
   gather_facts: false
@@ -26,7 +22,6 @@
       pacman:
         update_cache: yes
       become: yes
-
 - import_playbook: tools/macos/install_macos.yml
 - import_playbook: tools/debian/install_debian.yml
 - import_playbook: tools/arch/install_arch.yml
@@ -38,7 +33,6 @@
 - import_playbook: tools/ssh/install_ssh.yml
 - import_playbook: tools/git/install_git.yml
 - import_playbook: tools/keyboard/install_keyboard.yml
-
 - name: Clone dotfiles repo
   hosts: with_login_tools
   gather_facts: false
@@ -47,17 +41,14 @@
       stat:
         path: ~/_dotfiles
       register: dotfiles_dir
-
     - name: Clone dotfiles to ~/_dotfiles
       git:
         repo: git@github.com:matttelliott/_dotfiles.git
         dest: ~/_dotfiles
       when: not dotfiles_dir.stat.exists
-
     - name: Ensure dotfiles remote uses SSH
       command: git -C ~/_dotfiles remote set-url origin git@github.com:matttelliott/_dotfiles.git
       changed_when: false
-
 - import_playbook: tools/mosh/install_mosh.yml
 - import_playbook: tools/homebrew/install_homebrew.yml
 - import_playbook: tools/mas/install_mas.yml
@@ -119,13 +110,11 @@
 - import_playbook: tools/edge/install_edge.yml
 - import_playbook: tools/tor/install_tor.yml
 - import_playbook: tools/librewolf/install_librewolf.yml
-- import_playbook: tools/waterfox/install_waterfox.yml
 - import_playbook: tools/zen/install_zen.yml
 - import_playbook: tools/orion/install_orion.yml
 - import_playbook: tools/mullvad/install_mullvad.yml
 - import_playbook: tools/min/install_min.yml
 - import_playbook: tools/steam/install_steam.yml
-
 - name: Allow sleep after setup (macOS)
   hosts: macs
   gather_facts: false
