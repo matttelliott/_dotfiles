@@ -19,16 +19,27 @@
         path: "{{ nvm_dir }}"
         state: directory
 
-    - name: Add nvm to shell config
+    - name: Create zsh config directory
+      file:
+        path: ~/.config/zsh
+        state: directory
+
+    - name: Install node zsh config (lazy-load nvm)
+      copy:
+        src: node.zsh
+        dest: ~/.config/zsh/node.zsh
+
+    - name: Source node config in zshrc
+      lineinfile:
+        path: ~/.zshrc
+        line: source ~/.config/zsh/node.zsh
+        create: yes
+
+    - name: Remove old NVM block from zshrc
       blockinfile:
         path: ~/.zshrc
-        create: true
         marker: "# {mark} NVM"
-        block: |
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-          [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-          [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
+        state: absent
 
     - name: Install Node.js LTS (macOS)
       shell: |
