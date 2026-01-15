@@ -30,8 +30,6 @@
 - import_playbook: tools/curl/install_curl.yml
 - import_playbook: tools/unzip/install_unzip.yml
 - import_playbook: tools/zsh/install_zsh.yml
-- import_playbook: tools/zsh-syntax-highlighting/install_zsh-syntax-highlighting.yml
-- import_playbook: tools/zsh-autosuggestions/install_zsh-autosuggestions.yml
 - import_playbook: tools/ssh/install_ssh.yml
 - import_playbook: tools/git/install_git.yml
 - import_playbook: tools/keyboard/install_keyboard.yml
