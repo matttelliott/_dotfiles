@@ -42,3 +42,8 @@ all:
         macbookair:
         desktop:
         macmini:
+    with_nas:
+      hosts:
+        macbookair:
+        desktop:
+        macmini:
