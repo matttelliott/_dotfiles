@@ -1,0 +1,34 @@
+- name: Install direnv
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Install direnv via Homebrew
+      shell: /opt/homebrew/bin/brew install direnv
+      args:
+        creates: /opt/homebrew/bin/direnv
+      when: ansible_facts['os_family'] == "Darwin"
+    - name: Install direnv via apt (Debian)
+      apt:
+        name: direnv
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"
+    - name: Install direnv via pacman (Arch)
+      pacman:
+        name: direnv
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
+    - name: Create zsh config directory
+      file:
+        path: ~/.config/zsh
+        state: directory
+    - name: Install direnv shell hook
+      copy:
+        src: direnv.zsh
+        dest: ~/.config/zsh/direnv.zsh
+    - name: Source direnv hook in zshrc
+      lineinfile:
+        path: ~/.zshrc
+        line: source ~/.config/zsh/direnv.zsh
+        create: yes
