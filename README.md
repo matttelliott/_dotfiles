@@ -96,6 +96,10 @@ Hosts are added to groups to control which tools are installed:
 - Git config with SSH commit signing via 1Password
 - Aliases: `g`, `gac`, `gacm`, `gl`, `glg`
 
+### Network
+- **nas** - Automount NAS shares via autofs (~/NAS/home)
+- **wireguard** - VPN tunnel
+
 ### Browsers
 Chrome, Chromium, Firefox, Brave, Arc, Edge, Opera, Vivaldi, LibreWolf, Waterfox, Zen, Orion, Min, Tor
 
