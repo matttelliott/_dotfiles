@@ -1,22 +1,26 @@
----
 - name: Install Firefox
   hosts: with_browsers
   gather_facts: true
-
   tasks:
     - name: Install Firefox via Homebrew Cask (macOS)
       shell: /opt/homebrew/bin/brew install --cask firefox
       args:
         creates: /Applications/Firefox.app
       when: ansible_facts['os_family'] == "Darwin"
-
-    - name: Install Firefox via apt (Debian)
+    - name: Install Firefox ESR via apt (Debian)
       apt:
         name: firefox-esr
         state: present
       become: yes
+      register: firefox_esr_result
+      ignore_errors: yes
       when: ansible_facts['os_family'] == "Debian"
-
+    - name: Install Firefox via apt (Debian fallback)
+      apt:
+        name: firefox
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian" and firefox_esr_result is failed
     - name: Install Firefox via pacman (Arch)
       pacman:
         name: firefox
