@@ -1,0 +1,120 @@
+- name: Install NAS automount
+  hosts: with_nas
+  gather_facts: true
+  vars:
+    nas_server: nas.home.lan
+    nas_shares:
+      - name: home
+        mount_point: "{{ ansible_env.HOME }}/NAS/home"
+  tasks:
+    # macOS setup using autofs
+    - name: Create NAS mount directories (macOS)
+      file:
+        path: "{{ item.mount_point }}"
+        state: directory
+        mode: "0755"
+      loop: "{{ nas_shares }}"
+      when: ansible_facts['os_family'] == "Darwin"
+    - name: Create autofs map file (macOS)
+      copy:
+        dest: /etc/auto_nas
+        content: |
+          {% for share in nas_shares %}
+          {{ share.name }} -fstype=smbfs,soft ://{{ nas_server }}/{{ share.name }}
+          {% endfor %}
+        mode: "0644"
+      become: yes
+      when: ansible_facts['os_family'] == "Darwin"
+    - name: Add NAS to auto_master (macOS)
+      lineinfile:
+        path: /etc/auto_master
+        line: "/System/Volumes/Data/Users/{{ ansible_user_id }}/NAS /etc/auto_nas"
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Darwin"
+      notify: Restart autofs macOS
+    # Debian/Ubuntu setup using autofs
+    - name: Install autofs and cifs-utils (Debian)
+      apt:
+        name:
+          - autofs
+          - cifs-utils
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"
+    - name: Create NAS credentials file (Debian)
+      copy:
+        dest: "{{ ansible_env.HOME }}/.nas-credentials"
+        content: |
+          username=guest
+          password=
+        mode: "0600"
+      when: ansible_facts['os_family'] == "Debian"
+    - name: Create autofs map file (Debian)
+      copy:
+        dest: /etc/auto.nas
+        content: |
+          {% for share in nas_shares %}
+          {{ share.name }} -fstype=cifs,credentials={{ ansible_env.HOME }}/.nas-credentials,uid={{ ansible_user_id }},gid={{ ansible_user_id }} ://{{ nas_server }}/{{ share.name }}
+          {% endfor %}
+        mode: "0644"
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"
+    - name: Add NAS to auto.master (Debian)
+      lineinfile:
+        path: /etc/auto.master
+        line: "{{ ansible_env.HOME }}/NAS /etc/auto.nas --timeout=60"
+        insertbefore: "^\\+auto.master"
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"
+      notify: Restart autofs Debian
+    # Arch Linux setup using autofs
+    - name: Install autofs and cifs-utils (Arch)
+      pacman:
+        name:
+          - autofs
+          - cifs-utils
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
+    - name: Create NAS credentials file (Arch)
+      copy:
+        dest: "{{ ansible_env.HOME }}/.nas-credentials"
+        content: |
+          username=guest
+          password=
+        mode: "0600"
+      when: ansible_facts['os_family'] == "Archlinux"
+    - name: Create autofs map file (Arch)
+      copy:
+        dest: /etc/autofs/auto.nas
+        content: |
+          {% for share in nas_shares %}
+          {{ share.name }} -fstype=cifs,credentials={{ ansible_env.HOME }}/.nas-credentials,uid={{ ansible_user_id }},gid={{ ansible_user_id }} ://{{ nas_server }}/{{ share.name }}
+          {% endfor %}
+        mode: "0644"
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
+    - name: Add NAS to auto.master (Arch)
+      lineinfile:
+        path: /etc/autofs/auto.master
+        line: "{{ ansible_env.HOME }}/NAS /etc/autofs/auto.nas --timeout=60"
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
+      notify: Restart autofs Arch
+  handlers:
+    - name: Restart autofs macOS
+      command: automount -vc
+      become: yes
+    - name: Restart autofs Debian
+      service:
+        name: autofs
+        state: restarted
+      become: yes
+    - name: Restart autofs Arch
+      service:
+        name: autofs
+        state: restarted
+      become: yes
