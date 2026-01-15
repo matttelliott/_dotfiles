@@ -1,35 +1,29 @@
----
 - name: Install and configure zsh
   hosts: all
   gather_facts: true
-
   tasks:
     - name: Verify zsh is installed (macOS)
       raw: which zsh
       changed_when: false
       when: ansible_facts['os_family'] == "Darwin"
-
     - name: Install zsh via apt (Debian)
       apt:
         name: zsh
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Debian"
-
     - name: Install zsh via pacman (Arch)
       pacman:
         name: zsh
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Archlinux"
-
     - name: Set zsh as default shell (Linux)
       user:
         name: "{{ ansible_facts['user_id'] }}"
         shell: /usr/bin/zsh
       become: yes
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
-
     - name: Install zshrc base config
       blockinfile:
         path: ~/.zshrc
