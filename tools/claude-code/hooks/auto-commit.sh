@@ -38,7 +38,6 @@ else
 fi
 
 git commit --no-gpg-sign --no-verify -m "$msg" 2>/dev/null || true
-git push
 
 # --- Squash check ---
 
