@@ -30,7 +30,10 @@
       become: yes
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
 
-    - name: Install zshrc
-      copy:
-        src: zshrc
-        dest: ~/.zshrc
+    - name: Install zshrc base config
+      blockinfile:
+        path: ~/.zshrc
+        create: yes
+        insertbefore: BOF
+        marker: "# {mark} ZSH BASE"
+        block: "{{ lookup('file', 'zshrc') }}"
