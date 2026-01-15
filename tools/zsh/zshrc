@@ -2,6 +2,27 @@
 autoload -Uz compinit && compinit
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
+# Directory stack navigation (1-9 to jump to recent dirs)
+setopt AUTO_PUSHD           # Push dirs onto stack automatically
+setopt PUSHD_IGNORE_DUPS    # No duplicates in stack
+setopt PUSHD_SILENT         # Don't print stack after pushd
+alias 1='cd -1'
+alias 2='cd -2'
+alias 3='cd -3'
+alias 4='cd -4'
+alias 5='cd -5'
+alias 6='cd -6'
+alias 7='cd -7'
+alias 8='cd -8'
+alias 9='cd -9'
+alias d='dirs -v'           # List recent dirs with numbers
+
+# Job control - select backgrounded processes with fzf
+j() {
+  local job=$(jobs | fzf --height=40% --reverse | sed 's/\[\([0-9]*\)\].*/\1/')
+  [[ -n "$job" ]] && fg %$job
+}
+
 # Aliases
 alias q=exit
 alias c=clear
