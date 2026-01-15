@@ -46,6 +46,12 @@ format = "[](fg:#565f89 bg:#3b4261)[ $symbol$branch ]($style)"
 style = "fg:#c0caf5 bg:#3b4261"
 format = "[$all_status$ahead_behind]($style)[](fg:#3b4261)"
 
+[jobs]
+style = "fg:#7aa2f7"
+symbol = "󰜎 "
+number_threshold = 1
+format = "[$symbol$number]($style) "
+
 [cmd_duration]
 min_time = 0
 style = "fg:#565f89"
