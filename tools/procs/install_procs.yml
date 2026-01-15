@@ -1,0 +1,28 @@
+- name: Install procs
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Install procs via Homebrew
+      shell: /opt/homebrew/bin/brew install procs
+      args:
+        creates: /opt/homebrew/bin/procs
+      when: ansible_facts['os_family'] == "Darwin"
+    - name: Check if procs is installed (Debian)
+      stat:
+        path: /usr/local/bin/procs
+      register: procs_check
+      when: ansible_facts['os_family'] == "Debian"
+    - name: Download and install procs (Debian)
+      shell: |
+        curl -Lo /tmp/procs.zip "https://github.com/dalance/procs/releases/latest/download/procs-v0.14.8-x86_64-linux.zip"
+        unzip -o /tmp/procs.zip -d /tmp
+        install /tmp/procs /usr/local/bin
+        rm -f /tmp/procs /tmp/procs.zip
+      become: yes
+      when: ansible_facts['os_family'] == "Debian" and not procs_check.stat.exists
+    - name: Install procs via pacman (Arch)
+      pacman:
+        name: procs
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"

@@ -1,0 +1,21 @@
+- name: Install tldr
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Install tldr via Homebrew
+      shell: /opt/homebrew/bin/brew install tldr
+      args:
+        creates: /opt/homebrew/bin/tldr
+      when: ansible_facts['os_family'] == "Darwin"
+    - name: Install tldr via apt (Debian)
+      apt:
+        name: tldr
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"
+    - name: Install tldr via pacman (Arch)
+      pacman:
+        name: tldr
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
