@@ -65,12 +65,9 @@ if [[ "$OS" == "arch" ]]; then
   sudo pacman -Sy --noconfirm git ansible
 fi
 
-# Clone dotfiles if not present
-if [ ! -d "$DOTFILES_DIR" ]; then
-  echo "Cloning dotfiles..."
-  rm -rf $DOTFILES_DIR
-  git clone https://github.com/matttelliott/_dotfiles.git "$DOTFILES_DIR"
-fi
+echo "Cloning dotfiles..."
+rm -rf $DOTFILES_DIR
+git clone https://github.com/matttelliott/_dotfiles.git "$DOTFILES_DIR"
 
 cd "$DOTFILES_DIR"
 
