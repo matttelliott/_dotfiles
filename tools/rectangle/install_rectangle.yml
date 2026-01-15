@@ -1,0 +1,9 @@
+- name: Install rectangle
+  hosts: macs
+  gather_facts: true
+  tasks:
+    - name: Install rectangle via Homebrew Cask
+      shell: /opt/homebrew/bin/brew install --cask rectangle
+      args:
+        creates: /Applications/Rectangle.app
+      when: ansible_facts['os_family'] == "Darwin"
