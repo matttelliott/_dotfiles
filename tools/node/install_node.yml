@@ -1,11 +1,8 @@
----
 - name: Install Node.js via nvm
   hosts: all
   gather_facts: true
-
   vars:
     nvm_dir: ~/.nvm
-
   tasks:
     # macOS: Install nvm via Homebrew
     - name: Install nvm via Homebrew
@@ -13,34 +10,28 @@
       args:
         creates: /opt/homebrew/opt/nvm
       when: ansible_facts['os_family'] == "Darwin"
-
     - name: Create nvm directory
       file:
         path: "{{ nvm_dir }}"
         state: directory
-
     - name: Create zsh config directory
       file:
         path: ~/.config/zsh
         state: directory
-
     - name: Install node zsh config (lazy-load nvm)
       copy:
         src: node.zsh
         dest: ~/.config/zsh/node.zsh
-
     - name: Source node config in zshrc
       lineinfile:
         path: ~/.zshrc
         line: source ~/.config/zsh/node.zsh
         create: yes
-
     - name: Remove old NVM block from zshrc
       blockinfile:
         path: ~/.zshrc
         marker: "# {mark} NVM"
         state: absent
-
     - name: Install Node.js LTS (macOS)
       shell: |
         export NVM_DIR="$HOME/.nvm"
@@ -50,14 +41,12 @@
       args:
         creates: ~/.nvm/alias/default
       when: ansible_facts['os_family'] == "Darwin"
-
     # Debian/Arch: Install nvm from official script
     - name: Install nvm from official script (Linux)
       shell: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
       args:
         creates: ~/.nvm/nvm.sh
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
-
     - name: Install Node.js LTS (Linux)
       shell: |
         export NVM_DIR="$HOME/.nvm"
@@ -67,14 +56,12 @@
       args:
         creates: ~/.nvm/alias/default
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
-
     - name: Install global npm packages (macOS)
       shell: |
         export NVM_DIR="$HOME/.nvm"
         . /opt/homebrew/opt/nvm/nvm.sh
         npm install -g typescript @fsouza/prettierd eslint_d
       when: ansible_facts['os_family'] == "Darwin"
-
     - name: Install global npm packages (Linux)
       shell: |
         export NVM_DIR="$HOME/.nvm"
