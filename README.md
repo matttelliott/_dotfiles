@@ -1,6 +1,6 @@
 # _dotfiles
 
-Dotfiles and development environment management using Ansible. Supports macOS, Debian/Ubuntu, and Arch Linux with 50+ tools and applications.
+Dotfiles and development environment management using Ansible. Supports macOS, Debian/Ubuntu, and Arch Linux with 90+ tools and applications.
 
 ## Quick Start
 
