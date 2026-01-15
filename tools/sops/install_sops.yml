@@ -1,0 +1,25 @@
+- name: Install sops
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Install sops via Homebrew
+      shell: /opt/homebrew/bin/brew install sops
+      args:
+        creates: /opt/homebrew/bin/sops
+      when: ansible_facts['os_family'] == "Darwin"
+    - name: Check if sops is installed (Debian)
+      stat:
+        path: /usr/local/bin/sops
+      register: sops_check
+      when: ansible_facts['os_family'] == "Debian"
+    - name: Download and install sops (Debian)
+      shell: |
+        curl -Lo /usr/local/bin/sops "https://github.com/getsops/sops/releases/latest/download/sops-v3.9.4.linux.amd64"
+        chmod +x /usr/local/bin/sops
+      become: yes
+      when: ansible_facts['os_family'] == "Debian" and not sops_check.stat.exists
+    - name: Install sops via yay (Arch)
+      shell: yay -S --noconfirm sops
+      args:
+        creates: /usr/bin/sops
+      when: ansible_facts['os_family'] == "Archlinux"
