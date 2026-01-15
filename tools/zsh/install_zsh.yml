@@ -31,7 +31,6 @@
         insertbefore: BOF
         marker: "# {mark} ZSH BASE"
         block: "{{ lookup('file', 'zshrc') }}"
-
     # zsh-autosuggestions
     - name: Install zsh-autosuggestions via Homebrew
       shell: /opt/homebrew/bin/brew install zsh-autosuggestions
@@ -50,7 +49,6 @@
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Archlinux"
-
     # zsh-syntax-highlighting
     - name: Install zsh-syntax-highlighting via Homebrew
       shell: /opt/homebrew/bin/brew install zsh-syntax-highlighting
