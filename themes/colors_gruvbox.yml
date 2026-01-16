@@ -1,377 +1,317 @@
----
-# Apply Dracula color scheme to all themed tools
+# Apply Gruvbox Dark color scheme to all themed tools
+# Based on https://github.com/morhetz/gruvbox
 #
 # Usage:
-#   ansible-playbook themes/colors_dracula.yml
-
-- name: Apply Dracula colors
+#   ansible-playbook themes/colors_gruvbox.yml
+- name: Apply Gruvbox colors
   hosts: all
   gather_facts: true
-
   tasks:
     # tmux colors
     - name: Update tmux background color
       ansible.builtin.replace:
         path: ~/.tmux.conf
-        regexp: "#24283b"
-        replace: "#282a36"
-
+        regexp: "#24283b|#282a36|#151515"
+        replace: "#282828"
     - name: Update tmux dark background color
       ansible.builtin.replace:
         path: ~/.tmux.conf
-        regexp: "#1a1b26"
-        replace: "#21222c"
-
+        regexp: "#1a1b26|#21222c|#0d0d0d"
+        replace: "#1d2021"
     - name: Update tmux light background color
       ansible.builtin.replace:
         path: ~/.tmux.conf
-        regexp: "#3b4261"
-        replace: "#44475a"
-
+        regexp: "#3b4261|#44475a|#404040"
+        replace: "#3c3836"
     - name: Update tmux foreground color
       ansible.builtin.replace:
         path: ~/.tmux.conf
-        regexp: "#c0caf5"
-        replace: "#f8f8f2"
-
+        regexp: "#c0caf5|#f8f8f2|#e8e8d3"
+        replace: "#ebdbb2"
     - name: Update tmux dark foreground color
       ansible.builtin.replace:
         path: ~/.tmux.conf
-        regexp: "#565f89"
-        replace: "#6272a4"
-
-    - name: Update tmux light foreground color
-      ansible.builtin.replace:
-        path: ~/.tmux.conf
-        regexp: "#9aa5ce"
-        replace: "#f8f8f2"
-
+        regexp: "#565f89|#6272a4|#888888"
+        replace: "#928374"
     - name: Update tmux accent color
       ansible.builtin.replace:
         path: ~/.tmux.conf
-        regexp: "#7aa2f7"
-        replace: "#bd93f9"
-
+        regexp: "#7aa2f7|#bd93f9|#8197bf"
+        replace: "#83a598"
     - name: Update tmux theme comment
       ansible.builtin.replace:
         path: ~/.tmux.conf
-        regexp: "TokyoNight Storm"
-        replace: "Dracula"
-
+        regexp: "TokyoNight Storm|Dracula|Jellybeans"
+        replace: "Gruvbox Dark"
     # wezterm colors
     - name: Update wezterm color scheme
       ansible.builtin.replace:
         path: ~/.wezterm.lua
         regexp: 'color_scheme = ".*"'
-        replace: 'color_scheme = "Dracula"'
-
+        replace: 'color_scheme = "Gruvbox Dark (Gogh)"'
     # starship colors
     - name: Update starship background color
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: "#24283b"
-        replace: "#282a36"
-
+        regexp: "#24283b|#282a36|#151515"
+        replace: "#282828"
     - name: Update starship dark background color
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: "#1a1b26"
-        replace: "#21222c"
-
+        regexp: "#1a1b26|#21222c|#0d0d0d"
+        replace: "#1d2021"
     - name: Update starship light background color
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: "#3b4261"
-        replace: "#44475a"
-
+        regexp: "#3b4261|#44475a|#404040"
+        replace: "#3c3836"
     - name: Update starship foreground color
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: "#c0caf5"
-        replace: "#f8f8f2"
-
+        regexp: "#c0caf5|#f8f8f2|#e8e8d3"
+        replace: "#ebdbb2"
     - name: Update starship dark foreground color
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: "#565f89"
-        replace: "#6272a4"
-
-    - name: Update starship light foreground color
-      ansible.builtin.replace:
-        path: ~/.config/starship.toml
-        regexp: "#9aa5ce"
-        replace: "#f8f8f2"
-
+        regexp: "#565f89|#6272a4|#888888"
+        replace: "#928374"
     - name: Update starship accent color
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: "#7aa2f7"
-        replace: "#bd93f9"
-
+        regexp: "#7aa2f7|#bd93f9|#8197bf"
+        replace: "#83a598"
     - name: Update starship green color
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: "#9ece6a"
-        replace: "#50fa7b"
-
+        regexp: "#9ece6a|#50fa7b|#99ad6a"
+        replace: "#b8bb26"
     - name: Update starship red color
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: "#f7768e"
-        replace: "#ff5555"
-
+        regexp: "#f7768e|#ff5555|#cf6a4c"
+        replace: "#fb4934"
     - name: Update starship theme comment
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: "blue and grey only"
-        replace: "Dracula theme"
-
-    # neovim - add dracula plugin
-    - name: Add dracula plugin to neovim
+        regexp: "blue and grey only|Dracula theme|Jellybeans theme"
+        replace: "Gruvbox Dark theme"
+    # neovim - add gruvbox plugin
+    - name: Add gruvbox plugin to neovim
       ansible.builtin.lineinfile:
         path: ~/.config/nvim/init.lua
         insertbefore: "{ -- You can easily change to a different colorscheme"
-        line: "  { 'Mofiqul/dracula.nvim', priority = 1000 },"
-
+        line: "  { 'morhetz/gruvbox', priority = 1000 },"
+    # neovim - remove other theme plugins
+    - name: Remove dracula plugin from neovim
+      ansible.builtin.lineinfile:
+        path: ~/.config/nvim/init.lua
+        regexp: ".*Mofiqul/dracula.nvim.*"
+        state: absent
+    - name: Remove jellybeans plugin from neovim
+      ansible.builtin.lineinfile:
+        path: ~/.config/nvim/init.lua
+        regexp: ".*nanotech/jellybeans.vim.*"
+        state: absent
+    - name: Remove catppuccin plugin from neovim
+      ansible.builtin.lineinfile:
+        path: ~/.config/nvim/init.lua
+        regexp: ".*catppuccin/nvim.*"
+        state: absent
     # neovim - update colorscheme
     - name: Update neovim colorscheme
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: "vim[.]cmd[.]colorscheme '[^']+'"
-        replace: "vim.cmd.colorscheme 'dracula'"
-
+        replace: "vim.cmd.colorscheme 'gruvbox'"
     # neovim statusline colors
     - name: Update neovim statusline background color
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
-        regexp: "#24283b"
-        replace: "#282a36"
-
+        regexp: "#24283b|#282a36|#151515"
+        replace: "#282828"
     - name: Update neovim statusline dark background color
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
-        regexp: "#1a1b26"
-        replace: "#21222c"
-
+        regexp: "#1a1b26|#21222c|#0d0d0d"
+        replace: "#1d2021"
     - name: Update neovim statusline light background color
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
-        regexp: "#3b4261"
-        replace: "#44475a"
-
+        regexp: "#3b4261|#44475a|#404040"
+        replace: "#3c3836"
     - name: Update neovim statusline foreground color
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
-        regexp: "#c0caf5"
-        replace: "#f8f8f2"
-
+        regexp: "#c0caf5|#f8f8f2|#e8e8d3"
+        replace: "#ebdbb2"
     - name: Update neovim statusline dark foreground color
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
-        regexp: "#565f89"
-        replace: "#6272a4"
-
-    - name: Update neovim statusline light foreground color
-      ansible.builtin.replace:
-        path: ~/.config/nvim/init.lua
-        regexp: "#9aa5ce"
-        replace: "#f8f8f2"
-
+        regexp: "#565f89|#6272a4|#888888"
+        replace: "#928374"
     - name: Update neovim statusline accent color
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
-        regexp: "#7aa2f7"
-        replace: "#bd93f9"
-
+        regexp: "#7aa2f7|#bd93f9|#8197bf"
+        replace: "#83a598"
     # lazygit colors
     - name: Update lazygit accent color
       ansible.builtin.replace:
         path: ~/.config/lazygit/config.yml
-        regexp: "#7aa2f7"
-        replace: "#bd93f9"
-
+        regexp: "#7aa2f7|#bd93f9|#8197bf"
+        replace: "#83a598"
     - name: Update lazygit inactive border color
       ansible.builtin.replace:
         path: ~/.config/lazygit/config.yml
-        regexp: "#565f89"
-        replace: "#6272a4"
-
+        regexp: "#565f89|#6272a4|#888888"
+        replace: "#928374"
     - name: Update lazygit options text color
       ansible.builtin.replace:
         path: ~/.config/lazygit/config.yml
-        regexp: "#7dcfff"
-        replace: "#8be9fd"
-
+        regexp: "#7dcfff|#8be9fd|#8fbfdc"
+        replace: "#8ec07c"
     - name: Update lazygit selected line color
       ansible.builtin.replace:
         path: ~/.config/lazygit/config.yml
-        regexp: "#3b4261"
-        replace: "#44475a"
-
+        regexp: "#3b4261|#44475a|#404040"
+        replace: "#3c3836"
     - name: Update lazygit unstaged color
       ansible.builtin.replace:
         path: ~/.config/lazygit/config.yml
-        regexp: "#f7768e"
-        replace: "#ff5555"
-
+        regexp: "#f7768e|#ff5555|#cf6a4c"
+        replace: "#fb4934"
     - name: Update lazygit foreground color
       ansible.builtin.replace:
         path: ~/.config/lazygit/config.yml
-        regexp: "#c0caf5"
-        replace: "#f8f8f2"
-
+        regexp: "#c0caf5|#f8f8f2|#e8e8d3"
+        replace: "#ebdbb2"
     - name: Update lazygit green color
       ansible.builtin.replace:
         path: ~/.config/lazygit/config.yml
-        regexp: "#9ece6a"
-        replace: "#50fa7b"
-
+        regexp: "#9ece6a|#50fa7b|#99ad6a"
+        replace: "#b8bb26"
     - name: Update lazygit theme comment
       ansible.builtin.replace:
         path: ~/.config/lazygit/config.yml
-        regexp: "TokyoNight Storm"
-        replace: "Dracula"
-
+        regexp: "TokyoNight Storm|Dracula|Jellybeans"
+        replace: "Gruvbox Dark"
     # bat theme
     - name: Update bat theme
       ansible.builtin.replace:
         path: ~/.config/zsh/bat.zsh
         regexp: 'BAT_THEME="[^"]+"'
-        replace: 'BAT_THEME="Dracula"'
-
+        replace: 'BAT_THEME="gruvbox-dark"'
     - name: Update bat theme comment
       ansible.builtin.replace:
         path: ~/.config/zsh/bat.zsh
-        regexp: "TokyoNight Storm"
-        replace: "Dracula"
-
+        regexp: "TokyoNight Storm|Dracula|Jellybeans"
+        replace: "Gruvbox Dark"
     # fzf colors
     - name: Update fzf foreground color
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
-        regexp: "fg:#c0caf5"
-        replace: "fg:#f8f8f2"
-
+        regexp: "fg:#c0caf5|fg:#f8f8f2|fg:#e8e8d3"
+        replace: "fg:#ebdbb2"
     - name: Update fzf background color
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
-        regexp: "bg:#24283b"
-        replace: "bg:#282a36"
-
+        regexp: "bg:#24283b|bg:#282a36|bg:#151515"
+        replace: "bg:#282828"
     - name: Update fzf highlight color
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
-        regexp: "hl:#7aa2f7"
-        replace: "hl:#bd93f9"
-
+        regexp: "hl:#7aa2f7|hl:#bd93f9|hl:#8197bf"
+        replace: "hl:#83a598"
     - name: Update fzf selected background
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
-        regexp: "bg[+]:#3b4261"
-        replace: "bg+:#44475a"
-
+        regexp: "bg[+]:#3b4261|bg[+]:#44475a|bg[+]:#404040"
+        replace: "bg+:#3c3836"
     - name: Update fzf selected highlight
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
-        regexp: "hl[+]:#7dcfff"
-        replace: "hl+:#8be9fd"
-
+        regexp: "hl[+]:#7dcfff|hl[+]:#8be9fd|hl[+]:#8fbfdc"
+        replace: "hl+:#8ec07c"
     - name: Update fzf info color
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
-        regexp: "info:#9ece6a"
-        replace: "info:#50fa7b"
-
+        regexp: "info:#9ece6a|info:#50fa7b|info:#99ad6a"
+        replace: "info:#b8bb26"
     - name: Update fzf prompt color
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
-        regexp: "prompt:#7aa2f7"
-        replace: "prompt:#bd93f9"
-
+        regexp: "prompt:#7aa2f7|prompt:#bd93f9|prompt:#8197bf"
+        replace: "prompt:#83a598"
     - name: Update fzf pointer color
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
-        regexp: "pointer:#bb9af7"
-        replace: "pointer:#ff79c6"
-
+        regexp: "pointer:#bb9af7|pointer:#ff79c6|pointer:#c6b6ee"
+        replace: "pointer:#d3869b"
     - name: Update fzf marker color
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
-        regexp: "marker:#9ece6a"
-        replace: "marker:#50fa7b"
-
+        regexp: "marker:#9ece6a|marker:#50fa7b|marker:#99ad6a"
+        replace: "marker:#b8bb26"
     - name: Update fzf spinner color
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
-        regexp: "spinner:#bb9af7"
-        replace: "spinner:#ff79c6"
-
+        regexp: "spinner:#bb9af7|spinner:#ff79c6|spinner:#c6b6ee"
+        replace: "spinner:#d3869b"
     - name: Update fzf header color
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
-        regexp: "header:#7aa2f7"
-        replace: "header:#bd93f9"
-
+        regexp: "header:#7aa2f7|header:#bd93f9|header:#8197bf"
+        replace: "header:#83a598"
     - name: Update fzf theme comment
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
-        regexp: "TokyoNight Storm"
-        replace: "Dracula"
-
-    # lazydocker colors (same as lazygit)
+        regexp: "TokyoNight Storm|Dracula|Jellybeans"
+        replace: "Gruvbox Dark"
+    # lazydocker colors
     - name: Update lazydocker accent color
       ansible.builtin.replace:
         path: ~/.config/lazydocker/config.yml
-        regexp: "#7aa2f7"
-        replace: "#bd93f9"
-
+        regexp: "#7aa2f7|#bd93f9|#8197bf"
+        replace: "#83a598"
     - name: Update lazydocker inactive border color
       ansible.builtin.replace:
         path: ~/.config/lazydocker/config.yml
-        regexp: "#565f89"
-        replace: "#6272a4"
-
+        regexp: "#565f89|#6272a4|#888888"
+        replace: "#928374"
     - name: Update lazydocker options text color
       ansible.builtin.replace:
         path: ~/.config/lazydocker/config.yml
-        regexp: "#7dcfff"
-        replace: "#8be9fd"
-
+        regexp: "#7dcfff|#8be9fd|#8fbfdc"
+        replace: "#8ec07c"
     - name: Update lazydocker selected line color
       ansible.builtin.replace:
         path: ~/.config/lazydocker/config.yml
-        regexp: "#3b4261"
-        replace: "#44475a"
-
+        regexp: "#3b4261|#44475a|#404040"
+        replace: "#3c3836"
     - name: Update lazydocker unstaged color
       ansible.builtin.replace:
         path: ~/.config/lazydocker/config.yml
-        regexp: "#f7768e"
-        replace: "#ff5555"
-
+        regexp: "#f7768e|#ff5555|#cf6a4c"
+        replace: "#fb4934"
     - name: Update lazydocker foreground color
       ansible.builtin.replace:
         path: ~/.config/lazydocker/config.yml
-        regexp: "#c0caf5"
-        replace: "#f8f8f2"
-
+        regexp: "#c0caf5|#f8f8f2|#e8e8d3"
+        replace: "#ebdbb2"
     - name: Update lazydocker green color
       ansible.builtin.replace:
         path: ~/.config/lazydocker/config.yml
-        regexp: "#9ece6a"
-        replace: "#50fa7b"
-
+        regexp: "#9ece6a|#50fa7b|#99ad6a"
+        replace: "#b8bb26"
     - name: Update lazydocker theme comment
       ansible.builtin.replace:
         path: ~/.config/lazydocker/config.yml
-        regexp: "TokyoNight Storm"
-        replace: "Dracula"
-
-
+        regexp: "TokyoNight Storm|Dracula|Jellybeans"
+        replace: "Gruvbox Dark"
     - name: Done
       ansible.builtin.debug:
         msg: |
-          Dracula colors applied to all tools!
+          Gruvbox Dark colors applied to all tools!
           - tmux: run 'tmux source ~/.tmux.conf'
           - wezterm: restart wezterm
           - starship: changes apply on next prompt
