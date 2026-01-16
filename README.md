@@ -191,6 +191,17 @@ ansible-playbook setup.yml --limit myserver
 - import_playbook: tools/mytool/install_mytool.yml
 ```
 
+## Nerd Font / Powerline Characters
+
+The tmux statusline, neovim statusline, and starship prompt use special glyphs from Nerd Fonts (Unicode Private Use Area). These characters require a patched font to display correctly.
+
+**Key files with special characters:**
+- `tools/tmux/tmux.conf.j2` - Powerline arrows, icons
+- `tools/starship/starship.toml` - Powerline arrows, icons
+- `tools/neovim/nvim/init.lua` - Statusline arrows, diagnostic icons
+
+See the README in each tool directory for character code point references and editing instructions.
+
 ## Project Structure
 
 ```
