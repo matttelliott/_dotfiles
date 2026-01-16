@@ -1,0 +1,20 @@
+# Apply CaskaydiaCove Nerd Font (Cascadia Code)
+# Install: brew install --cask font-caskaydia-cove-nerd-font
+#
+# Usage:
+#   ansible-playbook themes/font_cascadia.yml
+- name: Apply CaskaydiaCove Nerd Font
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Update wezterm font
+      ansible.builtin.replace:
+        path: ~/.wezterm.lua
+        regexp: 'config\.font = wezterm\.font\("[^"]+"\)'
+        replace: 'config.font = wezterm.font("CaskaydiaCove Nerd Font")'
+    - name: Done
+      ansible.builtin.debug:
+        msg: |
+          CaskaydiaCove Nerd Font applied!
+          - Restart wezterm to see changes
+          - Install font if missing: brew install --cask font-caskaydia-cove-nerd-font
