@@ -114,7 +114,7 @@
     - name: Update starship git_branch format colors
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: '(format = "\[\]\(fg:#)[0-9a-fA-F]{6}( bg:#)[0-9a-fA-F]{6}(\)\[.+\$branch)'
+        regexp: '(format = "\[[^\]]*\]\(fg:#)[0-9a-fA-F]{6}( bg:#)[0-9a-fA-F]{6}(\)\[.+\$branch)'
         replace: '\g<1>6c6f85\g<2>ccd0da\g<3>'
     - name: Update starship git_status style colors
       ansible.builtin.replace:
