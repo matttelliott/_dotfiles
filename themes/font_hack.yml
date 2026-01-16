@@ -1,0 +1,20 @@
+# Apply Hack Nerd Font
+# Install: brew install --cask font-hack-nerd-font
+#
+# Usage:
+#   ansible-playbook themes/font_hack.yml
+- name: Apply Hack Nerd Font
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Update wezterm font
+      ansible.builtin.replace:
+        path: ~/.wezterm.lua
+        regexp: 'config\.font = wezterm\.font\("[^"]+"\)'
+        replace: 'config.font = wezterm.font("Hack Nerd Font")'
+    - name: Done
+      ansible.builtin.debug:
+        msg: |
+          Hack Nerd Font applied!
+          - Restart wezterm to see changes
+          - Install font if missing: brew install --cask font-hack-nerd-font
