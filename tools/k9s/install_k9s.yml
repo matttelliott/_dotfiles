@@ -25,3 +25,18 @@
       args:
         creates: /usr/bin/k9s
       when: ansible_facts['os_family'] == "Archlinux"
+    - name: Create k9s skins directory
+      file:
+        path: ~/.config/k9s/skins
+        state: directory
+    - name: Install k9s skin
+      copy:
+        src: skin.yml
+        dest: ~/.config/k9s/skins/tokyonight.yml
+    - name: Create k9s config to use skin
+      copy:
+        dest: ~/.config/k9s/config.yml
+        content: |
+          k9s:
+            ui:
+              skin: tokyonight
