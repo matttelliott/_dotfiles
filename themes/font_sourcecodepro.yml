@@ -1,0 +1,20 @@
+# Apply SauceCodePro Nerd Font (Source Code Pro)
+# Install: brew install --cask font-sauce-code-pro-nerd-font
+#
+# Usage:
+#   ansible-playbook themes/font_sourcecodepro.yml
+- name: Apply SauceCodePro Nerd Font
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Update wezterm font
+      ansible.builtin.replace:
+        path: ~/.wezterm.lua
+        regexp: 'config\.font = wezterm\.font\("[^"]+"\)'
+        replace: 'config.font = wezterm.font("SauceCodePro Nerd Font")'
+    - name: Done
+      ansible.builtin.debug:
+        msg: |
+          SauceCodePro Nerd Font applied!
+          - Restart wezterm to see changes
+          - Install font if missing: brew install --cask font-sauce-code-pro-nerd-font
