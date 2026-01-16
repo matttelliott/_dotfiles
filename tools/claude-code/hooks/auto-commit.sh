@@ -1,9 +1,9 @@
 #!/bin/bash
 # Auto-commit after Claude edits
 # Creates lightweight commits for easy undo with: git reset --hard HEAD~1
-# Squashes every 10 auto/wip commits into one with Claude-generated summary
+# Squashes every 5 auto/wip commits into one with Claude-generated summary
 
-SQUASH_THRESHOLD=10
+SQUASH_THRESHOLD=5
 
 git add -A
 
