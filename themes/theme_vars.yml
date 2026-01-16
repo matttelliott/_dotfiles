@@ -14,7 +14,6 @@
 # - red: Error/delete color
 # - cyan: Info/options color
 # - magenta: Secondary accent (pointer, spinner)
-
 themes:
   tokyonight:
     bg: "#24283b"
@@ -34,7 +33,6 @@ themes:
     nvim_plugin: ""
     wezterm_scheme: "tokyonight"
     bat_theme: "tokyonight_storm"
-
   dracula:
     bg: "#282a36"
     bg_dark: "#21222c"
@@ -53,7 +51,6 @@ themes:
     nvim_plugin: "  { 'Mofiqul/dracula.nvim', priority = 1000 },"
     wezterm_scheme: "Dracula"
     bat_theme: "Dracula"
-
   jellybeans:
     bg: "#151515"
     bg_dark: "#0d0d0d"
@@ -72,7 +69,6 @@ themes:
     nvim_plugin: "  { 'nanotech/jellybeans.vim', priority = 1000 },"
     wezterm_scheme: "Jellybeans"
     bat_theme: "base16"
-
   gruvbox:
     bg: "#282828"
     bg_dark: "#1d2021"
@@ -91,7 +87,6 @@ themes:
     nvim_plugin: "  { 'morhetz/gruvbox', priority = 1000 },"
     wezterm_scheme: "Gruvbox Dark (Gogh)"
     bat_theme: "gruvbox-dark"
-
   catppuccin_latte:
     bg: "#eff1f5"
     bg_dark: "#e6e9ef"
