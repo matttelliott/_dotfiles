@@ -191,6 +191,26 @@ ansible-playbook setup.yml --limit myserver
 - import_playbook: tools/mytool/install_mytool.yml
 ```
 
+## Themes
+
+Use the `themesetting` command to interactively switch colors, fonts, and styles:
+
+```bash
+themesetting
+```
+
+This uses fzf to select from available themes in the `themes/` directory:
+
+| Type | Files | Description |
+|------|-------|-------------|
+| color | `colors_*.yml` | Color schemes (tokyonight, gruvbox, dracula, etc.) |
+| font | `font_*.yml` | Terminal fonts (jetbrainsmono, firacode, etc.) |
+| style | `style_*.yml` | Powerline separator styles (angle, round) |
+
+### Theme Files
+
+Theme playbooks modify config files for tmux, starship, neovim, wezterm, lazygit, fzf, and bat.
+
 ## Nerd Font / Powerline Characters
 
 The tmux statusline, neovim statusline, and starship prompt use special glyphs from Nerd Fonts (Unicode Private Use Area). These characters require a patched font to display correctly.
@@ -200,7 +220,43 @@ The tmux statusline, neovim statusline, and starship prompt use special glyphs f
 - `tools/starship/starship.toml` - Powerline arrows, icons
 - `tools/neovim/nvim/init.lua` - Statusline arrows, diagnostic icons
 
-See the README in each tool directory for character code point references and editing instructions.
+### Powerline Separator Glyphs
+
+| Style | Right | Left | Code Points |
+|-------|-------|------|-------------|
+| Angled | `` | `` | U+E0B0, U+E0B2 |
+| Round | `` | `` | U+E0B4, U+E0B6 |
+
+### Editing Special Characters
+
+These Unicode Private Use Area characters display inconsistently in editors and are problematic for LLMs. When editing files containing these glyphs:
+
+**For Ansible playbooks** - Use `\uXXXX` escape sequences in variables:
+```yaml
+vars:
+  arrow_right: "\uE0B0"
+  round_right: "\uE0B4"
+tasks:
+  - name: Replace separator
+    ansible.builtin.replace:
+      path: ~/.tmux.conf
+      regexp: "{{ arrow_right }}"
+      replace: "{{ round_right }}"
+```
+
+**For Lua (neovim)** - Use `vim.fn.nr2char()`:
+```lua
+local arrow_right = vim.fn.nr2char(0xe0b0)
+local round_right = vim.fn.nr2char(0xe0b4)
+```
+
+**For Python** - Use `chr()`:
+```python
+arrow_right = chr(0xE0B0)
+round_right = chr(0xE0B4)
+```
+
+See `themes/style_angle.yml` and `themes/style_round.yml` for complete examples.
 
 ## Project Structure
 

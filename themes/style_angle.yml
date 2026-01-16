@@ -1,0 +1,93 @@
+# Apply angled/chevron powerline separators to all themed tools
+#
+# Changes round semicircle glyphs to angled chevron glyphs:
+#   U+E0B4 (right round) -> U+E0B0 (right arrow)
+#   U+E0B6 (left round)  -> U+E0B2 (left arrow)
+#
+# This playbook demonstrates the recommended pattern for editing Nerd Font
+# characters: use \uXXXX escape sequences in Ansible variables rather than
+# raw Unicode characters, which display inconsistently in editors and LLMs.
+#
+# See README.md "Nerd Font / Powerline Characters" for full documentation.
+#
+# Usage:
+#   ansible-playbook themes/style_angle.yml
+#   # or use the interactive themesetting command
+- name: Apply angled powerline separators
+  hosts: all
+  gather_facts: true
+  vars:
+    # Round separators (current)
+    round_right: "\uE0B4"
+    round_left: "\uE0B6"
+    # Angled separators (target)
+    arrow_right: "\uE0B0"
+    arrow_left: "\uE0B2"
+  tasks:
+    # ===================
+    # TMUX
+    # ===================
+    - name: Update tmux status-left right arrows
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ round_right }}"
+        replace: "{{ arrow_right }}"
+
+    - name: Update tmux status-left left arrows
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ round_left }}"
+        replace: "{{ arrow_left }}"
+
+    # ===================
+    # STARSHIP
+    # ===================
+    - name: Update starship right arrows
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ round_right }}"
+        replace: "{{ arrow_right }}"
+
+    - name: Update starship left arrows
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ round_left }}"
+        replace: "{{ arrow_left }}"
+
+    # ===================
+    # NEOVIM
+    # ===================
+    # Neovim uses vim.fn.nr2char(0xe0b4) format, so we replace the hex codes
+    - name: Update neovim right arrow (0xe0b4 -> 0xe0b0)
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: 'nr2char\(0xe0b4\)'
+        replace: 'nr2char(0xe0b0)'
+
+    - name: Update neovim left arrow (0xe0b6 -> 0xe0b2)
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: 'nr2char\(0xe0b6\)'
+        replace: 'nr2char(0xe0b2)'
+
+    # Also handle any comments referencing the round characters
+    - name: Update neovim arrow comment (right)
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "(--.*arrow.*){{ round_right }}"
+        replace: "\\1{{ arrow_right }}"
+
+    - name: Update neovim arrow comment (left)
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "(--.*arrow.*){{ round_left }}"
+        replace: "\\1{{ arrow_left }}"
+
+    - name: Done
+      ansible.builtin.debug:
+        msg: |
+          Angled powerline separators applied to all tools!
+          Changed: U+E0B4/U+E0B6 (round) -> U+E0B0/U+E0B2 (angled)
+          - tmux: run 'tmux source ~/.tmux.conf'
+          - starship: changes apply on next prompt
+          - neovim: restart neovim
