@@ -129,7 +129,7 @@
     - name: Update starship custom dir_end color
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: '(\[custom\.dir_end\].*\nformat = "\[\]\(fg:#)[0-9a-fA-F]{6}(\)")'
+        regexp: '(\[custom\.dir_end\].*\nformat = "\[[^\]]*\]\(fg:#)[0-9a-fA-F]{6}(\)")'
         replace: '\g<1>565f89\g<2>'
     - name: Update starship jobs style color
       ansible.builtin.replace:
