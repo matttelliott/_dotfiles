@@ -1,0 +1,20 @@
+# Apply MesloLGS Nerd Font
+# Install: brew install --cask font-meslo-lg-nerd-font
+#
+# Usage:
+#   ansible-playbook themes/font_meslo.yml
+- name: Apply MesloLGS Nerd Font
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Update wezterm font
+      ansible.builtin.replace:
+        path: ~/.wezterm.lua
+        regexp: 'config\.font = wezterm\.font\("[^"]+"\)'
+        replace: 'config.font = wezterm.font("MesloLGS Nerd Font")'
+    - name: Done
+      ansible.builtin.debug:
+        msg: |
+          MesloLGS Nerd Font applied!
+          - Restart wezterm to see changes
+          - Install font if missing: brew install --cask font-meslo-lg-nerd-font
