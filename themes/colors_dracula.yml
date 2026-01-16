@@ -1,5 +1,5 @@
 ---
-# Apply Dracula color scheme to tmux, wezterm, starship, neovim, and lazygit
+# Apply Dracula color scheme to all themed tools
 #
 # Usage:
 #   ansible-playbook themes/colors_dracula.yml
@@ -232,12 +232,236 @@
         regexp: "TokyoNight Storm"
         replace: "Dracula"
 
+    # bat theme
+    - name: Update bat theme
+      ansible.builtin.replace:
+        path: ~/.config/zsh/bat.zsh
+        regexp: 'BAT_THEME="[^"]+"'
+        replace: 'BAT_THEME="Dracula"'
+
+    - name: Update bat theme comment
+      ansible.builtin.replace:
+        path: ~/.config/zsh/bat.zsh
+        regexp: "TokyoNight Storm"
+        replace: "Dracula"
+
+    # fzf colors
+    - name: Update fzf foreground color
+      ansible.builtin.replace:
+        path: ~/.config/zsh/fzf.zsh
+        regexp: "fg:#c0caf5"
+        replace: "fg:#f8f8f2"
+
+    - name: Update fzf background color
+      ansible.builtin.replace:
+        path: ~/.config/zsh/fzf.zsh
+        regexp: "bg:#24283b"
+        replace: "bg:#282a36"
+
+    - name: Update fzf highlight color
+      ansible.builtin.replace:
+        path: ~/.config/zsh/fzf.zsh
+        regexp: "hl:#7aa2f7"
+        replace: "hl:#bd93f9"
+
+    - name: Update fzf selected background
+      ansible.builtin.replace:
+        path: ~/.config/zsh/fzf.zsh
+        regexp: "bg[+]:#3b4261"
+        replace: "bg+:#44475a"
+
+    - name: Update fzf selected highlight
+      ansible.builtin.replace:
+        path: ~/.config/zsh/fzf.zsh
+        regexp: "hl[+]:#7dcfff"
+        replace: "hl+:#8be9fd"
+
+    - name: Update fzf info color
+      ansible.builtin.replace:
+        path: ~/.config/zsh/fzf.zsh
+        regexp: "info:#9ece6a"
+        replace: "info:#50fa7b"
+
+    - name: Update fzf prompt color
+      ansible.builtin.replace:
+        path: ~/.config/zsh/fzf.zsh
+        regexp: "prompt:#7aa2f7"
+        replace: "prompt:#bd93f9"
+
+    - name: Update fzf pointer color
+      ansible.builtin.replace:
+        path: ~/.config/zsh/fzf.zsh
+        regexp: "pointer:#bb9af7"
+        replace: "pointer:#ff79c6"
+
+    - name: Update fzf marker color
+      ansible.builtin.replace:
+        path: ~/.config/zsh/fzf.zsh
+        regexp: "marker:#9ece6a"
+        replace: "marker:#50fa7b"
+
+    - name: Update fzf spinner color
+      ansible.builtin.replace:
+        path: ~/.config/zsh/fzf.zsh
+        regexp: "spinner:#bb9af7"
+        replace: "spinner:#ff79c6"
+
+    - name: Update fzf header color
+      ansible.builtin.replace:
+        path: ~/.config/zsh/fzf.zsh
+        regexp: "header:#7aa2f7"
+        replace: "header:#bd93f9"
+
+    - name: Update fzf theme comment
+      ansible.builtin.replace:
+        path: ~/.config/zsh/fzf.zsh
+        regexp: "TokyoNight Storm"
+        replace: "Dracula"
+
+    # lazydocker colors (same as lazygit)
+    - name: Update lazydocker accent color
+      ansible.builtin.replace:
+        path: ~/.config/lazydocker/config.yml
+        regexp: "#7aa2f7"
+        replace: "#bd93f9"
+
+    - name: Update lazydocker inactive border color
+      ansible.builtin.replace:
+        path: ~/.config/lazydocker/config.yml
+        regexp: "#565f89"
+        replace: "#6272a4"
+
+    - name: Update lazydocker options text color
+      ansible.builtin.replace:
+        path: ~/.config/lazydocker/config.yml
+        regexp: "#7dcfff"
+        replace: "#8be9fd"
+
+    - name: Update lazydocker selected line color
+      ansible.builtin.replace:
+        path: ~/.config/lazydocker/config.yml
+        regexp: "#3b4261"
+        replace: "#44475a"
+
+    - name: Update lazydocker unstaged color
+      ansible.builtin.replace:
+        path: ~/.config/lazydocker/config.yml
+        regexp: "#f7768e"
+        replace: "#ff5555"
+
+    - name: Update lazydocker foreground color
+      ansible.builtin.replace:
+        path: ~/.config/lazydocker/config.yml
+        regexp: "#c0caf5"
+        replace: "#f8f8f2"
+
+    - name: Update lazydocker green color
+      ansible.builtin.replace:
+        path: ~/.config/lazydocker/config.yml
+        regexp: "#9ece6a"
+        replace: "#50fa7b"
+
+    - name: Update lazydocker theme comment
+      ansible.builtin.replace:
+        path: ~/.config/lazydocker/config.yml
+        regexp: "TokyoNight Storm"
+        replace: "Dracula"
+
+    # k9s - copy dracula skin and update config
+    - name: Copy k9s skin as dracula
+      ansible.builtin.copy:
+        src: ~/.config/k9s/skins/tokyonight.yml
+        dest: ~/.config/k9s/skins/dracula.yml
+        remote_src: yes
+
+    - name: Update k9s dracula skin colors
+      ansible.builtin.replace:
+        path: ~/.config/k9s/skins/dracula.yml
+        regexp: "#24283b"
+        replace: "#282a36"
+
+    - name: Update k9s dracula dark bg
+      ansible.builtin.replace:
+        path: ~/.config/k9s/skins/dracula.yml
+        regexp: "#1a1b26"
+        replace: "#21222c"
+
+    - name: Update k9s dracula light bg
+      ansible.builtin.replace:
+        path: ~/.config/k9s/skins/dracula.yml
+        regexp: "#3b4261"
+        replace: "#44475a"
+
+    - name: Update k9s dracula foreground
+      ansible.builtin.replace:
+        path: ~/.config/k9s/skins/dracula.yml
+        regexp: "#c0caf5"
+        replace: "#f8f8f2"
+
+    - name: Update k9s dracula accent
+      ansible.builtin.replace:
+        path: ~/.config/k9s/skins/dracula.yml
+        regexp: "#7aa2f7"
+        replace: "#bd93f9"
+
+    - name: Update k9s dracula purple
+      ansible.builtin.replace:
+        path: ~/.config/k9s/skins/dracula.yml
+        regexp: "#bb9af7"
+        replace: "#ff79c6"
+
+    - name: Update k9s dracula cyan
+      ansible.builtin.replace:
+        path: ~/.config/k9s/skins/dracula.yml
+        regexp: "#7dcfff"
+        replace: "#8be9fd"
+
+    - name: Update k9s dracula green
+      ansible.builtin.replace:
+        path: ~/.config/k9s/skins/dracula.yml
+        regexp: "#9ece6a"
+        replace: "#50fa7b"
+
+    - name: Update k9s dracula red
+      ansible.builtin.replace:
+        path: ~/.config/k9s/skins/dracula.yml
+        regexp: "#f7768e"
+        replace: "#ff5555"
+
+    - name: Update k9s dracula orange
+      ansible.builtin.replace:
+        path: ~/.config/k9s/skins/dracula.yml
+        regexp: "#ff9e64"
+        replace: "#ffb86c"
+
+    - name: Update k9s dracula comment
+      ansible.builtin.replace:
+        path: ~/.config/k9s/skins/dracula.yml
+        regexp: "#565f89"
+        replace: "#6272a4"
+
+    - name: Update k9s skin comment
+      ansible.builtin.replace:
+        path: ~/.config/k9s/skins/dracula.yml
+        regexp: "TokyoNight Storm"
+        replace: "Dracula"
+
+    - name: Update k9s config to use dracula skin
+      ansible.builtin.replace:
+        path: ~/.config/k9s/config.yml
+        regexp: "skin: tokyonight"
+        replace: "skin: dracula"
+
     - name: Done
       ansible.builtin.debug:
         msg: |
-          Dracula colors applied!
+          Dracula colors applied to all tools!
           - tmux: run 'tmux source ~/.tmux.conf'
           - wezterm: restart wezterm
           - starship: changes apply on next prompt
           - neovim: restart neovim
           - lazygit: changes apply on next launch
+          - bat: changes apply on next use
+          - fzf: restart shell or source ~/.config/zsh/fzf.zsh
+          - lazydocker: changes apply on next launch
+          - k9s: changes apply on next launch
