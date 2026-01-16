@@ -161,27 +161,6 @@
         path: ~/.config/starship.toml
         regexp: '^# Starship configuration - .+$'
         replace: '# Starship configuration - TokyoNight Storm theme'
-    # neovim - remove other theme plugins
-    - name: Remove dracula plugin from neovim
-      ansible.builtin.lineinfile:
-        path: ~/.config/nvim/init.lua
-        regexp: ".*Mofiqul/dracula.nvim.*"
-        state: absent
-    - name: Remove jellybeans plugin from neovim
-      ansible.builtin.lineinfile:
-        path: ~/.config/nvim/init.lua
-        regexp: ".*nanotech/jellybeans.vim.*"
-        state: absent
-    - name: Remove gruvbox plugin from neovim
-      ansible.builtin.lineinfile:
-        path: ~/.config/nvim/init.lua
-        regexp: ".*morhetz/gruvbox.*"
-        state: absent
-    - name: Remove catppuccin plugin from neovim
-      ansible.builtin.lineinfile:
-        path: ~/.config/nvim/init.lua
-        regexp: ".*catppuccin/nvim.*"
-        state: absent
     # neovim - update colorscheme
     - name: Update neovim colorscheme
       ansible.builtin.replace:
