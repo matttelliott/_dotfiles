@@ -171,27 +171,27 @@
     - name: Update neovim StMode highlight
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
-        regexp: "vim.api.nvim_set_hl\\(0, 'StMode', \\{ fg = '#[0-9a-fA-F]{6}', bg = '#[0-9a-fA-F]{6}', bold = true \\}\\)"
+        regexp: "vim\\.api\\.nvim_set_hl\\(0, 'StMode', \\{ fg = '#[0-9a-fA-F]{6}', bg = '#[0-9a-fA-F]{6}', bold = true \\}\\)"
         replace: "vim.api.nvim_set_hl(0, 'StMode', { fg = '#21222c', bg = '#bd93f9', bold = true })"
     - name: Update neovim StModeSep highlight
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
-        regexp: "vim.api.nvim_set_hl\\(0, 'StModeSep', \\{ fg = '#[0-9a-fA-F]{6}', bg = '#[0-9a-fA-F]{6}' \\}\\)"
+        regexp: "vim\\.api\\.nvim_set_hl\\(0, 'StModeSep', \\{ fg = '#[0-9a-fA-F]{6}', bg = '#[0-9a-fA-F]{6}' \\}\\)"
         replace: "vim.api.nvim_set_hl(0, 'StModeSep', { fg = '#bd93f9', bg = '#282a36' })"
     - name: Update neovim StFile highlight
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
-        regexp: "vim.api.nvim_set_hl\\(0, 'StFile', \\{ fg = '#[0-9a-fA-F]{6}', bg = '#[0-9a-fA-F]{6}' \\}\\)"
+        regexp: "vim\\.api\\.nvim_set_hl\\(0, 'StFile', \\{ fg = '#[0-9a-fA-F]{6}', bg = '#[0-9a-fA-F]{6}' \\}\\)"
         replace: "vim.api.nvim_set_hl(0, 'StFile', { fg = '#6272a4', bg = '#282a36' })"
     - name: Update neovim StGitSep highlight
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
-        regexp: "vim.api.nvim_set_hl\\(0, 'StGitSep', \\{ fg = '#[0-9a-fA-F]{6}', bg = '#[0-9a-fA-F]{6}' \\}\\)"
+        regexp: "vim\\.api\\.nvim_set_hl\\(0, 'StGitSep', \\{ fg = '#[0-9a-fA-F]{6}', bg = '#[0-9a-fA-F]{6}' \\}\\)"
         replace: "vim.api.nvim_set_hl(0, 'StGitSep', { fg = '#282a36', bg = '#44475a' })"
     - name: Update neovim StGit highlight
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
-        regexp: "vim.api.nvim_set_hl\\(0, 'StGit', \\{ fg = '#[0-9a-fA-F]{6}', bg = '#[0-9a-fA-F]{6}' \\}\\)"
+        regexp: "vim\\.api\\.nvim_set_hl\\(0, 'StGit', \\{ fg = '#[0-9a-fA-F]{6}', bg = '#[0-9a-fA-F]{6}' \\}\\)"
         replace: "vim.api.nvim_set_hl(0, 'StGit', { fg = '#f8f8f2', bg = '#44475a' })"
     # lazygit
     - name: Update lazygit activeBorderColor
