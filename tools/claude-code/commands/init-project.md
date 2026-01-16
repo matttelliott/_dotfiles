@@ -32,6 +32,7 @@ Look for these indicators (or use hint: $ARGUMENTS):
 - **Lua**: \*.lua files, .luacheckrc
 - **Ansible**: playbook.yml, ansible.cfg, roles/
 - **Terraform**: \*.tf files
+- **Kubernetes**: kustomization.yaml, Chart.yaml, \*.yaml with `apiVersion:`/`kind:`
 
 ## Step 3: Customize Templates (AI-generated parts)
 
@@ -50,8 +51,9 @@ Fill in the skeleton with:
 Add PostToolUse hooks based on detected tools (only if installed):
 
 - **Formatters**: prettier, black, gofmt, rustfmt, stylua, yamlfmt
-- **Linters**: eslint, ruff, golangci-lint, clippy, luacheck, ansible-lint
+- **Linters**: eslint, ruff, golangci-lint, clippy, luacheck, ansible-lint, kubeval, helm lint
 - **Tests**: npm test, pytest, go test, cargo test, busted
+- **Kubernetes**: kubectl --dry-run=client, kubeconform, kustomize build
 
 ### .claude/agents/reviewer.md
 
@@ -62,6 +64,7 @@ Add project-specific checklist items:
 - Node: async/await, error handling, TypeScript types
 - Python: type hints, docstrings, import organization
 - Go: error handling, goroutine safety
+- Kubernetes: resource limits, security contexts, liveness/readiness probes, image tags (no :latest), namespace specification, RBAC least privilege
 
 ### .claude/commands/dev.md
 

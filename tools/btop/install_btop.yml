@@ -33,3 +33,14 @@
       ansible.builtin.copy:
         src: btop.conf
         dest: ~/.config/btop/btop.conf
+
+    - name: Install btop aliases
+      ansible.builtin.copy:
+        src: btop.zsh
+        dest: ~/.config/zsh/btop.zsh
+
+    - name: Source btop aliases in zshrc
+      ansible.builtin.lineinfile:
+        path: ~/.zshrc
+        line: source ~/.config/zsh/btop.zsh
+        create: yes
