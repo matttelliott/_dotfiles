@@ -38,3 +38,11 @@
         path: ~/.zshrc
         line: source ~/.config/zsh/lazydocker.zsh
         create: yes
+    - name: Create lazydocker config directory
+      file:
+        path: ~/.config/lazydocker
+        state: directory
+    - name: Install lazydocker config
+      copy:
+        src: config.yml
+        dest: ~/.config/lazydocker/config.yml
