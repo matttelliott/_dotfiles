@@ -46,3 +46,36 @@ if [[ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 elif [[ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
   source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fi
+
+# Adjust terminal theme
+themesetting () {
+	local themes_dir="$DOTFILES/themes"
+	local hostname=$(hostname -s)
+	if [[ ! -d "$themes_dir" ]]
+	then
+		echo "Error: themes directory not found at $themes_dir"
+		echo "Set DOTFILES environment variable to your dotfiles location"
+		return 1
+	fi
+	local themes=$(
+    ls "$themes_dir"/colors_*.yml 2>/dev/null | xargs -n1 basename | sed 's/colors_/color: /; s/\.yml//'
+    ls "$themes_dir"/font_*.yml 2>/dev/null | xargs -n1 basename | sed 's/font_/font: /; s/\.yml//'
+  )
+	local selection=$(echo "$themes" | sort | fzf --height=40% --reverse --prompt="Select theme: ")
+	if [[ -z "$selection" ]]
+	then
+		return 0
+	fi
+	local type=$(echo "$selection" | cut -d: -f1)
+	local name=$(echo "$selection" | cut -d: -f2 | xargs)
+	case "$type" in
+		(color) echo "Applying $name color theme..."
+			ansible-playbook "$themes_dir/colors_${name}.yml" --connection=local --limit "$hostname"
+			echo ""
+			echo "Reload: tmux source ~/.tmux.conf && restart wezterm/neovim" ;;
+		(font) echo "Applying $name font..."
+			ansible-playbook "$themes_dir/font_${name}.yml" --connection=local --limit "$hostname"
+			echo ""
+			echo "Restart wezterm to see changes" ;;
+	esac
+}
