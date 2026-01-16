@@ -105,3 +105,29 @@ Tools with shell config source their `<tool>.zsh` file in the zshrc.
 - Playbooks: Use `ansible-lint` for validation
 - Always use `become: yes` for package manager tasks on Linux
 - Use `creates:` for idempotent Homebrew shell commands
+
+## Nerd Font / Powerline Characters
+
+**IMPORTANT:** The tmux, starship, and neovim configs contain Nerd Font glyphs (Unicode Private Use Area: U+E0xx, U+F0xx, etc.). These characters are problematic for LLMs because they display as whitespace or render inconsistently.
+
+**Files with special characters:**
+- `tools/tmux/tmux.conf.j2`
+- `tools/starship/starship.toml`
+- `tools/neovim/nvim/init.lua`
+
+**DO NOT edit these characters directly.** Instead, use Python scripts to modify them by code point:
+
+```python
+# Example: Generate a powerline arrow
+POWERLINE_RIGHT = chr(0xE0B0)  #
+POWERLINE_LEFT = chr(0xE0B2)   #
+GIT_BRANCH = chr(0xE0A0)       #
+
+# Find code point of existing character
+char = ""  # paste character
+print(f"U+{ord(char):04X}")
+```
+
+**For Lua (neovim)**, prefer `vim.fn.nr2char(0xe0b0)` over raw characters.
+
+See README files in `tools/tmux/`, `tools/starship/`, and `tools/neovim/` for full character references.
