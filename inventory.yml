@@ -3,19 +3,19 @@ all:
     macs:
       hosts:
         macbookair:
-          ansible_host: macbookair
+          ansible_host: macbookair.home.lan
           ansible_user: matt
           ansible_ssh_timeout: 60
           ansible_python_interpreter: /opt/homebrew/bin/python3
         macmini:
-          ansible_host: macmini
+          ansible_host: macmini.home.lan
           ansible_user: matt
           ansible_ssh_timeout: 60
           ansible_python_interpreter: /opt/homebrew/bin/python3
     debian:
       hosts:
         desktop:
-          ansible_host: desktop
+          ansible_host: desktop.home.lan
           ansible_user: matt
           ansible_ssh_timeout: 60
           ansible_python_interpreter: /usr/bin/python3
