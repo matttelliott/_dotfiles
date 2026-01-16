@@ -75,77 +75,61 @@
         path: ~/.wezterm.lua
         regexp: 'color_scheme = "[^"]+"'
         replace: 'color_scheme = "Dracula"'
-    # starship - styles
-    - name: Update starship username style_user
+    # starship - section-specific patterns (include section header for uniqueness)
+    - name: Update starship username section
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: 'style_user = "fg:#[0-9a-fA-F]{6} bg:#[0-9a-fA-F]{6} bold"'
-        replace: 'style_user = "fg:#21222c bg:#bd93f9 bold"'
-    - name: Update starship username style_root
+        regexp: '\[username\]\nstyle_user = "[^"]+"\nstyle_root = "[^"]+"\nshow_always = true\nformat = "[^"]+"'
+        replace: '[username]\nstyle_user = "fg:#21222c bg:#bd93f9 bold"\nstyle_root = "fg:#21222c bg:#ff5555 bold"\nshow_always = true\nformat = "[  $user ]($style)[](fg:#bd93f9 bg:#44475a)"'
+    - name: Update starship hostname section
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: 'style_root = "fg:#[0-9a-fA-F]{6} bg:#[0-9a-fA-F]{6} bold"'
-        replace: 'style_root = "fg:#21222c bg:#ff5555 bold"'
-    # starship - format lines with transitions (match by unique content)
-    - name: Update starship username format
+        regexp: '\[hostname\]\nssh_only = false\nstyle = "[^"]+"\nformat = "[^"]+"'
+        replace: '[hostname]\nssh_only = false\nstyle = "fg:#f8f8f2 bg:#44475a"\nformat = "[  $hostname ]($style)[](fg:#44475a bg:#6272a4)"'
+    - name: Update starship directory section
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: 'format = "\[  \$user \]\(\$style\)\[\]\(fg:#[0-9a-fA-F]{6} bg:#[0-9a-fA-F]{6}\)"'
-        replace: 'format = "[  $user ]($style)[](fg:#bd93f9 bg:#44475a)"'
-    - name: Update starship hostname style
+        regexp: '\[directory\]\nstyle = "[^"]+"\ntruncation_length = 3\ntruncation_symbol = "[^"]+"\nformat = "[^"]+"'
+        replace: '[directory]\nstyle = "fg:#f8f8f2 bg:#6272a4 bold"\ntruncation_length = 3\ntruncation_symbol = "…/"\nformat = "[  $path ]($style)"'
+    - name: Update starship git_branch section
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: 'style = "fg:#[0-9a-fA-F]{6} bg:#[0-9a-fA-F]{6}"'
-        replace: 'style = "fg:#f8f8f2 bg:#44475a"'
-    - name: Update starship hostname format
+        regexp: '\[git_branch\]\nstyle = "[^"]+"\nsymbol = "[^"]+"\nformat = "[^"]+"'
+        replace: '[git_branch]\nstyle = "fg:#f8f8f2 bg:#44475a bold"\nsymbol = " "\nformat = "[](fg:#6272a4 bg:#44475a)[ $symbol$branch ]($style)"'
+    - name: Update starship git_status section
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: 'format = "\[  \$hostname \]\(\$style\)\[\]\(fg:#[0-9a-fA-F]{6} bg:#[0-9a-fA-F]{6}\)"'
-        replace: 'format = "[  $hostname ]($style)[](fg:#44475a bg:#6272a4)"'
-    - name: Update starship directory style
-      ansible.builtin.replace:
-        path: ~/.config/starship.toml
-        regexp: 'style = "fg:#[0-9a-fA-F]{6} bg:#[0-9a-fA-F]{6} bold"'
-        replace: 'style = "fg:#f8f8f2 bg:#6272a4 bold"'
-    - name: Update starship git_branch format
-      ansible.builtin.replace:
-        path: ~/.config/starship.toml
-        regexp: 'format = "\[\]\(fg:#[0-9a-fA-F]{6} bg:#[0-9a-fA-F]{6}\)\[ \$symbol\$branch \]\(\$style\)"'
-        replace: 'format = "[](fg:#6272a4 bg:#44475a)[ $symbol$branch ]($style)"'
-    - name: Update starship git_status format
-      ansible.builtin.replace:
-        path: ~/.config/starship.toml
-        regexp: 'format = "\[\$all_status\$ahead_behind\]\(\$style\)\[\]\(fg:#[0-9a-fA-F]{6}\)"'
-        replace: 'format = "[$all_status$ahead_behind]($style)[](fg:#44475a)"'
+        regexp: '\[git_status\]\nstyle = "[^"]+"\nformat = "[^"]+"'
+        replace: '[git_status]\nstyle = "fg:#f8f8f2 bg:#44475a"\nformat = "[$all_status$ahead_behind]($style)[](fg:#44475a)"'
     - name: Update starship custom dir_end format
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: 'format = "\[\]\(fg:#[0-9a-fA-F]{6}\)"'
-        replace: 'format = "[](fg:#6272a4)"'
-    - name: Update starship jobs style
+        regexp: '\[custom\.dir_end\]\nwhen = "[^"]+"\nshell = \["sh"\]\nformat = "[^"]+"'
+        replace: '[custom.dir_end]\nwhen = "! git rev-parse --is-inside-work-tree 2>/dev/null"\nshell = ["sh"]\nformat = "[](fg:#6272a4)"'
+    - name: Update starship jobs section
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: '\[jobs\]\nstyle = "fg:#[0-9a-fA-F]{6}"'
+        regexp: '\[jobs\]\nstyle = "[^"]+"'
         replace: '[jobs]\nstyle = "fg:#bd93f9"'
-    - name: Update starship cmd_duration style
+    - name: Update starship cmd_duration section
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: '\[cmd_duration\]\nmin_time = 0\nstyle = "fg:#[0-9a-fA-F]{6}"'
+        regexp: '\[cmd_duration\]\nmin_time = 0\nstyle = "[^"]+"'
         replace: '[cmd_duration]\nmin_time = 0\nstyle = "fg:#6272a4"'
-    - name: Update starship time style
+    - name: Update starship time section
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: '\[time\]\ndisabled = false\nstyle = "fg:#[0-9a-fA-F]{6}"'
+        regexp: '\[time\]\ndisabled = false\nstyle = "[^"]+"'
         replace: '[time]\ndisabled = false\nstyle = "fg:#6272a4"'
     - name: Update starship character success
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: 'success_symbol = ".+\(bold #[0-9a-fA-F]{6}\)"'
+        regexp: 'success_symbol = "[^"]+"'
         replace: 'success_symbol = " [](bold #50fa7b)"'
     - name: Update starship character error
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: 'error_symbol = ".+\(bold #[0-9a-fA-F]{6}\)"'
+        regexp: 'error_symbol = "[^"]+"'
         replace: 'error_symbol = " [](bold #ff5555)"'
     - name: Update starship theme comment
       ansible.builtin.replace:
