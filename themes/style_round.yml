@@ -4,8 +4,15 @@
 #   U+E0B0 (right arrow) -> U+E0B4 (right round)
 #   U+E0B2 (left arrow)  -> U+E0B6 (left round)
 #
+# This playbook demonstrates the recommended pattern for editing Nerd Font
+# characters: use \uXXXX escape sequences in Ansible variables rather than
+# raw Unicode characters, which display inconsistently in editors and LLMs.
+#
+# See README.md "Nerd Font / Powerline Characters" for full documentation.
+#
 # Usage:
 #   ansible-playbook themes/style_round.yml
+#   # or use the interactive themesetting command
 - name: Apply round powerline separators
   hosts: all
   gather_facts: true

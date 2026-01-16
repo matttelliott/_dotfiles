@@ -120,19 +120,40 @@ Tools with shell config source their `<tool>.zsh` file in the zshrc.
 - `tools/starship/starship.toml`
 - `tools/neovim/nvim/init.lua`
 
-**DO NOT edit these characters directly.** Instead, use Python scripts to modify them by code point:
+**DO NOT edit these characters directly.** Use escape sequences by code point instead.
 
-```python
-# Example: Generate a powerline arrow
-POWERLINE_RIGHT = chr(0xE0B0)  #
-POWERLINE_LEFT = chr(0xE0B2)   #
-GIT_BRANCH = chr(0xE0A0)       #
+### Powerline Separator Code Points
 
-# Find code point of existing character
-char = ""  # paste character
-print(f"U+{ord(char):04X}")
+| Style | Right | Left | Code Points |
+|-------|-------|------|-------------|
+| Angled | `` | `` | U+E0B0, U+E0B2 |
+| Round | `` | `` | U+E0B4, U+E0B6 |
+
+### Editing Approaches
+
+**For Ansible playbooks** - Use `\uXXXX` escape sequences in variables:
+```yaml
+vars:
+  arrow_right: "\uE0B0"
+  round_right: "\uE0B4"
+tasks:
+  - ansible.builtin.replace:
+      regexp: "{{ arrow_right }}"
+      replace: "{{ round_right }}"
 ```
 
-**For Lua (neovim)**, prefer `vim.fn.nr2char(0xe0b0)` over raw characters.
+**For Lua (neovim)** - Use `vim.fn.nr2char()`:
+```lua
+local arrow_right = vim.fn.nr2char(0xe0b0)
+```
 
-See README files in `tools/tmux/`, `tools/starship/`, and `tools/neovim/` for full character references.
+**For Python** - Use `chr()`:
+```python
+POWERLINE_RIGHT = chr(0xE0B0)
+```
+
+### Reference Examples
+
+See `themes/style_angle.yml` and `themes/style_round.yml` for complete working examples of replacing Nerd Font characters across tmux, starship, and neovim using Ansible.
+
+See `README.md` section "Nerd Font / Powerline Characters" for full documentation.

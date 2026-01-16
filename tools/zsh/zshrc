@@ -68,6 +68,7 @@ themesetting () {
 	local themes=$(
     ls "$themes_dir"/colors_*.yml 2>/dev/null | xargs -n1 basename | sed 's/colors_/color: /; s/\.yml//'
     ls "$themes_dir"/font_*.yml 2>/dev/null | xargs -n1 basename | sed 's/font_/font: /; s/\.yml//'
+    ls "$themes_dir"/style_*.yml 2>/dev/null | xargs -n1 basename | sed 's/style_/style: /; s/\.yml//'
   )
 	local selection=$(echo "$themes" | sort | fzf --height=40% --reverse --prompt="Select theme: ")
 	if [[ -z "$selection" ]]
@@ -82,6 +83,10 @@ themesetting () {
 			echo ""
 			echo "Reload: tmux source ~/.tmux.conf" ;;
 		(font) echo "Applying $name font..."
-			ansible-playbook "$themes_dir/font_${name}.yml" -i "$DOTFILES/inventory.yml" --connection=local --limit "$hostname"
+			ansible-playbook "$themes_dir/font_${name}.yml" -i "$DOTFILES/inventory.yml" --connection=local --limit "$hostname" ;;
+		(style) echo "Applying $name style..."
+			ansible-playbook "$themes_dir/style_${name}.yml" -i "$DOTFILES/inventory.yml" --connection=local --limit "$hostname"
+			echo ""
+			echo "Reload: tmux source ~/.tmux.conf"
 	esac
 }
