@@ -7,19 +7,18 @@ Set up Claude Code configuration for this project using templates and project an
 
 ## Step 1: Copy Templates (EXACT - do not modify structure)
 
-Copy these files from `~/_dotfiles/tools/claude-code/templates/` to the project:
+Copy these files from `{{ ansible_env.HOME }}/_dotfiles/tools/claude-code/templates/` to the project:
 
 | Template             | Destination                  | Action                                 |
 | -------------------- | ---------------------------- | -------------------------------------- |
 | `mcp.json`           | `.mcp.json`                  | Copy exactly                           |
 | `settings.json`      | `.claude/settings.json`      | Copy, then customize hooks             |
 | `agents/reviewer.md` | `.claude/agents/reviewer.md` | Copy, then add project-specific checks |
-| `commands/dev.md`    | `.claude/commands/dev.md`    | Copy, then customize commands          |
 | `rules/tests.md`     | `.claude/rules/tests.md`     | Copy exactly                           |
 | `CLAUDE.md`          | `CLAUDE.md`                  | Copy skeleton, then fill in            |
 | `gitignore`          | Append to `.gitignore`       | Append if entries missing              |
 
-Create directories first: `.claude/commands/`, `.claude/agents/`, `.claude/rules/`
+Create directories first: `.claude/agents/`, `.claude/rules/`
 
 ## Step 2: Detect Project Type
 
@@ -65,15 +64,6 @@ Add project-specific checklist items:
 - Python: type hints, docstrings, import organization
 - Go: error handling, goroutine safety
 - Kubernetes: resource limits, security contexts, liveness/readiness probes, image tags (no :latest), namespace specification, RBAC least privilege
-
-### .claude/commands/dev.md
-
-Replace placeholder commands with actual commands:
-
-- Node: `npm run dev`, `npm test`
-- Python: `python main.py`, `pytest`
-- Ansible: `ansible-playbook -i localhost.yml setup.yml --check`
-- Go: `go run .`, `go test ./...`
 
 ## Step 4: Verify
 

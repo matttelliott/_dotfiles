@@ -55,6 +55,11 @@
         src: commands/
         dest: ~/.claude/commands/
 
+    - name: Template init-project command with resolved home path
+      template:
+        src: commands/init-project.md.j2
+        dest: ~/.claude/commands/init-project.md
+
     - name: Create Claude agents directory
       file:
         path: ~/.claude/agents
