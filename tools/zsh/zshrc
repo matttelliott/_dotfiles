@@ -70,10 +70,10 @@ themesetting () {
 	local name=$(echo "$selection" | cut -d: -f2 | xargs)
 	case "$type" in
 		(color) echo "Applying $name color theme..."
-			ansible-playbook "$themes_dir/colors_${name}.yml" --connection=local --limit "$hostname"
+			ansible-playbook "$themes_dir/colors_${name}.yml" -i "$DOTFILES/inventory.yml" --connection=local --limit "$hostname"
 			echo ""
 			echo "Reload: tmux source ~/.tmux.conf" ;;
 		(font) echo "Applying $name font..."
-			ansible-playbook "$themes_dir/font_${name}.yml" --connection=local --limit "$hostname"
+			ansible-playbook "$themes_dir/font_${name}.yml" -i "$DOTFILES/inventory.yml" --connection=local --limit "$hostname"
 	esac
 }
