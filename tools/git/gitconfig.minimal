@@ -1,11 +1,2 @@
-[user]
-	email = matt@matttelliott.com
-	name = Matt T Elliott
-[init]
-	defaultBranch = master
-[pull]
-	rebase = false
-[merge]
-	ff = only
-[http]
-	sslVerify = true
+[include]
+	path = ~/.gitconfig.base
