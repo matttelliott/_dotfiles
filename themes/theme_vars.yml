@@ -1,0 +1,112 @@
+# Central theme color definitions - SINGLE SOURCE OF TRUTH
+# All color theme playbooks include this file
+# Regex patterns are dynamically computed from these definitions using Jinja2
+#
+# Each theme defines semantic color slots that map to the same roles across tools:
+# - bg: Main background color
+# - bg_dark: Darker background (e.g., statusline segments)
+# - bg_light: Lighter background (e.g., selection, active pane)
+# - fg: Main foreground/text color
+# - fg_dark: Muted/secondary foreground
+# - fg_light: Bright foreground (some themes use fg for this)
+# - accent: Primary accent (usually blue)
+# - green: Success/add color
+# - red: Error/delete color
+# - cyan: Info/options color
+# - magenta: Secondary accent (pointer, spinner)
+
+themes:
+  tokyonight:
+    bg: "#24283b"
+    bg_dark: "#1a1b26"
+    bg_light: "#3b4261"
+    fg: "#c0caf5"
+    fg_dark: "#565f89"
+    fg_light: "#9aa5ce"
+    accent: "#7aa2f7"
+    green: "#9ece6a"
+    red: "#f7768e"
+    cyan: "#7dcfff"
+    magenta: "#bb9af7"
+    name: "TokyoNight Storm"
+    comment: "blue and grey only"
+    nvim_colorscheme: "tokyonight-night"
+    nvim_plugin: ""
+    wezterm_scheme: "tokyonight"
+    bat_theme: "tokyonight_storm"
+
+  dracula:
+    bg: "#282a36"
+    bg_dark: "#21222c"
+    bg_light: "#44475a"
+    fg: "#f8f8f2"
+    fg_dark: "#6272a4"
+    fg_light: "#f8f8f2"
+    accent: "#bd93f9"
+    green: "#50fa7b"
+    red: "#ff5555"
+    cyan: "#8be9fd"
+    magenta: "#ff79c6"
+    name: "Dracula"
+    comment: "Dracula theme"
+    nvim_colorscheme: "dracula"
+    nvim_plugin: "  { 'Mofiqul/dracula.nvim', priority = 1000 },"
+    wezterm_scheme: "Dracula"
+    bat_theme: "Dracula"
+
+  jellybeans:
+    bg: "#151515"
+    bg_dark: "#0d0d0d"
+    bg_light: "#404040"
+    fg: "#e8e8d3"
+    fg_dark: "#888888"
+    fg_light: "#e8e8d3"
+    accent: "#8197bf"
+    green: "#99ad6a"
+    red: "#cf6a4c"
+    cyan: "#8fbfdc"
+    magenta: "#c6b6ee"
+    name: "Jellybeans"
+    comment: "Jellybeans theme"
+    nvim_colorscheme: "jellybeans"
+    nvim_plugin: "  { 'nanotech/jellybeans.vim', priority = 1000 },"
+    wezterm_scheme: "Jellybeans"
+    bat_theme: "base16"
+
+  gruvbox:
+    bg: "#282828"
+    bg_dark: "#1d2021"
+    bg_light: "#3c3836"
+    fg: "#ebdbb2"
+    fg_dark: "#928374"
+    fg_light: "#ebdbb2"
+    accent: "#83a598"
+    green: "#b8bb26"
+    red: "#fb4934"
+    cyan: "#8ec07c"
+    magenta: "#d3869b"
+    name: "Gruvbox Dark"
+    comment: "Gruvbox Dark theme"
+    nvim_colorscheme: "gruvbox"
+    nvim_plugin: "  { 'morhetz/gruvbox', priority = 1000 },"
+    wezterm_scheme: "Gruvbox Dark (Gogh)"
+    bat_theme: "gruvbox-dark"
+
+  catppuccin_latte:
+    bg: "#eff1f5"
+    bg_dark: "#e6e9ef"
+    bg_light: "#ccd0da"
+    fg: "#4c4f69"
+    fg_dark: "#6c6f85"
+    fg_light: "#4c4f69"
+    accent: "#1e66f5"
+    green: "#40a02b"
+    red: "#d20f39"
+    cyan: "#179299"
+    magenta: "#8839ef"
+    name: "Catppuccin Latte"
+    comment: "Catppuccin Latte theme"
+    nvim_colorscheme: "catppuccin-latte"
+    nvim_plugin: "  { 'catppuccin/nvim', name = 'catppuccin', priority = 1000 },"
+    wezterm_scheme: "Catppuccin Latte"
+    bat_theme: "Catppuccin Latte"
