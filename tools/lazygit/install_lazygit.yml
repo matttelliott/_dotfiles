@@ -50,3 +50,13 @@
         path: ~/.zshrc
         line: 'source ~/.config/zsh/lazygit.zsh'
         create: yes
+
+    - name: Create lazygit config directory
+      file:
+        path: ~/.config/lazygit
+        state: directory
+
+    - name: Install lazygit config
+      copy:
+        src: config.yml
+        dest: ~/.config/lazygit/config.yml

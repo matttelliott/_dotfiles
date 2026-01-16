@@ -1,0 +1,193 @@
+---
+# Apply Dracula color scheme to tmux, wezterm, starship, and neovim
+#
+# Usage:
+#   ansible-playbook themes/colors_dracula.yml
+
+- name: Apply Dracula colors
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    # tmux colors
+    - name: Update tmux background color
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "#24283b"
+        replace: "#282a36"
+
+    - name: Update tmux dark background color
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "#1a1b26"
+        replace: "#21222c"
+
+    - name: Update tmux light background color
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "#3b4261"
+        replace: "#44475a"
+
+    - name: Update tmux foreground color
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "#c0caf5"
+        replace: "#f8f8f2"
+
+    - name: Update tmux dark foreground color
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "#565f89"
+        replace: "#6272a4"
+
+    - name: Update tmux light foreground color
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "#9aa5ce"
+        replace: "#f8f8f2"
+
+    - name: Update tmux accent color
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "#7aa2f7"
+        replace: "#bd93f9"
+
+    - name: Update tmux theme comment
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "TokyoNight Storm"
+        replace: "Dracula"
+
+    # wezterm colors
+    - name: Update wezterm color scheme
+      ansible.builtin.replace:
+        path: ~/.wezterm.lua
+        regexp: 'color_scheme = ".*"'
+        replace: 'color_scheme = "Dracula"'
+
+    # starship colors
+    - name: Update starship background color
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "#24283b"
+        replace: "#282a36"
+
+    - name: Update starship dark background color
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "#1a1b26"
+        replace: "#21222c"
+
+    - name: Update starship light background color
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "#3b4261"
+        replace: "#44475a"
+
+    - name: Update starship foreground color
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "#c0caf5"
+        replace: "#f8f8f2"
+
+    - name: Update starship dark foreground color
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "#565f89"
+        replace: "#6272a4"
+
+    - name: Update starship light foreground color
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "#9aa5ce"
+        replace: "#f8f8f2"
+
+    - name: Update starship accent color
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "#7aa2f7"
+        replace: "#bd93f9"
+
+    - name: Update starship green color
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "#9ece6a"
+        replace: "#50fa7b"
+
+    - name: Update starship red color
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "#f7768e"
+        replace: "#ff5555"
+
+    - name: Update starship theme comment
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "blue and grey only"
+        replace: "Dracula theme"
+
+    # neovim - add dracula plugin
+    - name: Add dracula plugin to neovim
+      ansible.builtin.lineinfile:
+        path: ~/.config/nvim/init.lua
+        insertbefore: "{ -- You can easily change to a different colorscheme"
+        line: "  { 'Mofiqul/dracula.nvim', priority = 1000 },"
+
+    # neovim - update colorscheme
+    - name: Update neovim colorscheme
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "vim[.]cmd[.]colorscheme '[^']+'"
+        replace: "vim.cmd.colorscheme 'dracula'"
+
+    # neovim statusline colors
+    - name: Update neovim statusline background color
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "#24283b"
+        replace: "#282a36"
+
+    - name: Update neovim statusline dark background color
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "#1a1b26"
+        replace: "#21222c"
+
+    - name: Update neovim statusline light background color
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "#3b4261"
+        replace: "#44475a"
+
+    - name: Update neovim statusline foreground color
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "#c0caf5"
+        replace: "#f8f8f2"
+
+    - name: Update neovim statusline dark foreground color
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "#565f89"
+        replace: "#6272a4"
+
+    - name: Update neovim statusline light foreground color
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "#9aa5ce"
+        replace: "#f8f8f2"
+
+    - name: Update neovim statusline accent color
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "#7aa2f7"
+        replace: "#bd93f9"
+
+    - name: Done
+      ansible.builtin.debug:
+        msg: |
+          Dracula colors applied!
+          - tmux: run 'tmux source ~/.tmux.conf'
+          - wezterm: restart wezterm
+          - starship: changes apply on next prompt
+          - neovim: restart neovim (lazy.nvim will install dracula plugin)
