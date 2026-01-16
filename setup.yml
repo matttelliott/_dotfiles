@@ -6,6 +6,13 @@
     - name: Disable sleep
       command: pmset -a disablesleep 1
       become: yes
+- name: Update Homebrew (macOS)
+  hosts: macs
+  gather_facts: false
+  tasks:
+    - name: Update Homebrew
+      shell: /opt/homebrew/bin/brew update
+      changed_when: false
 - name: Update apt cache (Debian)
   hosts: debian
   gather_facts: false
