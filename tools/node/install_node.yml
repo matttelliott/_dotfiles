@@ -61,6 +61,8 @@
         export NVM_DIR="$HOME/.nvm"
         . /opt/homebrew/opt/nvm/nvm.sh
         npm install -g typescript @fsouza/prettierd eslint_d
+      args:
+        creates: ~/.nvm/versions/node/*/bin/tsc
       when: ansible_facts['os_family'] == "Darwin"
     - name: Install global npm packages (Linux)
       shell: |

@@ -856,6 +856,9 @@ require('lazy').setup({
         -- By default, you may press `<c-space>` to show the documentation.
         -- Optionally, set `auto_show = true` to show the documentation after a delay.
         documentation = { auto_show = false, auto_show_delay_ms = 500 },
+        accept = {
+          auto_brackets = { enabled = false },
+        },
       },
 
       sources = {
@@ -1007,10 +1010,30 @@ require('lazy').setup({
       if ok then
         configs.setup {
           ensure_installed = {
-            'bash', 'lua', 'luadoc', 'vim', 'vimdoc', 'query', 'diff',
-            'javascript', 'typescript', 'tsx', 'html', 'css', 'scss', 'json', 'yaml',
-            'python', 'rust', 'toml',
-            'gitcommit', 'gitignore', 'git_rebase', 'markdown', 'markdown_inline', 'regex',
+            'bash',
+            'lua',
+            'luadoc',
+            'vim',
+            'vimdoc',
+            'query',
+            'diff',
+            'javascript',
+            'typescript',
+            'tsx',
+            'html',
+            'css',
+            'scss',
+            'json',
+            'yaml',
+            'python',
+            'rust',
+            'toml',
+            'gitcommit',
+            'gitignore',
+            'git_rebase',
+            'markdown',
+            'markdown_inline',
+            'regex',
           },
           auto_install = false,
           sync_install = false,

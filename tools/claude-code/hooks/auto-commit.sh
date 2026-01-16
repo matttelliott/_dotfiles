@@ -37,16 +37,29 @@ else
     msg="Claude auto commit - $summary files"
 fi
 
-git commit --no-gpg-sign --no-verify -m "$msg" 2>/dev/null || true
+if ! git commit --no-gpg-sign --no-verify -m "$msg" 2>&1; then
+    echo "[auto-commit] Commit failed: $msg" >&2
+fi
 
 # --- Squash check ---
 
-# Count consecutive auto/wip commits from HEAD
+# Get remote HEAD to know which commits are already pushed
+remote_branch=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null)
+remote_head=""
+if [ -n "$remote_branch" ]; then
+    remote_head=$(git rev-parse "$remote_branch" 2>/dev/null)
+fi
+
+# Count consecutive LOCAL auto/wip commits from HEAD (stop at remote or non-auto)
 count=0
 commits_to_squash=""
 for sha in $(git log --format='%H' -n 50 2>/dev/null); do
+    # Stop if we've reached the remote HEAD (these commits are pushed)
+    if [ -n "$remote_head" ] && [ "$sha" = "$remote_head" ]; then
+        break
+    fi
     commit_msg=$(git log -1 --format='%s' "$sha" 2>/dev/null)
-    if [[ "$commit_msg" =~ "Claude auto commit"* ]] || [[ "$commit_msg" =~ ^[Ww][Ii][Pp] ]]; then
+    if [[ "$commit_msg" == "Claude auto commit"* ]] || [[ "$commit_msg" =~ ^[Ww][Ii][Pp] ]]; then
         ((count++))
         commits_to_squash="$commits_to_squash $sha"
     else
@@ -57,19 +70,10 @@ done
 # Only squash if threshold reached
 [ "$count" -lt "$SQUASH_THRESHOLD" ] && exit 0
 
-# Get the commit before the oldest auto-commit
+# Get the commit before the oldest auto-commit (or remote HEAD if we stopped there)
 oldest_auto_commit=$(echo "$commits_to_squash" | awk '{print $NF}')
 base_commit=$(git rev-parse "${oldest_auto_commit}^" 2>/dev/null)
 [ -z "$base_commit" ] && exit 0
-
-# Safety: don't squash if any commits have been pushed
-remote_branch=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null)
-if [ -n "$remote_branch" ]; then
-    remote_head=$(git rev-parse "$remote_branch" 2>/dev/null)
-    if [ -n "$remote_head" ]; then
-        git merge-base --is-ancestor "$remote_head" "$base_commit" 2>/dev/null || exit 0
-    fi
-fi
 
 # Get diff for Claude to summarize
 diff_content=$(git diff "$base_commit" HEAD 2>/dev/null)
@@ -88,5 +92,7 @@ squash_summary="Claude squashed auto-commits - $squash_summary"
 
 # Perform soft reset and recommit
 git reset --soft "$base_commit" 2>/dev/null || exit 0
-git commit --no-gpg-sign --no-verify -m "$squash_summary" 2>/dev/null || true
+if ! git commit --no-gpg-sign --no-verify -m "$squash_summary" 2>&1; then
+    echo "[auto-commit] Squash commit failed: $squash_summary" >&2
+fi
 git push
