@@ -74,6 +74,7 @@
 - import_playbook: tools/fzf/install_fzf.yml
 - import_playbook: tools/jq/install_jq.yml
 - import_playbook: tools/htop/install_htop.yml
+- import_playbook: tools/btop/install_btop.yml
 - import_playbook: tools/procs/install_procs.yml
 - import_playbook: tools/nmap/install_nmap.yml
 - import_playbook: tools/bat/install_bat.yml

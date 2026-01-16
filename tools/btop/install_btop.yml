@@ -1,0 +1,35 @@
+---
+- name: Install btop
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Install btop (macOS)
+      community.general.homebrew:
+        name: btop
+        state: present
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install btop (Debian/Ubuntu)
+      ansible.builtin.apt:
+        name: btop
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install btop (Arch)
+      community.general.pacman:
+        name: btop
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
+
+    - name: Create btop config directory
+      ansible.builtin.file:
+        path: ~/.config/btop
+        state: directory
+
+    - name: Install btop config
+      ansible.builtin.copy:
+        src: btop.conf
+        dest: ~/.config/btop/btop.conf
