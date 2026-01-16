@@ -34,20 +34,25 @@ _dotfiles/
 curl -fsSL https://raw.githubusercontent.com/matttelliott/_dotfiles/master/bootstrap.sh | bash
 ```
 
-### Run Locally (on macbookair)
+### Run Locally
 ```bash
-ansible-playbook setup.yml --connection=local --limit macbookair
+ansible-playbook setup.yml --connection=local --limit $(hostname -s)
 ```
 
 ### Dry-run (Check Mode)
 ```bash
-ansible-playbook setup.yml --connection=local --limit macbookair --check
+ansible-playbook setup.yml --connection=local --limit $(hostname -s) --check --diff
 ```
 
 ### Install Specific Tool Locally
 ```bash
-ansible-playbook tools/<tool>/install_<tool>.yml --connection=local --limit macbookair
+ansible-playbook tools/<tool>/install_<tool>.yml --connection=local --limit $(hostname -s)
 ```
+
+### Development Workflow
+1. Run in check mode with diff to preview changes
+2. If issues, run `ansible-lint` to validate
+3. Apply changes after review
 
 ### Run on Remote Host
 ```bash
