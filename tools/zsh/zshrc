@@ -14,6 +14,11 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 setopt AUTO_PUSHD           # Push dirs onto stack automatically
 setopt PUSHD_IGNORE_DUPS    # No duplicates in stack
 setopt PUSHD_SILENT         # Don't print stack after pushd
+
+# Spelling correction for commands and arguments
+setopt CORRECT              # Correct mistyped commands
+setopt CORRECT_ALL          # Correct mistyped arguments too
+SPROMPT='Correct %F{red}%R%f to %F{green}%r%f? [nyae] '
 alias 1='cd -1'
 alias 2='cd -2'
 alias 3='cd -3'

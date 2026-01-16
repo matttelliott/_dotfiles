@@ -96,7 +96,7 @@
         {% else %}
         . ~/.nvm/nvm.sh
         {% endif %}
-        claude mcp add --scope user --transport stdio playwright -- npx -y @anthropic/mcp-server-playwright
+        claude mcp add --scope user --transport stdio playwright -- npx -y @playwright/mcp
       register: mcp_playwright_result
       changed_when: "'Added' in mcp_playwright_result.stdout"
       failed_when: false

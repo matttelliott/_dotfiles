@@ -1,0 +1,25 @@
+---
+- name: Install cowsay
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Install cowsay (macOS)
+      community.general.homebrew:
+        name: cowsay
+        state: present
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install cowsay (Debian/Ubuntu)
+      ansible.builtin.apt:
+        name: cowsay
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install cowsay (Arch)
+      community.general.pacman:
+        name: cowsay
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"

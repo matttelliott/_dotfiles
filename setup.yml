@@ -89,6 +89,7 @@
 - import_playbook: tools/imagemagick/install_imagemagick.yml
 - import_playbook: tools/pandoc/install_pandoc.yml
 - import_playbook: tools/asciiquarium/install_asciiquarium.yml
+- import_playbook: tools/fastfetch/install_fastfetch.yml
 - import_playbook: tools/lazygit/install_lazygit.yml
 - import_playbook: tools/lazydocker/install_lazydocker.yml
 - import_playbook: tools/docker/install_docker.yml
