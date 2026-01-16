@@ -1,0 +1,80 @@
+# k9s skin - TokyoNight Storm theme
+k9s:
+  body:
+    fgColor: "#c0caf5"
+    bgColor: "#24283b"
+    logoColor: "#7aa2f7"
+  prompt:
+    fgColor: "#c0caf5"
+    bgColor: "#24283b"
+    suggestColor: "#7aa2f7"
+  info:
+    fgColor: "#bb9af7"
+    sectionColor: "#c0caf5"
+  dialog:
+    fgColor: "#c0caf5"
+    bgColor: "#24283b"
+    buttonFgColor: "#c0caf5"
+    buttonBgColor: "#7aa2f7"
+    buttonFocusFgColor: "#1a1b26"
+    buttonFocusBgColor: "#9ece6a"
+    labelFgColor: "#ff9e64"
+    fieldFgColor: "#c0caf5"
+  frame:
+    border:
+      fgColor: "#3b4261"
+      focusColor: "#7aa2f7"
+    menu:
+      fgColor: "#c0caf5"
+      keyColor: "#7aa2f7"
+      numKeyColor: "#7aa2f7"
+    crumbs:
+      fgColor: "#1a1b26"
+      bgColor: "#7aa2f7"
+      activeColor: "#bb9af7"
+    status:
+      newColor: "#7aa2f7"
+      modifyColor: "#bb9af7"
+      addColor: "#9ece6a"
+      errorColor: "#f7768e"
+      highlightColor: "#ff9e64"
+      killColor: "#565f89"
+      completedColor: "#565f89"
+    title:
+      fgColor: "#c0caf5"
+      bgColor: "#24283b"
+      highlightColor: "#7aa2f7"
+      counterColor: "#bb9af7"
+      filterColor: "#bb9af7"
+  views:
+    charts:
+      bgColor: default
+      defaultDialColors:
+        - "#7aa2f7"
+        - "#f7768e"
+      defaultChartColors:
+        - "#7aa2f7"
+        - "#f7768e"
+    table:
+      fgColor: "#c0caf5"
+      bgColor: "#24283b"
+      header:
+        fgColor: "#c0caf5"
+        bgColor: "#24283b"
+        sorterColor: "#7dcfff"
+    xray:
+      fgColor: "#c0caf5"
+      bgColor: "#24283b"
+      cursorColor: "#3b4261"
+      graphicColor: "#bb9af7"
+      showIcons: false
+    yaml:
+      keyColor: "#7aa2f7"
+      colonColor: "#565f89"
+      valueColor: "#c0caf5"
+    logs:
+      fgColor: "#c0caf5"
+      bgColor: "#24283b"
+      indicator:
+        fgColor: "#c0caf5"
+        bgColor: "#bb9af7"

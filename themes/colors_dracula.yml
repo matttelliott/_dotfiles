@@ -1,5 +1,5 @@
 ---
-# Apply Dracula color scheme to tmux, wezterm, starship, and neovim
+# Apply Dracula color scheme to tmux, wezterm, starship, neovim, and lazygit
 #
 # Usage:
 #   ansible-playbook themes/colors_dracula.yml
@@ -183,6 +183,55 @@
         regexp: "#7aa2f7"
         replace: "#bd93f9"
 
+    # lazygit colors
+    - name: Update lazygit accent color
+      ansible.builtin.replace:
+        path: ~/.config/lazygit/config.yml
+        regexp: "#7aa2f7"
+        replace: "#bd93f9"
+
+    - name: Update lazygit inactive border color
+      ansible.builtin.replace:
+        path: ~/.config/lazygit/config.yml
+        regexp: "#565f89"
+        replace: "#6272a4"
+
+    - name: Update lazygit options text color
+      ansible.builtin.replace:
+        path: ~/.config/lazygit/config.yml
+        regexp: "#7dcfff"
+        replace: "#8be9fd"
+
+    - name: Update lazygit selected line color
+      ansible.builtin.replace:
+        path: ~/.config/lazygit/config.yml
+        regexp: "#3b4261"
+        replace: "#44475a"
+
+    - name: Update lazygit unstaged color
+      ansible.builtin.replace:
+        path: ~/.config/lazygit/config.yml
+        regexp: "#f7768e"
+        replace: "#ff5555"
+
+    - name: Update lazygit foreground color
+      ansible.builtin.replace:
+        path: ~/.config/lazygit/config.yml
+        regexp: "#c0caf5"
+        replace: "#f8f8f2"
+
+    - name: Update lazygit green color
+      ansible.builtin.replace:
+        path: ~/.config/lazygit/config.yml
+        regexp: "#9ece6a"
+        replace: "#50fa7b"
+
+    - name: Update lazygit theme comment
+      ansible.builtin.replace:
+        path: ~/.config/lazygit/config.yml
+        regexp: "TokyoNight Storm"
+        replace: "Dracula"
+
     - name: Done
       ansible.builtin.debug:
         msg: |
@@ -190,4 +239,5 @@
           - tmux: run 'tmux source ~/.tmux.conf'
           - wezterm: restart wezterm
           - starship: changes apply on next prompt
-          - neovim: restart neovim (lazy.nvim will install dracula plugin)
+          - neovim: restart neovim
+          - lazygit: changes apply on next launch

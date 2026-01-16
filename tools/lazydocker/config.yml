@@ -1,0 +1,22 @@
+# lazydocker configuration - TokyoNight Storm theme
+gui:
+  theme:
+    activeBorderColor:
+      - "#7aa2f7"
+      - bold
+    inactiveBorderColor:
+      - "#565f89"
+    optionsTextColor:
+      - "#7dcfff"
+    selectedLineBgColor:
+      - "#3b4261"
+    cherryPickedCommitBgColor:
+      - "#3b4261"
+    cherryPickedCommitFgColor:
+      - "#ff79c6"
+    unstagedChangesColor:
+      - "#f7768e"
+    defaultFgColor:
+      - "#c0caf5"
+    searchingActiveBorderColor:
+      - "#9ece6a"
