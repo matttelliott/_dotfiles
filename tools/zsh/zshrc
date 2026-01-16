@@ -1,3 +1,6 @@
+# Dotfiles location
+export DOTFILES="$HOME/_dotfiles"
+
 # Case-insensitive tab completion (cached, regenerates daily)
 autoload -Uz compinit
 if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then
