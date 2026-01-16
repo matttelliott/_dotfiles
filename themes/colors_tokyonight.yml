@@ -165,7 +165,7 @@
     - name: Update neovim colorscheme
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
-        regexp: "vim.cmd.colorscheme '[^']+'"
+        regexp: "vim\\.cmd\\.colorscheme '[^']+'"
         replace: "vim.cmd.colorscheme 'tokyonight-night'"
     # neovim - statusline highlights
     - name: Update neovim StMode highlight
