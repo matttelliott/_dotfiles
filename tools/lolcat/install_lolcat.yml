@@ -1,0 +1,25 @@
+---
+- name: Install lolcat
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Install lolcat (macOS)
+      community.general.homebrew:
+        name: lolcat
+        state: present
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install lolcat (Debian/Ubuntu)
+      ansible.builtin.apt:
+        name: lolcat
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install lolcat (Arch)
+      community.general.pacman:
+        name: lolcat
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"

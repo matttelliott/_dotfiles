@@ -1,0 +1,25 @@
+---
+- name: Install cmatrix
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Install cmatrix (macOS)
+      community.general.homebrew:
+        name: cmatrix
+        state: present
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install cmatrix (Debian/Ubuntu)
+      ansible.builtin.apt:
+        name: cmatrix
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install cmatrix (Arch)
+      community.general.pacman:
+        name: cmatrix
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
