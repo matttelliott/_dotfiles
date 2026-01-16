@@ -23,3 +23,14 @@
         state: present
       become: yes
       when: ansible_facts['os_family'] == "Archlinux"
+
+    - name: Install cowsay aliases
+      ansible.builtin.copy:
+        src: cowsay.zsh
+        dest: ~/.config/zsh/cowsay.zsh
+
+    - name: Source cowsay aliases in zshrc
+      ansible.builtin.lineinfile:
+        path: ~/.zshrc
+        line: source ~/.config/zsh/cowsay.zsh
+        create: yes
