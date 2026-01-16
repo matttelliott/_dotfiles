@@ -34,8 +34,8 @@
     - name: Update tmux window-status-current-format
       ansible.builtin.replace:
         path: ~/.tmux.conf
-        regexp: 'window-status-current-format "#\[fg=#[0-9a-fA-F]{6},bg=#[0-9a-fA-F]{6}\](.+?)#\[fg=#[0-9a-fA-F]{6},bg=#[0-9a-fA-F]{6},bold\](.+?)#\[fg=#[0-9a-fA-F]{6},bg=#[0-9a-fA-F]{6}\]"'
-        replace: 'window-status-current-format "#[fg=#282a36,bg=#bd93f9]\1#[fg=#21222c,bg=#bd93f9,bold]\2#[fg=#bd93f9,bg=#282a36]"'
+        regexp: 'window-status-current-format "#\[fg=#[0-9a-fA-F]{6},bg=#[0-9a-fA-F]{6}\](.+?)#\[fg=#[0-9a-fA-F]{6},bg=#[0-9a-fA-F]{6},bold\](.+?)#\[fg=#[0-9a-fA-F]{6},bg=#[0-9a-fA-F]{6}\]([^"]+)"'
+        replace: 'window-status-current-format "#[fg=#282a36,bg=#bd93f9]\1#[fg=#21222c,bg=#bd93f9,bold]\2#[fg=#bd93f9,bg=#282a36]\3"'
     # tmux - pane borders
     - name: Update tmux pane-border-style
       ansible.builtin.replace:
