@@ -46,7 +46,7 @@ count=0
 commits_to_squash=""
 for sha in $(git log --format='%H' -n 50 2>/dev/null); do
     commit_msg=$(git log -1 --format='%s' "$sha" 2>/dev/null)
-    if [[ "$commit_msg" == "Claude auto commit"* ]] || [[ "$commit_msg" =~ ^[Ww][Ii][Pp] ]]; then
+    if [[ "$commit_msg" =~ "Claude auto commit"* ]] || [[ "$commit_msg" =~ ^[Ww][Ii][Pp] ]]; then
         ((count++))
         commits_to_squash="$commits_to_squash $sha"
     else
