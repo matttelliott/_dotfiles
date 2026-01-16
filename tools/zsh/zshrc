@@ -72,10 +72,8 @@ themesetting () {
 		(color) echo "Applying $name color theme..."
 			ansible-playbook "$themes_dir/colors_${name}.yml" --connection=local --limit "$hostname"
 			echo ""
-			echo "Reload: tmux source ~/.tmux.conf && restart wezterm/neovim" ;;
+			echo "Reload: tmux source ~/.tmux.conf" ;;
 		(font) echo "Applying $name font..."
 			ansible-playbook "$themes_dir/font_${name}.yml" --connection=local --limit "$hostname"
-			echo ""
-			echo "Restart wezterm to see changes" ;;
 	esac
 }
