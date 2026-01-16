@@ -172,27 +172,27 @@
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: "vim\\.api\\.nvim_set_hl\\(0, 'StMode', \\{ fg = '#[0-9a-fA-F]{6}', bg = '#[0-9a-fA-F]{6}', bold = true \\}\\)"
-        replace: "vim\\.api\\.nvim_set_hl(0, 'StMode', { fg = '#1a1b26', bg = '#7aa2f7', bold = true })"
+        replace: "vim.api.nvim_set_hl(0, 'StMode', { fg = '#1a1b26', bg = '#7aa2f7', bold = true })"
     - name: Update neovim StModeSep highlight
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: "vim\\.api\\.nvim_set_hl\\(0, 'StModeSep', \\{ fg = '#[0-9a-fA-F]{6}', bg = '#[0-9a-fA-F]{6}' \\}\\)"
-        replace: "vim\\.api\\.nvim_set_hl(0, 'StModeSep', { fg = '#7aa2f7', bg = '#24283b' })"
+        replace: "vim.api.nvim_set_hl(0, 'StModeSep', { fg = '#7aa2f7', bg = '#24283b' })"
     - name: Update neovim StFile highlight
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: "vim\\.api\\.nvim_set_hl\\(0, 'StFile', \\{ fg = '#[0-9a-fA-F]{6}', bg = '#[0-9a-fA-F]{6}' \\}\\)"
-        replace: "vim\\.api\\.nvim_set_hl(0, 'StFile', { fg = '#565f89', bg = '#24283b' })"
+        replace: "vim.api.nvim_set_hl(0, 'StFile', { fg = '#565f89', bg = '#24283b' })"
     - name: Update neovim StGitSep highlight
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: "vim\\.api\\.nvim_set_hl\\(0, 'StGitSep', \\{ fg = '#[0-9a-fA-F]{6}', bg = '#[0-9a-fA-F]{6}' \\}\\)"
-        replace: "vim\\.api\\.nvim_set_hl(0, 'StGitSep', { fg = '#24283b', bg = '#3b4261' })"
+        replace: "vim.api.nvim_set_hl(0, 'StGitSep', { fg = '#24283b', bg = '#3b4261' })"
     - name: Update neovim StGit highlight
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: "vim\\.api\\.nvim_set_hl\\(0, 'StGit', \\{ fg = '#[0-9a-fA-F]{6}', bg = '#[0-9a-fA-F]{6}' \\}\\)"
-        replace: "vim\\.api\\.nvim_set_hl(0, 'StGit', { fg = '#9aa5ce', bg = '#3b4261' })"
+        replace: "vim.api.nvim_set_hl(0, 'StGit', { fg = '#9aa5ce', bg = '#3b4261' })"
     # lazygit
     - name: Update lazygit activeBorderColor
       ansible.builtin.replace:
