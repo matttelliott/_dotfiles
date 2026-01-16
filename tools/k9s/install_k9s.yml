@@ -31,13 +31,11 @@
         path: ~/Library/Application Support/k9s/skins
         state: directory
       when: ansible_facts['os_family'] == "Darwin"
-
     - name: Install k9s skin (macOS)
       copy:
         src: skin.yml
         dest: ~/Library/Application Support/k9s/skins/tokyonight.yml
       when: ansible_facts['os_family'] == "Darwin"
-
     - name: Create k9s config (macOS)
       copy:
         dest: ~/Library/Application Support/k9s/config.yaml
@@ -46,20 +44,17 @@
             ui:
               skin: tokyonight
       when: ansible_facts['os_family'] == "Darwin"
-
     # Linux uses ~/.config/k9s/
     - name: Create k9s skins directory (Linux)
       file:
         path: ~/.config/k9s/skins
         state: directory
       when: ansible_facts['os_family'] != "Darwin"
-
     - name: Install k9s skin (Linux)
       copy:
         src: skin.yml
         dest: ~/.config/k9s/skins/tokyonight.yml
       when: ansible_facts['os_family'] != "Darwin"
-
     - name: Create k9s config (Linux)
       copy:
         dest: ~/.config/k9s/config.yml
