@@ -1,13 +1,10 @@
----
 # Apply Gruvbox Dark color scheme to all themed tools
 #
 # Usage:
 #   ansible-playbook themes/colors_gruvbox.yml
-
 - name: Apply Gruvbox colors
   hosts: all
   gather_facts: true
-
   tasks:
     # tmux - status-style
     - name: Update tmux status-style
@@ -15,402 +12,338 @@
         path: ~/.tmux.conf
         regexp: 'status-style "bg=#[0-9a-fA-F]{6},fg=#[0-9a-fA-F]{6}"'
         replace: 'status-style "bg=#282828,fg=#ebdbb2"'
-
     # tmux - status-left
     - name: Update tmux status-left
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: 'status-left "#\[fg=#[0-9a-fA-F]{6},bg=#[0-9a-fA-F]{6},bold\](.+?)#\[fg=#[0-9a-fA-F]{6},bg=#[0-9a-fA-F]{6}\](.+?)#\[fg=#[0-9a-fA-F]{6},bg=#[0-9a-fA-F]{6}\](.+?)#\[fg=#[0-9a-fA-F]{6},bg=#[0-9a-fA-F]{6}\]'
         replace: 'status-left "#[fg=#1d2021,bg=#83a598,bold]\1#[fg=#83a598,bg=#3c3836]\2#[fg=#ebdbb2,bg=#3c3836]\3#[fg=#3c3836,bg=#282828]'
-
     # tmux - status-right
     - name: Update tmux status-right
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: 'status-right "#\[fg=#[0-9a-fA-F]{6},bg=#[0-9a-fA-F]{6}\](.+?)#\[fg=#[0-9a-fA-F]{6},bg=#[0-9a-fA-F]{6}\](.+?)#\[fg=#[0-9a-fA-F]{6},bg=#[0-9a-fA-F]{6}\](.+?)#\[fg=#[0-9a-fA-F]{6},bg=#[0-9a-fA-F]{6},bold\]'
         replace: 'status-right "#[fg=#3c3836,bg=#282828]\1#[fg=#ebdbb2,bg=#3c3836]\2#[fg=#83a598,bg=#3c3836]\3#[fg=#1d2021,bg=#83a598,bold]'
-
     # tmux - window-status-format
     - name: Update tmux window-status-format
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: 'window-status-format "#\[fg=#[0-9a-fA-F]{6},bg=#[0-9a-fA-F]{6}\]'
         replace: 'window-status-format "#[fg=#928374,bg=#282828]'
-
     # tmux - window-status-current-format
     - name: Update tmux window-status-current-format
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: 'window-status-current-format "#\[fg=#[0-9a-fA-F]{6},bg=#[0-9a-fA-F]{6}\](.+?)#\[fg=#[0-9a-fA-F]{6},bg=#[0-9a-fA-F]{6},bold\](.+?)#\[fg=#[0-9a-fA-F]{6},bg=#[0-9a-fA-F]{6}\]"'
         replace: 'window-status-current-format "#[fg=#282828,bg=#83a598]\1#[fg=#1d2021,bg=#83a598,bold]\2#[fg=#83a598,bg=#282828]"'
-
     # tmux - pane borders
     - name: Update tmux pane-border-style
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: 'pane-border-style "fg=#[0-9a-fA-F]{6}"'
         replace: 'pane-border-style "fg=#3c3836"'
-
     - name: Update tmux pane-active-border-style
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: 'pane-active-border-style "fg=#[0-9a-fA-F]{6}"'
         replace: 'pane-active-border-style "fg=#83a598"'
-
     # tmux - messages
     - name: Update tmux message-style
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: 'message-style "bg=#[0-9a-fA-F]{6},fg=#[0-9a-fA-F]{6}"'
         replace: 'message-style "bg=#3c3836,fg=#83a598"'
-
     - name: Update tmux message-command-style
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: 'message-command-style "bg=#[0-9a-fA-F]{6},fg=#[0-9a-fA-F]{6}"'
         replace: 'message-command-style "bg=#3c3836,fg=#83a598"'
-
     - name: Update tmux mode-style
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: 'mode-style "bg=#[0-9a-fA-F]{6},fg=#[0-9a-fA-F]{6}"'
         replace: 'mode-style "bg=#3c3836,fg=#83a598"'
-
     # tmux - theme comment
     - name: Update tmux theme comment
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: '^# .+ colors$'
         replace: '# Gruvbox Dark colors'
-
     # wezterm
     - name: Update wezterm color scheme
       ansible.builtin.replace:
         path: ~/.wezterm.lua
         regexp: 'color_scheme = "[^"]+"'
         replace: 'color_scheme = "Gruvbox Dark (Gogh)"'
-
     # starship
     - name: Update starship username style_user
       ansible.builtin.replace:
         path: ~/.config/starship.toml
         regexp: 'style_user = "fg:#[0-9a-fA-F]{6} bg:#[0-9a-fA-F]{6} bold"'
         replace: 'style_user = "fg:#1d2021 bg:#83a598 bold"'
-
     - name: Update starship username style_root
       ansible.builtin.replace:
         path: ~/.config/starship.toml
         regexp: 'style_root = "fg:#[0-9a-fA-F]{6} bg:#[0-9a-fA-F]{6} bold"'
         replace: 'style_root = "fg:#1d2021 bg:#fb4934 bold"'
-
     - name: Update starship username format separator
       ansible.builtin.replace:
         path: ~/.config/starship.toml
         regexp: '\[username\][\s\S]*?format = "\[(.+?)\]\(\$style\)\[\]?\(fg:#[0-9a-fA-F]{6} bg:#[0-9a-fA-F]{6}\)"'
         replace: '[username]\nstyle_user = "fg:#1d2021 bg:#83a598 bold"\nstyle_root = "fg:#1d2021 bg:#fb4934 bold"\nshow_always = true\nformat = "[\1]($style)[](fg:#83a598 bg:#3c3836)"'
-
     - name: Update starship hostname style
       ansible.builtin.replace:
         path: ~/.config/starship.toml
         regexp: '\[hostname\][\s\S]*?style = "fg:#[0-9a-fA-F]{6} bg:#[0-9a-fA-F]{6}"'
         replace: '[hostname]\nssh_only = false\nstyle = "fg:#ebdbb2 bg:#3c3836"'
-
     - name: Update starship directory style
       ansible.builtin.replace:
         path: ~/.config/starship.toml
         regexp: '\[directory\][\s\S]*?style = "fg:#[0-9a-fA-F]{6} bg:#[0-9a-fA-F]{6} bold"'
         replace: '[directory]\nstyle = "fg:#ebdbb2 bg:#928374 bold"'
-
     - name: Update starship git_branch style
       ansible.builtin.replace:
         path: ~/.config/starship.toml
         regexp: '\[git_branch\][\s\S]*?style = "fg:#[0-9a-fA-F]{6} bg:#[0-9a-fA-F]{6} bold"'
         replace: '[git_branch]\nstyle = "fg:#ebdbb2 bg:#3c3836 bold"'
-
     - name: Update starship git_status style
       ansible.builtin.replace:
         path: ~/.config/starship.toml
         regexp: '\[git_status\][\s\S]*?style = "fg:#[0-9a-fA-F]{6} bg:#[0-9a-fA-F]{6}"'
         replace: '[git_status]\nstyle = "fg:#ebdbb2 bg:#3c3836"'
-
     - name: Update starship jobs style
       ansible.builtin.replace:
         path: ~/.config/starship.toml
         regexp: '\[jobs\][\s\S]*?style = "fg:#[0-9a-fA-F]{6}"'
         replace: '[jobs]\nstyle = "fg:#83a598"'
-
     - name: Update starship cmd_duration style
       ansible.builtin.replace:
         path: ~/.config/starship.toml
         regexp: '\[cmd_duration\][\s\S]*?style = "fg:#[0-9a-fA-F]{6}"'
         replace: '[cmd_duration]\nmin_time = 0\nstyle = "fg:#928374"'
-
     - name: Update starship time style
       ansible.builtin.replace:
         path: ~/.config/starship.toml
         regexp: '\[time\][\s\S]*?style = "fg:#[0-9a-fA-F]{6}"'
         replace: '[time]\ndisabled = false\nstyle = "fg:#928374"'
-
     - name: Update starship character success
       ansible.builtin.replace:
         path: ~/.config/starship.toml
         regexp: 'success_symbol = ".+\(bold #[0-9a-fA-F]{6}\)"'
         replace: 'success_symbol = " [](bold #b8bb26)"'
-
     - name: Update starship character error
       ansible.builtin.replace:
         path: ~/.config/starship.toml
         regexp: 'error_symbol = ".+\(bold #[0-9a-fA-F]{6}\)"'
         replace: 'error_symbol = " [](bold #fb4934)"'
-
     - name: Update starship theme comment
       ansible.builtin.replace:
         path: ~/.config/starship.toml
         regexp: '^# Starship configuration - .+$'
         replace: '# Starship configuration - Gruvbox Dark theme'
-
     # neovim - remove other theme plugins
     - name: Remove dracula plugin from neovim
       ansible.builtin.lineinfile:
         path: ~/.config/nvim/init.lua
         regexp: ".*Mofiqul/dracula.nvim.*"
         state: absent
-
     - name: Remove jellybeans plugin from neovim
       ansible.builtin.lineinfile:
         path: ~/.config/nvim/init.lua
         regexp: ".*nanotech/jellybeans.vim.*"
         state: absent
-
     - name: Remove catppuccin plugin from neovim
       ansible.builtin.lineinfile:
         path: ~/.config/nvim/init.lua
         regexp: ".*catppuccin/nvim.*"
         state: absent
-
     # neovim - add gruvbox plugin
     - name: Add gruvbox plugin to neovim
       ansible.builtin.lineinfile:
         path: ~/.config/nvim/init.lua
         insertbefore: "{ -- You can easily change to a different colorscheme"
         line: "  { 'morhetz/gruvbox', priority = 1000 },"
-
     # neovim - update colorscheme
     - name: Update neovim colorscheme
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: "vim.cmd.colorscheme '[^']+'"
         replace: "vim.cmd.colorscheme 'gruvbox'"
-
     # neovim - statusline highlights
     - name: Update neovim StMode highlight
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: "vim.api.nvim_set_hl\\(0, 'StMode', \\{ fg = '#[0-9a-fA-F]{6}', bg = '#[0-9a-fA-F]{6}', bold = true \\}\\)"
         replace: "vim.api.nvim_set_hl(0, 'StMode', { fg = '#1d2021', bg = '#83a598', bold = true })"
-
     - name: Update neovim StModeSep highlight
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: "vim.api.nvim_set_hl\\(0, 'StModeSep', \\{ fg = '#[0-9a-fA-F]{6}', bg = '#[0-9a-fA-F]{6}' \\}\\)"
         replace: "vim.api.nvim_set_hl(0, 'StModeSep', { fg = '#83a598', bg = '#282828' })"
-
     - name: Update neovim StFile highlight
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: "vim.api.nvim_set_hl\\(0, 'StFile', \\{ fg = '#[0-9a-fA-F]{6}', bg = '#[0-9a-fA-F]{6}' \\}\\)"
         replace: "vim.api.nvim_set_hl(0, 'StFile', { fg = '#928374', bg = '#282828' })"
-
     - name: Update neovim StGitSep highlight
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: "vim.api.nvim_set_hl\\(0, 'StGitSep', \\{ fg = '#[0-9a-fA-F]{6}', bg = '#[0-9a-fA-F]{6}' \\}\\)"
         replace: "vim.api.nvim_set_hl(0, 'StGitSep', { fg = '#282828', bg = '#3c3836' })"
-
     - name: Update neovim StGit highlight
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: "vim.api.nvim_set_hl\\(0, 'StGit', \\{ fg = '#[0-9a-fA-F]{6}', bg = '#[0-9a-fA-F]{6}' \\}\\)"
         replace: "vim.api.nvim_set_hl(0, 'StGit', { fg = '#ebdbb2', bg = '#3c3836' })"
-
     # lazygit
     - name: Update lazygit activeBorderColor
       ansible.builtin.replace:
         path: ~/.config/lazygit/config.yml
         regexp: 'activeBorderColor:\n\s+- "#[0-9a-fA-F]{6}"'
         replace: 'activeBorderColor:\n      - "#83a598"'
-
     - name: Update lazygit inactiveBorderColor
       ansible.builtin.replace:
         path: ~/.config/lazygit/config.yml
         regexp: 'inactiveBorderColor:\n\s+- "#[0-9a-fA-F]{6}"'
         replace: 'inactiveBorderColor:\n      - "#928374"'
-
     - name: Update lazygit optionsTextColor
       ansible.builtin.replace:
         path: ~/.config/lazygit/config.yml
         regexp: 'optionsTextColor:\n\s+- "#[0-9a-fA-F]{6}"'
         replace: 'optionsTextColor:\n      - "#8ec07c"'
-
     - name: Update lazygit selectedLineBgColor
       ansible.builtin.replace:
         path: ~/.config/lazygit/config.yml
         regexp: 'selectedLineBgColor:\n\s+- "#[0-9a-fA-F]{6}"'
         replace: 'selectedLineBgColor:\n      - "#3c3836"'
-
     - name: Update lazygit cherryPickedCommitBgColor
       ansible.builtin.replace:
         path: ~/.config/lazygit/config.yml
         regexp: 'cherryPickedCommitBgColor:\n\s+- "#[0-9a-fA-F]{6}"'
         replace: 'cherryPickedCommitBgColor:\n      - "#3c3836"'
-
     - name: Update lazygit cherryPickedCommitFgColor
       ansible.builtin.replace:
         path: ~/.config/lazygit/config.yml
         regexp: 'cherryPickedCommitFgColor:\n\s+- "#[0-9a-fA-F]{6}"'
         replace: 'cherryPickedCommitFgColor:\n      - "#d3869b"'
-
     - name: Update lazygit unstagedChangesColor
       ansible.builtin.replace:
         path: ~/.config/lazygit/config.yml
         regexp: 'unstagedChangesColor:\n\s+- "#[0-9a-fA-F]{6}"'
         replace: 'unstagedChangesColor:\n      - "#fb4934"'
-
     - name: Update lazygit defaultFgColor
       ansible.builtin.replace:
         path: ~/.config/lazygit/config.yml
         regexp: 'defaultFgColor:\n\s+- "#[0-9a-fA-F]{6}"'
         replace: 'defaultFgColor:\n      - "#ebdbb2"'
-
     - name: Update lazygit searchingActiveBorderColor
       ansible.builtin.replace:
         path: ~/.config/lazygit/config.yml
         regexp: 'searchingActiveBorderColor:\n\s+- "#[0-9a-fA-F]{6}"'
         replace: 'searchingActiveBorderColor:\n      - "#b8bb26"'
-
     - name: Update lazygit theme comment
       ansible.builtin.replace:
         path: ~/.config/lazygit/config.yml
         regexp: '^# lazygit configuration - .+ theme$'
         replace: '# lazygit configuration - Gruvbox Dark theme'
-
     # bat
     - name: Update bat theme
       ansible.builtin.replace:
         path: ~/.config/zsh/bat.zsh
         regexp: 'BAT_THEME="[^"]+"'
         replace: 'BAT_THEME="gruvbox-dark"'
-
     - name: Update bat theme comment
       ansible.builtin.replace:
         path: ~/.config/zsh/bat.zsh
         regexp: '^# Bat configuration - .+ theme$'
         replace: '# Bat configuration - Gruvbox Dark theme'
-
     # fzf
     - name: Update fzf fg color
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
         regexp: 'fg:#[0-9a-fA-F]{6}'
         replace: 'fg:#ebdbb2'
-
     - name: Update fzf bg color
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
         regexp: 'bg:#[0-9a-fA-F]{6}'
         replace: 'bg:#282828'
-
     - name: Update fzf hl color
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
         regexp: 'hl:#[0-9a-fA-F]{6}'
         replace: 'hl:#83a598'
-
     - name: Update fzf fg+ color
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
         regexp: 'fg\+:#[0-9a-fA-F]{6}'
         replace: 'fg+:#ebdbb2'
-
     - name: Update fzf bg+ color
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
         regexp: 'bg\+:#[0-9a-fA-F]{6}'
         replace: 'bg+:#3c3836'
-
     - name: Update fzf hl+ color
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
         regexp: 'hl\+:#[0-9a-fA-F]{6}'
         replace: 'hl+:#8ec07c'
-
     - name: Update fzf info color
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
         regexp: 'info:#[0-9a-fA-F]{6}'
         replace: 'info:#b8bb26'
-
     - name: Update fzf prompt color
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
         regexp: 'prompt:#[0-9a-fA-F]{6}'
         replace: 'prompt:#83a598'
-
     - name: Update fzf pointer color
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
         regexp: 'pointer:#[0-9a-fA-F]{6}'
         replace: 'pointer:#d3869b'
-
     - name: Update fzf marker color
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
         regexp: 'marker:#[0-9a-fA-F]{6}'
         replace: 'marker:#b8bb26'
-
     - name: Update fzf spinner color
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
         regexp: 'spinner:#[0-9a-fA-F]{6}'
         replace: 'spinner:#d3869b'
-
     - name: Update fzf header color
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
         regexp: 'header:#[0-9a-fA-F]{6}'
         replace: 'header:#83a598'
-
     - name: Update fzf theme comment
       ansible.builtin.replace:
         path: ~/.config/zsh/fzf.zsh
         regexp: '^# FZF configuration - .+ theme$'
         replace: '# FZF configuration - Gruvbox Dark theme'
-
     # lazydocker
     - name: Update lazydocker activeBorderColor
       ansible.builtin.replace:
         path: ~/.config/lazydocker/config.yml
         regexp: 'activeBorderColor:\n\s+- "#[0-9a-fA-F]{6}"'
         replace: 'activeBorderColor:\n      - "#83a598"'
-
     - name: Update lazydocker inactiveBorderColor
       ansible.builtin.replace:
         path: ~/.config/lazydocker/config.yml
         regexp: 'inactiveBorderColor:\n\s+- "#[0-9a-fA-F]{6}"'
         replace: 'inactiveBorderColor:\n      - "#928374"'
-
     - name: Update lazydocker optionsTextColor
       ansible.builtin.replace:
         path: ~/.config/lazydocker/config.yml
         regexp: 'optionsTextColor:\n\s+- "#[0-9a-fA-F]{6}"'
         replace: 'optionsTextColor:\n      - "#8ec07c"'
-
     - name: Update lazydocker selectedLineBgColor
       ansible.builtin.replace:
         path: ~/.config/lazydocker/config.yml
         regexp: 'selectedLineBgColor:\n\s+- "#[0-9a-fA-F]{6}"'
         replace: 'selectedLineBgColor:\n      - "#3c3836"'
-
     - name: Done
       ansible.builtin.debug:
         msg: |
