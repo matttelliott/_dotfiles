@@ -66,11 +66,12 @@ themesetting () {
 		return 1
 	fi
 	# Parse available options from shared YAML files
-	# Colors/fonts: keys on own line ending with colon
+	# Colors/fonts: keys on own line ending with colon (filter out ansible keywords)
 	# Styles: inline dicts with { after colon
+	local ansible_keywords='args|file|stat|when|loop|shell|register|path|state'
 	local themes=$(
-    grep -E '^      [a-z_]+:$' "$themes_dir/_color.yml" 2>/dev/null | sed 's/^ *//; s/:$//' | sed 's/^/color: /'
-    grep -E '^      [a-z_]+:$' "$themes_dir/_font.yml" 2>/dev/null | sed 's/^ *//; s/:$//' | sed 's/^/font: /'
+    grep -E '^      [a-z_]+:$' "$themes_dir/_color.yml" 2>/dev/null | grep -vE "($ansible_keywords):" | sed 's/^ *//; s/:$//' | sed 's/^/color: /'
+    grep -E '^      [a-z_]+:$' "$themes_dir/_font.yml" 2>/dev/null | grep -vE "($ansible_keywords):" | sed 's/^ *//; s/:$//' | sed 's/^/font: /'
     grep -E '^      [a-z_]+:  *\{' "$themes_dir/_style.yml" 2>/dev/null | sed 's/:.*//; s/^ *//' | sed 's/^/style: /'
   )
 	local selection=$(echo "$themes" | sort | fzf --height=40% --reverse --prompt="Select theme: ")
