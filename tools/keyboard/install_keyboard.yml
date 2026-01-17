@@ -48,7 +48,7 @@
       become: yes
       when: ansible_facts['os_family'] == "Archlinux"
 
-    - name: Remap Caps Lock to Ctrl (Arch)
+    - name: Remap Caps Lock to Ctrl for X11 (Arch)
       copy:
         dest: /etc/X11/xorg.conf.d/00-keyboard.conf
         content: |
@@ -60,4 +60,28 @@
           EndSection
         mode: '0644'
       become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
+
+    - name: Remap Caps Lock to Ctrl for Wayland (Arch)
+      lineinfile:
+        path: /etc/environment
+        regexp: '^XKB_DEFAULT_OPTIONS='
+        line: 'XKB_DEFAULT_OPTIONS=ctrl:nocaps'
+        create: yes
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
+
+    - name: Set keyboard layout in vconsole.conf (Arch)
+      lineinfile:
+        path: /etc/vconsole.conf
+        regexp: '^KEYMAP='
+        line: 'KEYMAP=us'
+        create: yes
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
+
+    - name: Apply keyboard remap for current session (Arch)
+      command: setxkbmap -option ctrl:nocaps
+      changed_when: false
+      failed_when: false
       when: ansible_facts['os_family'] == "Archlinux"
