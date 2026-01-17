@@ -65,10 +65,13 @@ themesetting () {
 		echo "Set DOTFILES environment variable to your dotfiles location"
 		return 1
 	fi
+	# Parse available options from shared YAML files
+	# Colors/fonts: keys on own line ending with colon
+	# Styles: inline dicts with { after colon
 	local themes=$(
-    ls "$themes_dir"/colors_*.yml 2>/dev/null | xargs -n1 basename | sed 's/colors_/color: /; s/\.yml//'
-    ls "$themes_dir"/font_*.yml 2>/dev/null | xargs -n1 basename | sed 's/font_/font: /; s/\.yml//'
-    ls "$themes_dir"/style_*.yml 2>/dev/null | xargs -n1 basename | sed 's/style_/style: /; s/\.yml//'
+    grep -E '^      [a-z_]+:$' "$themes_dir/_color.yml" 2>/dev/null | sed 's/^ *//; s/:$//' | sed 's/^/color: /'
+    grep -E '^      [a-z_]+:$' "$themes_dir/_font.yml" 2>/dev/null | sed 's/^ *//; s/:$//' | sed 's/^/font: /'
+    grep -E '^      [a-z_]+:  *\{' "$themes_dir/_style.yml" 2>/dev/null | sed 's/:.*//; s/^ *//' | sed 's/^/style: /'
   )
 	local selection=$(echo "$themes" | sort | fzf --height=40% --reverse --prompt="Select theme: ")
 	if [[ -z "$selection" ]]
@@ -79,13 +82,13 @@ themesetting () {
 	local name=$(echo "$selection" | cut -d: -f2 | xargs)
 	case "$type" in
 		(color) echo "Applying $name color theme..."
-			ansible-playbook "$themes_dir/colors_${name}.yml" -i "$DOTFILES/inventory.yml" --connection=local --limit "$hostname"
+			ansible-playbook "$themes_dir/_color.yml" -i "$DOTFILES/inventory.yml" --connection=local --limit "$hostname" -e "color=$name"
 			echo ""
 			echo "Reload: tmux source ~/.tmux.conf" ;;
 		(font) echo "Applying $name font..."
-			ansible-playbook "$themes_dir/font_${name}.yml" -i "$DOTFILES/inventory.yml" --connection=local --limit "$hostname" ;;
+			ansible-playbook "$themes_dir/_font.yml" -i "$DOTFILES/inventory.yml" --connection=local --limit "$hostname" -e "font=$name" ;;
 		(style) echo "Applying $name style..."
-			ansible-playbook "$themes_dir/style_${name}.yml" -i "$DOTFILES/inventory.yml" --connection=local --limit "$hostname"
+			ansible-playbook "$themes_dir/_style.yml" -i "$DOTFILES/inventory.yml" --connection=local --limit "$hostname" -e "style=$name"
 			echo ""
 			echo "Reload: tmux source ~/.tmux.conf"
 	esac
