@@ -186,6 +186,42 @@
         regexp: "{{ slant_left }}"
         replace: "{{ round_left }}"
 
+    - name: Replace pixels right with round in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ pixels_right }}"
+        replace: "{{ round_right }}"
+
+    - name: Replace pixels left with round in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ pixels_left }}"
+        replace: "{{ round_left }}"
+
+    - name: Replace flames right with round in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ flames_right }}"
+        replace: "{{ round_right }}"
+
+    - name: Replace flames left with round in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ flames_left }}"
+        replace: "{{ round_left }}"
+
+    - name: Replace ice right with round in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ ice_right }}"
+        replace: "{{ round_right }}"
+
+    - name: Replace ice left with round in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ ice_left }}"
+        replace: "{{ round_left }}"
+
     # STARSHIP - From none (space in separator brackets)
     - name: Restore separator from none in starship
       ansible.builtin.replace:
@@ -218,6 +254,42 @@
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: "nr2char\\(0xe0be\\)"
+        replace: "nr2char(0xe0b6)"
+
+    - name: Update neovim right arrow from pixels
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0c4\\)"
+        replace: "nr2char(0xe0b4)"
+
+    - name: Update neovim left arrow from pixels
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0c6\\)"
+        replace: "nr2char(0xe0b6)"
+
+    - name: Update neovim right arrow from flames
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0c0\\)"
+        replace: "nr2char(0xe0b4)"
+
+    - name: Update neovim left arrow from flames
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0c2\\)"
+        replace: "nr2char(0xe0b6)"
+
+    - name: Update neovim right arrow from ice
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0c8\\)"
+        replace: "nr2char(0xe0b4)"
+
+    - name: Update neovim left arrow from ice
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0ca\\)"
         replace: "nr2char(0xe0b6)"
 
     - name: Update neovim right arrow from none (space)

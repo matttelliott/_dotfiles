@@ -23,6 +23,12 @@
     arrow_left: "\uE0B2"
     round_right: "\uE0B4"
     round_left: "\uE0B6"
+    pixels_right: "\uE0C4"
+    pixels_left: "\uE0C6"
+    flames_right: "\uE0C0"
+    flames_left: "\uE0C2"
+    ice_right: "\uE0C8"
+    ice_left: "\uE0CA"
     # Target separators
     slant_right: "\uE0BC"
     slant_left: "\uE0BE"
@@ -52,6 +58,42 @@
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: "{{ round_left }}"
+        replace: "{{ slant_left }}"
+
+    - name: Replace pixels right with slant in tmux
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ pixels_right }}"
+        replace: "{{ slant_right }}"
+
+    - name: Replace pixels left with slant in tmux
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ pixels_left }}"
+        replace: "{{ slant_left }}"
+
+    - name: Replace flames right with slant in tmux
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ flames_right }}"
+        replace: "{{ slant_right }}"
+
+    - name: Replace flames left with slant in tmux
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ flames_left }}"
+        replace: "{{ slant_left }}"
+
+    - name: Replace ice right with slant in tmux
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ ice_right }}"
+        replace: "{{ slant_right }}"
+
+    - name: Replace ice left with slant in tmux
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ ice_left }}"
         replace: "{{ slant_left }}"
 
     # TMUX - From none (space at separator positions)
@@ -142,6 +184,42 @@
       ansible.builtin.replace:
         path: ~/.config/starship.toml
         regexp: "{{ round_left }}"
+        replace: "{{ slant_left }}"
+
+    - name: Replace pixels right with slant in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ pixels_right }}"
+        replace: "{{ slant_right }}"
+
+    - name: Replace pixels left with slant in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ pixels_left }}"
+        replace: "{{ slant_left }}"
+
+    - name: Replace flames right with slant in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ flames_right }}"
+        replace: "{{ slant_right }}"
+
+    - name: Replace flames left with slant in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ flames_left }}"
+        replace: "{{ slant_left }}"
+
+    - name: Replace ice right with slant in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ ice_right }}"
+        replace: "{{ slant_right }}"
+
+    - name: Replace ice left with slant in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ ice_left }}"
         replace: "{{ slant_left }}"
 
     # STARSHIP - From none (space in separator brackets)
