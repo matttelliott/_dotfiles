@@ -29,6 +29,12 @@
     round_left: "\uE0B6"
     slant_right: "\uE0BC"
     slant_left: "\uE0BE"
+    pixels_right: "\uE0C4"
+    pixels_left: "\uE0C6"
+    flames_right: "\uE0C0"
+    flames_left: "\uE0C2"
+    ice_right: "\uE0C8"
+    ice_left: "\uE0CA"
     # Replacement (simple space for clean look)
     clean: " "
   tasks:
@@ -71,6 +77,42 @@
         regexp: "{{ slant_left }}"
         replace: "{{ clean }}"
 
+    - name: Update tmux pixels right to clean
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ pixels_right }}"
+        replace: "{{ clean }}"
+
+    - name: Update tmux pixels left to clean
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ pixels_left }}"
+        replace: "{{ clean }}"
+
+    - name: Update tmux flames right to clean
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ flames_right }}"
+        replace: "{{ clean }}"
+
+    - name: Update tmux flames left to clean
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ flames_left }}"
+        replace: "{{ clean }}"
+
+    - name: Update tmux ice right to clean
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ ice_right }}"
+        replace: "{{ clean }}"
+
+    - name: Update tmux ice left to clean
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ ice_left }}"
+        replace: "{{ clean }}"
+
     # ===================
     # STARSHIP
     # ===================
@@ -108,6 +150,42 @@
       ansible.builtin.replace:
         path: ~/.config/starship.toml
         regexp: "{{ slant_left }}"
+        replace: "{{ clean }}"
+
+    - name: Update starship pixels right to clean
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ pixels_right }}"
+        replace: "{{ clean }}"
+
+    - name: Update starship pixels left to clean
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ pixels_left }}"
+        replace: "{{ clean }}"
+
+    - name: Update starship flames right to clean
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ flames_right }}"
+        replace: "{{ clean }}"
+
+    - name: Update starship flames left to clean
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ flames_left }}"
+        replace: "{{ clean }}"
+
+    - name: Update starship ice right to clean
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ ice_right }}"
+        replace: "{{ clean }}"
+
+    - name: Update starship ice left to clean
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ ice_left }}"
         replace: "{{ clean }}"
 
     # ===================
@@ -149,6 +227,42 @@
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: 'vim\.fn\.nr2char\(0xe0be\)'
+        replace: "' '"
+
+    - name: Update neovim pixels right to clean
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: 'vim\.fn\.nr2char\(0xe0c4\)'
+        replace: "' '"
+
+    - name: Update neovim pixels left to clean
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: 'vim\.fn\.nr2char\(0xe0c6\)'
+        replace: "' '"
+
+    - name: Update neovim flames right to clean
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: 'vim\.fn\.nr2char\(0xe0c0\)'
+        replace: "' '"
+
+    - name: Update neovim flames left to clean
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: 'vim\.fn\.nr2char\(0xe0c2\)'
+        replace: "' '"
+
+    - name: Update neovim ice right to clean
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: 'vim\.fn\.nr2char\(0xe0c8\)'
+        replace: "' '"
+
+    - name: Update neovim ice left to clean
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: 'vim\.fn\.nr2char\(0xe0ca\)'
         replace: "' '"
 
     - name: Done

@@ -256,6 +256,42 @@
         regexp: "nr2char\\(0xe0b6\\)"
         replace: "nr2char(0xe0be)"
 
+    - name: Update neovim right arrow from pixels
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0c4\\)"
+        replace: "nr2char(0xe0bc)"
+
+    - name: Update neovim left arrow from pixels
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0c6\\)"
+        replace: "nr2char(0xe0be)"
+
+    - name: Update neovim right arrow from flames
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0c0\\)"
+        replace: "nr2char(0xe0bc)"
+
+    - name: Update neovim left arrow from flames
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0c2\\)"
+        replace: "nr2char(0xe0be)"
+
+    - name: Update neovim right arrow from ice
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0c8\\)"
+        replace: "nr2char(0xe0bc)"
+
+    - name: Update neovim left arrow from ice
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0ca\\)"
+        replace: "nr2char(0xe0be)"
+
     - name: Update neovim right arrow from none (space)
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
