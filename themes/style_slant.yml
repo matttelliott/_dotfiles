@@ -54,6 +54,13 @@
         regexp: "{{ round_left }}"
         replace: "{{ slant_left }}"
 
+    # TMUX - From none (space at separator positions)
+    - name: Restore separator from none in tmux
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '\] #\[fg='
+        replace: "]{{ slant_right }}#[fg="
+
     # ===================
     # STARSHIP - Global replacement
     # ===================

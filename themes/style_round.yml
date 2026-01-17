@@ -54,6 +54,13 @@
         regexp: "{{ slant_left }}"
         replace: "{{ round_left }}"
 
+    # TMUX - From none (space at separator positions)
+    - name: Restore separator from none in tmux
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '\] #\[fg='
+        replace: "]{{ round_right }}#[fg="
+
     # ===================
     # STARSHIP - Global replacement
     # ===================
@@ -80,6 +87,13 @@
         path: ~/.config/starship.toml
         regexp: "{{ slant_left }}"
         replace: "{{ round_left }}"
+
+    # STARSHIP - From none (space in separator brackets)
+    - name: Restore separator from none in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: '\[ \]\(fg:'
+        replace: "[{{ round_right }}](fg:"
 
     # ===================
     # NEOVIM - Code replacement

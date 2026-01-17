@@ -54,6 +54,14 @@
         regexp: "{{ slant_left }}"
         replace: "{{ arrow_left }}"
 
+    # TMUX - From none (space at separator positions)
+    # Pattern: ] #[fg= means space between ] and #[fg= in format strings
+    - name: Restore separator from none in tmux
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '\] #\[fg='
+        replace: "]{{ arrow_right }}#[fg="
+
     # ===================
     # STARSHIP - Global replacement
     # ===================
@@ -80,6 +88,14 @@
         path: ~/.config/starship.toml
         regexp: "{{ slant_left }}"
         replace: "{{ arrow_left }}"
+
+    # STARSHIP - From none (space in separator brackets)
+    # Pattern: [ ](fg: means single space between [ and ](fg:
+    - name: Restore separator from none in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: '\[ \]\(fg:'
+        replace: "[{{ arrow_right }}](fg:"
 
     # ===================
     # NEOVIM - Code replacement
