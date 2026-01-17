@@ -40,21 +40,45 @@
 - import_playbook: tools/ssh/install_ssh.yml
 - import_playbook: tools/git/install_git.yml
 - import_playbook: tools/keyboard/install_keyboard.yml
-- name: Clone dotfiles repo
-  hosts: with_login_tools
+- name: Clone and update dotfiles repo
+  hosts: all
   gather_facts: false
+  vars:
+    dotfiles_ssh_url: git@github.com:matttelliott/_dotfiles.git
+    dotfiles_https_url: https://github.com/matttelliott/_dotfiles.git
+    use_ssh: "{{ inventory_hostname in groups['with_login_tools'] }}"
   tasks:
     - name: Check if dotfiles exists
       stat:
         path: ~/_dotfiles
       register: dotfiles_dir
-    - name: Clone dotfiles to ~/_dotfiles
+
+    - name: Clone dotfiles via SSH
       git:
-        repo: git@github.com:matttelliott/_dotfiles.git
+        repo: "{{ dotfiles_ssh_url }}"
         dest: ~/_dotfiles
-      when: not dotfiles_dir.stat.exists
-    - name: Ensure dotfiles remote uses SSH
-      command: git -C ~/_dotfiles remote set-url origin git@github.com:matttelliott/_dotfiles.git
+      when: not dotfiles_dir.stat.exists and use_ssh
+
+    - name: Clone dotfiles via HTTPS
+      git:
+        repo: "{{ dotfiles_https_url }}"
+        dest: ~/_dotfiles
+      when: not dotfiles_dir.stat.exists and not use_ssh
+
+    - name: Update dotfiles repo
+      command: git -C ~/_dotfiles pull --ff-only
+      register: git_pull
+      changed_when: "'Already up to date' not in git_pull.stdout"
+      when: dotfiles_dir.stat.exists
+
+    - name: Set remote to SSH
+      command: git -C ~/_dotfiles remote set-url origin {{ dotfiles_ssh_url }}
+      when: use_ssh
+      changed_when: false
+
+    - name: Set remote to HTTPS
+      command: git -C ~/_dotfiles remote set-url origin {{ dotfiles_https_url }}
+      when: not use_ssh
       changed_when: false
 - import_playbook: tools/mosh/install_mosh.yml
 - import_playbook: tools/homebrew/install_homebrew.yml

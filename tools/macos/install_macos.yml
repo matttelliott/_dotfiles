@@ -25,6 +25,49 @@
         creates: /Library/Apple/usr/share/rosetta/rosetta
       become: yes
 
+    - name: Check if SSH is enabled
+      command: systemsetup -getremotelogin
+      become: yes
+      register: ssh_status
+      changed_when: false
+
+    - name: Enable Remote Login (SSH)
+      command: systemsetup -setremotelogin on
+      become: yes
+      when: "'Off' in ssh_status.stdout"
+      register: ssh_enable
+      failed_when: false
+      changed_when: ssh_enable.rc == 0
+
+    - name: Notify if SSH enable requires Full Disk Access
+      debug:
+        msg: "SSH enable failed - grant Full Disk Access to Terminal, or enable manually: System Settings > General > Sharing > Remote Login"
+      when: ssh_enable.rc is defined and ssh_enable.rc != 0
+
+    - name: Check if Wake on LAN is supported
+      command: pmset -g
+      become: yes
+      register: pmset_status
+      changed_when: false
+
+    - name: Enable Wake on LAN
+      command: pmset -a wolenabled 1
+      become: yes
+      when: "'wolenabled' in pmset_status.stdout"
+      register: wol_enable
+      failed_when: false
+      changed_when: wol_enable.rc == 0
+
+    - name: Notify if Wake on LAN not supported
+      debug:
+        msg: "Wake on LAN not supported on this Mac (no Ethernet interface)"
+      when: "'wolenabled' not in pmset_status.stdout"
+
+    - name: Notify if Wake on LAN enable failed
+      debug:
+        msg: "Wake on LAN enable failed: {{ wol_enable.stderr | default(wol_enable.stdout) }}"
+      when: wol_enable.rc is defined and wol_enable.rc != 0
+
     - name: Auto-hide Dock
       command: defaults write com.apple.dock autohide -bool true
       changed_when: false
