@@ -58,7 +58,6 @@ fi
 # Adjust terminal theme
 themesetting () {
 	local themes_dir="$DOTFILES/themes"
-	local hostname=$(hostname -s)
 	if [[ ! -d "$themes_dir" ]]
 	then
 		echo "Error: themes directory not found at $themes_dir"
