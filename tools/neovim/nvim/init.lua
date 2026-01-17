@@ -884,6 +884,14 @@ require('lazy').setup({
     },
   },
 
+  -- Additional colorscheme plugins for theme switching
+  { 'shaunsingh/nord.nvim', priority = 1000 },
+  { 'Mofiqul/dracula.nvim', priority = 1000 },
+  { 'ellisonleao/gruvbox.nvim', priority = 1000, opts = {} },
+  { 'catppuccin/nvim', name = 'catppuccin', priority = 1000 },
+  { 'navarasu/onedark.nvim', priority = 1000 },
+  { 'maxmx03/solarized.nvim', priority = 1000 },
+
   { -- You can easily change to a different colorscheme.
     -- Change the name of the colorscheme plugin below, and then
     -- change the command in the config to whatever the name of that colorscheme is.

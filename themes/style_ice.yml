@@ -1,0 +1,303 @@
+# Apply ice powerline separators to all themed tools
+#
+# Target glyphs:
+#   U+E0C8 (right ice)
+#   U+E0CA (left ice)
+#
+# Usage:
+#   ansible-playbook themes/style_ice.yml
+- name: Apply ice powerline separators
+  hosts: all
+  gather_facts: true
+  vars:
+    # Source glyphs (to be replaced)
+    arrow_right: "\uE0B0"
+    arrow_left: "\uE0B2"
+    round_right: "\uE0B4"
+    round_left: "\uE0B6"
+    slant_right: "\uE0BC"
+    slant_left: "\uE0BE"
+    pixels_right: "\uE0C4"
+    pixels_left: "\uE0C6"
+    flames_right: "\uE0C0"
+    flames_left: "\uE0C2"
+    # Target separators
+    ice_right: "\uE0C8"
+    ice_left: "\uE0CA"
+  tasks:
+    # ===================
+    # TMUX - Global replacement
+    # ===================
+    - name: Replace angle right with ice in tmux
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ arrow_right }}"
+        replace: "{{ ice_right }}"
+
+    - name: Replace angle left with ice in tmux
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ arrow_left }}"
+        replace: "{{ ice_left }}"
+
+    - name: Replace round right with ice in tmux
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ round_right }}"
+        replace: "{{ ice_right }}"
+
+    - name: Replace round left with ice in tmux
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ round_left }}"
+        replace: "{{ ice_left }}"
+
+    - name: Replace slant right with ice in tmux
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ slant_right }}"
+        replace: "{{ ice_right }}"
+
+    - name: Replace slant left with ice in tmux
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ slant_left }}"
+        replace: "{{ ice_left }}"
+
+    - name: Replace pixels right with ice in tmux
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ pixels_right }}"
+        replace: "{{ ice_right }}"
+
+    - name: Replace pixels left with ice in tmux
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ pixels_left }}"
+        replace: "{{ ice_left }}"
+
+    - name: Replace flames right with ice in tmux
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ flames_right }}"
+        replace: "{{ ice_right }}"
+
+    - name: Replace flames left with ice in tmux
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ flames_left }}"
+        replace: "{{ ice_left }}"
+
+    # TMUX - From none (space at separator positions)
+    - name: Restore right separator from none in tmux (status-left, pass 1)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(status-left.*?)\] #\[fg='
+        replace: '\1]{{ ice_right }}#[fg='
+
+    - name: Restore right separator from none in tmux (status-left, pass 2)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(status-left.*?)\] #\[fg='
+        replace: '\1]{{ ice_right }}#[fg='
+
+    - name: Restore right separator from none in tmux (window-status, pass 1)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(window-status.*?)\] #\[fg='
+        replace: '\1]{{ ice_right }}#[fg='
+
+    - name: Restore right separator from none in tmux (window-status, pass 2)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(window-status.*?)\] #\[fg='
+        replace: '\1]{{ ice_right }}#[fg='
+
+    - name: Restore left separator from none in tmux (status-right, pass 1)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(status-right.*?)\] #\[fg='
+        replace: '\1]{{ ice_left }}#[fg='
+
+    - name: Restore left separator from none in tmux (status-right, pass 2)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(status-right.*?)\] #\[fg='
+        replace: '\1]{{ ice_left }}#[fg='
+
+    - name: Restore trailing right separator in tmux (status-left)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(status-left.*?)\]  "'
+        replace: '\1]{{ ice_right }} "'
+
+    - name: Restore trailing right separator in tmux (window-status, two spaces)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(window-status-current.*?)\]  "'
+        replace: '\1]{{ ice_right }} "'
+
+    - name: Restore trailing right separator in tmux (window-status, one space)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(window-status-current.*?)\] "'
+        replace: '\1]{{ ice_right }}"'
+
+    - name: Restore trailing left separator in tmux (status-right)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(status-right.*?)\]  "'
+        replace: '\1]{{ ice_left }} "'
+
+    # ===================
+    # STARSHIP - Global replacement
+    # ===================
+    - name: Replace angle right with ice in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ arrow_right }}"
+        replace: "{{ ice_right }}"
+
+    - name: Replace angle left with ice in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ arrow_left }}"
+        replace: "{{ ice_left }}"
+
+    - name: Replace round right with ice in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ round_right }}"
+        replace: "{{ ice_right }}"
+
+    - name: Replace round left with ice in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ round_left }}"
+        replace: "{{ ice_left }}"
+
+    - name: Replace slant right with ice in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ slant_right }}"
+        replace: "{{ ice_right }}"
+
+    - name: Replace slant left with ice in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ slant_left }}"
+        replace: "{{ ice_left }}"
+
+    - name: Replace pixels right with ice in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ pixels_right }}"
+        replace: "{{ ice_right }}"
+
+    - name: Replace pixels left with ice in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ pixels_left }}"
+        replace: "{{ ice_left }}"
+
+    - name: Replace flames right with ice in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ flames_right }}"
+        replace: "{{ ice_right }}"
+
+    - name: Replace flames left with ice in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ flames_left }}"
+        replace: "{{ ice_left }}"
+
+    - name: Restore separator from none in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: '\[ \]\(fg:'
+        replace: "[{{ ice_right }}](fg:"
+
+    # ===================
+    # NEOVIM - Code replacement
+    # ===================
+    - name: Update neovim right arrow from angle
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0b0\\)"
+        replace: "nr2char(0xe0c8)"
+
+    - name: Update neovim left arrow from angle
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0b2\\)"
+        replace: "nr2char(0xe0ca)"
+
+    - name: Update neovim right arrow from round
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0b4\\)"
+        replace: "nr2char(0xe0c8)"
+
+    - name: Update neovim left arrow from round
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0b6\\)"
+        replace: "nr2char(0xe0ca)"
+
+    - name: Update neovim right arrow from slant
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0bc\\)"
+        replace: "nr2char(0xe0c8)"
+
+    - name: Update neovim left arrow from slant
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0be\\)"
+        replace: "nr2char(0xe0ca)"
+
+    - name: Update neovim right arrow from pixels
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0c4\\)"
+        replace: "nr2char(0xe0c8)"
+
+    - name: Update neovim left arrow from pixels
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0c6\\)"
+        replace: "nr2char(0xe0ca)"
+
+    - name: Update neovim right arrow from flames
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0c0\\)"
+        replace: "nr2char(0xe0c8)"
+
+    - name: Update neovim left arrow from flames
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\(0xe0c2\\)"
+        replace: "nr2char(0xe0ca)"
+
+    - name: Update neovim right arrow from none (space)
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "(local arrow_right = )' '"
+        replace: "\\1vim.fn.nr2char(0xe0c8)"
+
+    - name: Update neovim left arrow from none (space)
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "(local arrow_left = )' '"
+        replace: "\\1vim.fn.nr2char(0xe0ca)"
+
+    - name: Done
+      ansible.builtin.debug:
+        msg: |
+          Ice powerline separators applied!
+          Target: U+E0C8 (right) / U+E0CA (left)
+          - tmux: run 'tmux source ~/.tmux.conf'
+          - starship: changes apply on next prompt
+          - neovim: restart neovim
