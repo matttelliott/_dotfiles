@@ -1,0 +1,203 @@
+# Apply no powerline separators (clean/minimal style)
+#
+# Replaces all powerline separator glyphs with simple spaces or empty strings.
+# This is useful for:
+#   - Terminals without Nerd Font support
+#   - Users who prefer a cleaner, minimal aesthetic
+#   - Fallback when special characters display incorrectly
+#
+# This playbook replaces all separator glyph variants:
+#   U+E0B0 (right arrow)  -> space
+#   U+E0B2 (left arrow)   -> space
+#   U+E0B4 (right round)  -> space
+#   U+E0B6 (left round)   -> space
+#   U+E0BC (right slant)  -> space
+#   U+E0BE (left slant)   -> space
+#
+# See README.md "Nerd Font / Powerline Characters" for full documentation.
+#
+# Usage:
+#   ansible-playbook themes/style_none.yml
+- name: Apply no powerline separators (clean style)
+  hosts: all
+  gather_facts: true
+  vars:
+    # All possible separator glyphs
+    arrow_right: "\uE0B0"
+    arrow_left: "\uE0B2"
+    round_right: "\uE0B4"
+    round_left: "\uE0B6"
+    slant_right: "\uE0BC"
+    slant_left: "\uE0BE"
+    # Replacement (simple space for clean look)
+    clean: " "
+  tasks:
+    # ===================
+    # TMUX
+    # ===================
+    - name: Update tmux arrow right to clean
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ arrow_right }}"
+        replace: "{{ clean }}"
+
+    - name: Update tmux arrow left to clean
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ arrow_left }}"
+        replace: "{{ clean }}"
+
+    - name: Update tmux round right to clean
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ round_right }}"
+        replace: "{{ clean }}"
+
+    - name: Update tmux round left to clean
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ round_left }}"
+        replace: "{{ clean }}"
+
+    - name: Update tmux slant right to clean
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ slant_right }}"
+        replace: "{{ clean }}"
+
+    - name: Update tmux slant left to clean
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ slant_left }}"
+        replace: "{{ clean }}"
+
+    # ===================
+    # STARSHIP
+    # ===================
+    - name: Update starship arrow right to clean
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ arrow_right }}"
+        replace: "{{ clean }}"
+
+    - name: Update starship arrow left to clean
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ arrow_left }}"
+        replace: "{{ clean }}"
+
+    - name: Update starship round right to clean
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ round_right }}"
+        replace: "{{ clean }}"
+
+    - name: Update starship round left to clean
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ round_left }}"
+        replace: "{{ clean }}"
+
+    - name: Update starship slant right to clean
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ slant_right }}"
+        replace: "{{ clean }}"
+
+    - name: Update starship slant left to clean
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ slant_left }}"
+        replace: "{{ clean }}"
+
+    # ===================
+    # NEOVIM
+    # ===================
+    # Neovim uses vim.fn.nr2char(0xe0b0) format
+    # Replace with a simple space character (0x20)
+    - name: Update neovim arrow right to clean (0xe0b0 -> 0x20)
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: 'nr2char\(0xe0b0\)'
+        replace: "' '"
+
+    - name: Update neovim arrow left to clean (0xe0b2 -> 0x20)
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: 'nr2char\(0xe0b2\)'
+        replace: "' '"
+
+    - name: Update neovim round right to clean (0xe0b4 -> 0x20)
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: 'nr2char\(0xe0b4\)'
+        replace: "' '"
+
+    - name: Update neovim round left to clean (0xe0b6 -> 0x20)
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: 'nr2char\(0xe0b6\)'
+        replace: "' '"
+
+    - name: Update neovim slant right to clean (0xe0bc -> 0x20)
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: 'nr2char\(0xe0bc\)'
+        replace: "' '"
+
+    - name: Update neovim slant left to clean (0xe0be -> 0x20)
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: 'nr2char\(0xe0be\)'
+        replace: "' '"
+
+    # Handle direct glyph occurrences in comments
+    - name: Update neovim arrow comment (right arrow)
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "(--.*arrow.*){{ arrow_right }}"
+        replace: "\\1{{ clean }}"
+
+    - name: Update neovim arrow comment (left arrow)
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "(--.*arrow.*){{ arrow_left }}"
+        replace: "\\1{{ clean }}"
+
+    - name: Update neovim arrow comment (right round)
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "(--.*arrow.*){{ round_right }}"
+        replace: "\\1{{ clean }}"
+
+    - name: Update neovim arrow comment (left round)
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "(--.*arrow.*){{ round_left }}"
+        replace: "\\1{{ clean }}"
+
+    - name: Update neovim arrow comment (right slant)
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "(--.*arrow.*){{ slant_right }}"
+        replace: "\\1{{ clean }}"
+
+    - name: Update neovim arrow comment (left slant)
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "(--.*arrow.*){{ slant_left }}"
+        replace: "\\1{{ clean }}"
+
+    - name: Done
+      ansible.builtin.debug:
+        msg: |
+          Clean/minimal style applied (no powerline separators)!
+          All separator glyphs replaced with spaces.
+          - tmux: run 'tmux source ~/.tmux.conf'
+          - starship: changes apply on next prompt
+          - neovim: restart neovim
+
+          NOTE: To restore powerline separators, run one of:
+            ansible-playbook themes/style_angle.yml
+            ansible-playbook themes/style_round.yml
+            ansible-playbook themes/style_slant.yml
