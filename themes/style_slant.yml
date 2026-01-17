@@ -55,11 +55,25 @@
         replace: "{{ slant_left }}"
 
     # TMUX - From none (space at separator positions)
-    - name: Restore separator from none in tmux
+    # status-left and window-status use right arrows
+    # status-right uses left arrows
+    - name: Restore right separator from none in tmux (status-left)
       ansible.builtin.replace:
         path: ~/.tmux.conf
-        regexp: '\] #\[fg='
-        replace: "]{{ slant_right }}#[fg="
+        regexp: '(status-left.*)\] #\[fg='
+        replace: '\1]{{ slant_right }}#[fg='
+
+    - name: Restore right separator from none in tmux (window-status)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(window-status.*)\] #\[fg='
+        replace: '\1]{{ slant_right }}#[fg='
+
+    - name: Restore left separator from none in tmux (status-right)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(status-right.*)\] #\[fg='
+        replace: '\1]{{ slant_left }}#[fg='
 
     # ===================
     # STARSHIP - Global replacement
@@ -87,6 +101,13 @@
         path: ~/.config/starship.toml
         regexp: "{{ round_left }}"
         replace: "{{ slant_left }}"
+
+    # STARSHIP - From none (space in separator brackets)
+    - name: Restore separator from none in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: '\[ \]\(fg:'
+        replace: "[{{ slant_right }}](fg:"
 
     # ===================
     # NEOVIM - Code replacement

@@ -55,12 +55,44 @@
         replace: "{{ arrow_left }}"
 
     # TMUX - From none (space at separator positions)
-    # Pattern: ] #[fg= means space between ] and #[fg= in format strings
-    - name: Restore separator from none in tmux
+    # status-left and window-status use right arrows
+    # status-right uses left arrows
+    - name: Restore right separator from none in tmux (status-left)
       ansible.builtin.replace:
         path: ~/.tmux.conf
-        regexp: '\] #\[fg='
-        replace: "]{{ arrow_right }}#[fg="
+        regexp: '(status-left.*)\] #\[fg='
+        replace: '\1]{{ arrow_right }}#[fg='
+
+    - name: Restore right separator from none in tmux (window-status)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(window-status.*)\] #\[fg='
+        replace: '\1]{{ arrow_right }}#[fg='
+
+    - name: Restore left separator from none in tmux (status-right)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(status-right.*)\] #\[fg='
+        replace: '\1]{{ arrow_left }}#[fg='
+
+    # Trailing separators (at end of format strings before closing ")
+    - name: Restore trailing right separator in tmux (status-left)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(status-left.*)\]  "'
+        replace: '\1]{{ arrow_right }} "'
+
+    - name: Restore trailing right separator in tmux (window-status)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(window-status-current.*)\]  "'
+        replace: '\1]{{ arrow_right }} "'
+
+    - name: Restore trailing left separator in tmux (status-right)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(status-right.*)\]  "'
+        replace: '\1]{{ arrow_left }} "'
 
     # ===================
     # STARSHIP - Global replacement
