@@ -1,0 +1,178 @@
+# Shared font configuration - apply any Nerd Font
+# Usage: import this playbook with font variable set
+#   - import_playbook: _font.yml
+#     vars:
+#       font: jetbrainsmono
+#
+# Supported fonts: jetbrainsmono, firacode, meslo, cascadia, dejavu, hack,
+#                  iosevka, sourcecodepro, victormono, monaspace, commitmono,
+#                  fantasquesansmono, ibmplexmono
+- name: Apply font
+  hosts: all
+  gather_facts: true
+  vars:
+    fonts:
+      jetbrainsmono:
+        name: "JetBrainsMono Nerd Font"
+        brew_cask: "font-jetbrains-mono-nerd-font"
+        arch_pkg: "ttf-jetbrains-mono-nerd"
+        debian_tar: "JetBrainsMono"
+        mac_font_file: "JetBrainsMonoNerdFont-Regular.ttf"
+        arch_font_file: "JetBrainsMonoNerdFont-Regular.ttf"
+        debian_font_file: "JetBrainsMonoNerdFont-Regular.ttf"
+        wezterm_name: "JetBrainsMono Nerd Font"
+      firacode:
+        name: "FiraCode Nerd Font"
+        brew_cask: "font-fira-code-nerd-font"
+        arch_pkg: "ttf-firacode-nerd"
+        debian_tar: "FiraCode"
+        mac_font_file: "FiraCodeNerdFont-Regular.ttf"
+        arch_font_file: "FiraCodeNerdFont-Regular.ttf"
+        debian_font_file: "FiraCodeNerdFont-Regular.ttf"
+        wezterm_name: "FiraCode Nerd Font"
+      meslo:
+        name: "MesloLGS Nerd Font"
+        brew_cask: "font-meslo-lg-nerd-font"
+        arch_pkg: "ttf-meslo-nerd"
+        debian_tar: "Meslo"
+        mac_font_file: "MesloLGSNerdFont-Regular.ttf"
+        arch_font_file: "MesloLGSNerdFont-Regular.ttf"
+        debian_font_file: "MesloLGSNerdFont-Regular.ttf"
+        wezterm_name: "MesloLGS Nerd Font"
+      cascadia:
+        name: "CaskaydiaCove Nerd Font"
+        brew_cask: "font-caskaydia-cove-nerd-font"
+        arch_pkg: "ttf-cascadia-code-nerd"
+        debian_tar: "CascadiaCode"
+        mac_font_file: "CaskaydiaCoveNerdFont-Regular.ttf"
+        arch_font_file: "CaskaydiaCoveNerdFont-Regular.ttf"
+        debian_font_file: "CaskaydiaCoveNerdFont-Regular.ttf"
+        wezterm_name: "CaskaydiaCove Nerd Font"
+      dejavu:
+        name: "DejaVuSansM Nerd Font"
+        brew_cask: "font-dejavu-sans-mono-nerd-font"
+        arch_pkg: "ttf-dejavu-nerd"
+        debian_tar: "DejaVuSansMono"
+        mac_font_file: "DejaVuSansMNerdFont-Regular.ttf"
+        arch_font_file: "DejaVuSansMNerdFont-Regular.ttf"
+        debian_font_file: "DejaVuSansMNerdFont-Regular.ttf"
+        wezterm_name: "DejaVuSansM Nerd Font Mono"
+      hack:
+        name: "Hack Nerd Font"
+        brew_cask: "font-hack-nerd-font"
+        arch_pkg: "ttf-hack-nerd"
+        debian_tar: "Hack"
+        mac_font_file: "HackNerdFont-Regular.ttf"
+        arch_font_file: "HackNerdFont-Regular.ttf"
+        debian_font_file: "HackNerdFont-Regular.ttf"
+        wezterm_name: "Hack Nerd Font"
+      iosevka:
+        name: "Iosevka Nerd Font"
+        brew_cask: "font-iosevka-nerd-font"
+        arch_pkg: "ttf-iosevka-nerd"
+        debian_tar: "Iosevka"
+        mac_font_file: "IosevkaNerdFont-Regular.ttf"
+        arch_font_file: "IosevkaNerdFont-Regular.ttf"
+        debian_font_file: "IosevkaNerdFont-Regular.ttf"
+        wezterm_name: "Iosevka Nerd Font"
+      sourcecodepro:
+        name: "SauceCodePro Nerd Font"
+        brew_cask: "font-sauce-code-pro-nerd-font"
+        arch_pkg: "ttf-sourcecodepro-nerd"
+        debian_tar: "SourceCodePro"
+        mac_font_file: "SauceCodeProNerdFont-Regular.ttf"
+        arch_font_file: "SauceCodeProNerdFont-Regular.ttf"
+        debian_font_file: "SauceCodeProNerdFont-Regular.ttf"
+        wezterm_name: "SauceCodePro Nerd Font"
+      victormono:
+        name: "VictorMono Nerd Font"
+        brew_cask: "font-victor-mono-nerd-font"
+        arch_pkg: "ttf-victor-mono-nerd"
+        debian_tar: "VictorMono"
+        mac_font_file: "VictorMonoNerdFont-Regular.ttf"
+        arch_font_file: "VictorMonoNerdFont-Regular.ttf"
+        debian_font_file: "VictorMonoNerdFont-Regular.ttf"
+        wezterm_name: "VictorMono Nerd Font"
+      monaspace:
+        name: "Monaspace Nerd Font"
+        brew_cask: "font-monaspace-nerd-font"
+        arch_pkg: "ttf-monaspace-nerd"
+        debian_tar: "Monaspace"
+        mac_font_file: "MonaspaceNeonNerdFont-Regular.otf"
+        arch_font_file: "MonaspaceNeonNerdFont-Regular.ttf"
+        debian_font_file: "MonaspaceNeonNerdFont-Regular.otf"
+        wezterm_name: "MonaspiceNe Nerd Font"
+      commitmono:
+        name: "CommitMono Nerd Font"
+        brew_cask: "font-commit-mono-nerd-font"
+        arch_pkg: "ttf-commit-mono-nerd"
+        debian_tar: "CommitMono"
+        mac_font_file: "CommitMonoNerdFont-Regular.otf"
+        arch_font_file: "CommitMonoNerdFont-Regular.ttf"
+        debian_font_file: "CommitMonoNerdFont-Regular.otf"
+        wezterm_name: "CommitMono Nerd Font"
+      fantasquesansmono:
+        name: "FantasqueSansM Nerd Font"
+        brew_cask: "font-fantasque-sans-mono-nerd-font"
+        arch_pkg: "ttf-fantasque-sans-mono-nerd"
+        debian_tar: "FantasqueSansMono"
+        mac_font_file: "FantasqueSansMNerdFont-Regular.ttf"
+        arch_font_file: "FantasqueSansMNerdFont-Regular.ttf"
+        debian_font_file: "FantasqueSansMNerdFont-Regular.ttf"
+        wezterm_name: "FantasqueSansM Nerd Font"
+      ibmplexmono:
+        name: "BlexMono Nerd Font"
+        brew_cask: "font-blex-mono-nerd-font"
+        arch_pkg: "ttf-ibmplex-mono-nerd"
+        debian_tar: "IBMPlexMono"
+        mac_font_file: "BlexMonoNerdFont-Regular.ttf"
+        arch_font_file: "BlexMonoNerdFont-Regular.ttf"
+        debian_font_file: "BlexMonoNerdFont-Regular.ttf"
+        wezterm_name: "BlexMono Nerd Font"
+    current: "{{ fonts[font] }}"
+  tasks:
+    # Install font - macOS
+    - name: Install font via Homebrew (macOS)
+      shell: "brew install --cask {{ current.brew_cask }}"
+      args:
+        creates: "~/Library/Fonts/{{ current.mac_font_file }}"
+      when: ansible_facts['os_family'] == "Darwin"
+
+    # Install font - Arch
+    - name: Install font via yay (Arch)
+      shell: "yay -S --noconfirm {{ current.arch_pkg }}"
+      args:
+        creates: "/usr/share/fonts/TTF/{{ current.arch_font_file }}"
+      when: ansible_facts['os_family'] == "Archlinux"
+
+    # Install font - Debian
+    - name: Create fonts directory (Debian)
+      file:
+        path: ~/.local/share/fonts
+        state: directory
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Check if font exists (Debian)
+      stat:
+        path: "~/.local/share/fonts/{{ current.debian_font_file }}"
+      register: font_check
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Download and install font (Debian)
+      shell: |
+        curl -fLo /tmp/{{ current.debian_tar }}.tar.xz "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/{{ current.debian_tar }}.tar.xz"
+        tar -xf /tmp/{{ current.debian_tar }}.tar.xz -C ~/.local/share/fonts
+        fc-cache -fv
+        rm /tmp/{{ current.debian_tar }}.tar.xz
+      when: ansible_facts['os_family'] == "Debian" and not font_check.stat.exists
+
+    # Update wezterm config
+    - name: Update wezterm font
+      ansible.builtin.replace:
+        path: ~/.wezterm.lua
+        regexp: 'config\.font = wezterm\.font\("[^"]+"\)'
+        replace: 'config.font = wezterm.font("{{ current.wezterm_name }}")'
+
+    - name: Done
+      ansible.builtin.debug:
+        msg: "{{ current.name }} applied! Restart wezterm to see changes."
