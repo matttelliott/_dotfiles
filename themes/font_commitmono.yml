@@ -1,49 +1,5 @@
-# Apply Commit Mono Nerd Font (neutral, open-source programming font)
-#
-# Commit Mono is designed to be a neutral programming font that doesn't
-# distract from code. It features clear differentiation between similar
-# characters and excellent readability at small sizes.
-#
-# Usage:
-#   ansible-playbook themes/font_commitmono.yml
-- name: Apply Commit Mono Nerd Font
-  hosts: all
-  gather_facts: true
-  tasks:
-    # Install font
-    - name: Install font via Homebrew (macOS)
-      shell: brew install --cask font-commit-mono-nerd-font
-      args:
-        creates: ~/Library/Fonts/CommitMonoNerdFont-Regular.otf
-      when: ansible_facts['os_family'] == "Darwin"
-    - name: Install font via yay (Arch)
-      shell: yay -S --noconfirm ttf-commit-mono-nerd
-      args:
-        creates: /usr/share/fonts/TTF/CommitMonoNerdFont-Regular.ttf
-      when: ansible_facts['os_family'] == "Archlinux"
-    - name: Create fonts directory (Debian)
-      file:
-        path: ~/.local/share/fonts
-        state: directory
-      when: ansible_facts['os_family'] == "Debian"
-    - name: Check if font exists (Debian)
-      stat:
-        path: ~/.local/share/fonts/CommitMonoNerdFont-Regular.otf
-      register: font_check
-      when: ansible_facts['os_family'] == "Debian"
-    - name: Download and install font (Debian)
-      shell: |
-        curl -fLo /tmp/CommitMono.tar.xz "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/CommitMono.tar.xz"
-        tar -xf /tmp/CommitMono.tar.xz -C ~/.local/share/fonts
-        fc-cache -fv
-        rm /tmp/CommitMono.tar.xz
-      when: ansible_facts['os_family'] == "Debian" and not font_check.stat.exists
-    # Update wezterm config
-    - name: Update wezterm font
-      ansible.builtin.replace:
-        path: ~/.wezterm.lua
-        regexp: 'config\.font = wezterm\.font\("[^"]+"\)'
-        replace: 'config.font = wezterm.font("CommitMono Nerd Font")'
-    - name: Done
-      ansible.builtin.debug:
-        msg: "Commit Mono Nerd Font applied! Restart wezterm to see changes."
+# Apply CommitMono Nerd Font
+# Usage: ansible-playbook themes/font_commitmono.yml
+- import_playbook: _font.yml
+  vars:
+    font: commitmono
