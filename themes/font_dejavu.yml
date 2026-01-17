@@ -1,45 +1,5 @@
 # Apply DejaVuSansM Nerd Font
-#
-# Usage:
-#   ansible-playbook themes/font_dejavu.yml
-- name: Apply DejaVuSansM Nerd Font
-  hosts: all
-  gather_facts: true
-  tasks:
-    # Install font
-    - name: Install font via Homebrew (macOS)
-      shell: brew install --cask font-dejavu-sans-mono-nerd-font
-      args:
-        creates: ~/Library/Fonts/DejaVuSansMNerdFont-Regular.ttf
-      when: ansible_facts['os_family'] == "Darwin"
-    - name: Install font via yay (Arch)
-      shell: yay -S --noconfirm ttf-dejavu-nerd
-      args:
-        creates: /usr/share/fonts/TTF/DejaVuSansMNerdFont-Regular.ttf
-      when: ansible_facts['os_family'] == "Archlinux"
-    - name: Create fonts directory (Debian)
-      file:
-        path: ~/.local/share/fonts
-        state: directory
-      when: ansible_facts['os_family'] == "Debian"
-    - name: Check if font exists (Debian)
-      stat:
-        path: ~/.local/share/fonts/DejaVuSansMNerdFont-Regular.ttf
-      register: font_check
-      when: ansible_facts['os_family'] == "Debian"
-    - name: Download and install font (Debian)
-      shell: |
-        curl -fLo /tmp/DejaVuSansMono.tar.xz "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/DejaVuSansMono.tar.xz"
-        tar -xf /tmp/DejaVuSansMono.tar.xz -C ~/.local/share/fonts
-        fc-cache -fv
-        rm /tmp/DejaVuSansMono.tar.xz
-      when: ansible_facts['os_family'] == "Debian" and not font_check.stat.exists
-    # Update wezterm config
-    - name: Update wezterm font
-      ansible.builtin.replace:
-        path: ~/.wezterm.lua
-        regexp: 'config\.font = wezterm\.font\("[^"]+"\)'
-        replace: 'config.font = wezterm.font("DejaVuSansM Nerd Font Mono")'
-    - name: Done
-      ansible.builtin.debug:
-        msg: "DejaVuSansM Nerd Font applied! Restart wezterm to see changes."
+# Usage: ansible-playbook themes/font_dejavu.yml
+- import_playbook: _font.yml
+  vars:
+    font: dejavu
