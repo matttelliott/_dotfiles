@@ -40,3 +40,24 @@
       become: yes
       changed_when: false
       when: ansible_facts['os_family'] == "Debian"
+
+    - name: Create xorg.conf.d directory (Arch)
+      file:
+        path: /etc/X11/xorg.conf.d
+        state: directory
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
+
+    - name: Remap Caps Lock to Ctrl (Arch)
+      copy:
+        dest: /etc/X11/xorg.conf.d/00-keyboard.conf
+        content: |
+          Section "InputClass"
+              Identifier "system-keyboard"
+              MatchIsKeyboard "on"
+              Option "XkbLayout" "us"
+              Option "XkbOptions" "ctrl:nocaps"
+          EndSection
+        mode: '0644'
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"
