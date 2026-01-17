@@ -7,11 +7,10 @@
       args:
         creates: /opt/homebrew/bin/tldr
       when: ansible_facts['os_family'] == "Darwin"
-    - name: Install tldr via apt (Debian)
-      apt:
-        name: tldr
-        state: present
-      become: yes
+    - name: Install tldr via uv (Debian)
+      shell: ~/.local/bin/uv tool install tldr
+      args:
+        creates: ~/.local/share/uv/tools/tldr/bin/tldr
       when: ansible_facts['os_family'] == "Debian"
     - name: Install tldr via pacman (Arch)
       pacman:
