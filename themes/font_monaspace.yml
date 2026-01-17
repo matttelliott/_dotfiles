@@ -1,0 +1,48 @@
+# Apply Monaspace Nerd Font (GitHub's monospace superfamily)
+#
+# Monaspace includes 5 variants: Argon, Krypton, Neon, Radon, Xenon
+# This theme uses Monaspace Neon (the most traditional coding font)
+#
+# Usage:
+#   ansible-playbook themes/font_monaspace.yml
+- name: Apply Monaspace Nerd Font
+  hosts: all
+  gather_facts: true
+  tasks:
+    # Install font
+    - name: Install font via Homebrew (macOS)
+      shell: brew install --cask font-monaspace-nerd-font
+      args:
+        creates: ~/Library/Fonts/MonaspaceNeonNerdFont-Regular.otf
+      when: ansible_facts['os_family'] == "Darwin"
+    - name: Install font via yay (Arch)
+      shell: yay -S --noconfirm ttf-monaspace-nerd
+      args:
+        creates: /usr/share/fonts/TTF/MonaspaceNeonNerdFont-Regular.ttf
+      when: ansible_facts['os_family'] == "Archlinux"
+    - name: Create fonts directory (Debian)
+      file:
+        path: ~/.local/share/fonts
+        state: directory
+      when: ansible_facts['os_family'] == "Debian"
+    - name: Check if font exists (Debian)
+      stat:
+        path: ~/.local/share/fonts/MonaspaceNeonNerdFont-Regular.otf
+      register: font_check
+      when: ansible_facts['os_family'] == "Debian"
+    - name: Download and install font (Debian)
+      shell: |
+        curl -fLo /tmp/Monaspace.tar.xz "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Monaspace.tar.xz"
+        tar -xf /tmp/Monaspace.tar.xz -C ~/.local/share/fonts
+        fc-cache -fv
+        rm /tmp/Monaspace.tar.xz
+      when: ansible_facts['os_family'] == "Debian" and not font_check.stat.exists
+    # Update wezterm config
+    - name: Update wezterm font
+      ansible.builtin.replace:
+        path: ~/.wezterm.lua
+        regexp: 'config\.font = wezterm\.font\("[^"]+"\)'
+        replace: 'config.font = wezterm.font("MonaspiceNe Nerd Font")'
+    - name: Done
+      ansible.builtin.debug:
+        msg: "Monaspace Nerd Font (Neon) applied! Restart wezterm to see changes."
