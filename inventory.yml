@@ -14,11 +14,6 @@ all:
           ansible_python_interpreter: /opt/homebrew/bin/python3
     debian:
       hosts:
-        desktop:
-          ansible_host: desktop.home.lan
-          ansible_user: matt
-          ansible_ssh_timeout: 60
-          ansible_python_interpreter: /usr/bin/python3
         miniserver:
           ansible_host: miniserver.home.lan
           ansible_user: matt
@@ -26,7 +21,11 @@ all:
           ansible_python_interpreter: /usr/bin/python3
     arch:
       hosts:
-      # archbox:
+        desktop:
+          ansible_host: desktop.home.lan
+          ansible_user: matt
+          ansible_ssh_timeout: 60
+          ansible_python_interpreter: /usr/bin/python3
     with_login_tools:
       hosts:
         macbookair:
