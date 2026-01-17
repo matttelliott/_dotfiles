@@ -18,7 +18,7 @@
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Tor Browser via yay (Arch)
-      shell: yay -S --noconfirm tor-browser
+      shell: yay -S --noconfirm tor-browser-bin
       args:
         creates: /usr/bin/tor-browser
       when: ansible_facts['os_family'] == "Archlinux"
