@@ -9,3 +9,7 @@ Host macmini
 Host macbookair
     HostName macbookair.home.lan
     User matt
+
+Host miniserver
+    HostName miniserver.home.lan
+    User matt
