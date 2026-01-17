@@ -3,7 +3,7 @@
 # This playbook can RESTORE powerline characters from any state:
 #   - From angled (U+E0B0/U+E0B2)
 #   - From slant (U+E0BC/U+E0BE)
-#   - From none/clean (spaces)
+#   - From none/clean (spaces in tmux/starship context)
 #   - Already round (no change)
 #
 # Target glyphs:
@@ -18,74 +18,79 @@
   hosts: all
   gather_facts: true
   vars:
+    # Source glyphs (to be replaced)
+    arrow_right: "\uE0B0"
+    arrow_left: "\uE0B2"
+    slant_right: "\uE0BC"
+    slant_left: "\uE0BE"
     # Target separators
     round_right: "\uE0B4"
     round_left: "\uE0B6"
   tasks:
     # ===================
-    # TMUX
+    # TMUX - Global replacement
     # ===================
-    - name: Update tmux right separators in status-left
+    - name: Replace angle right with round in tmux
       ansible.builtin.replace:
         path: ~/.tmux.conf
-        regexp: '(\],bold\])([ \uE0B0\uE0B4\uE0BC])( #h)'
-        replace: '\g<1>{{ round_right }}\g<3>'
+        regexp: "{{ arrow_right }}"
+        replace: "{{ round_right }}"
 
-    - name: Update tmux right separators after session block
+    - name: Replace angle left with round in tmux
       ansible.builtin.replace:
         path: ~/.tmux.conf
-        regexp: '(bg=#[0-9a-fA-F]{6}\])([ \uE0B0\uE0B4\uE0BC])(#\[fg=)'
-        replace: '\g<1>{{ round_right }}\g<3>'
+        regexp: "{{ arrow_left }}"
+        replace: "{{ round_left }}"
 
-    - name: Update tmux left separators in status-right
+    - name: Replace slant right with round in tmux
       ansible.builtin.replace:
         path: ~/.tmux.conf
-        regexp: '(bg=#[0-9a-fA-F]{6}\])([ \uE0B2\uE0B6\uE0BE])(#\[fg=)'
-        replace: '\g<1>{{ round_left }}\g<3>'
+        regexp: "{{ slant_right }}"
+        replace: "{{ round_right }}"
 
-    - name: Update tmux window-status-current right sep start
+    - name: Replace slant left with round in tmux
       ansible.builtin.replace:
         path: ~/.tmux.conf
-        regexp: '(window-status-current-format "#\[fg=#[0-9a-fA-F]{6},bg=#[0-9a-fA-F]{6}\])([ \uE0B0\uE0B4\uE0BC])(#\[)'
-        replace: '\g<1>{{ round_right }}\g<3>'
-
-    - name: Update tmux window-status-current right sep end
-      ansible.builtin.replace:
-        path: ~/.tmux.conf
-        regexp: '(bg=#[0-9a-fA-F]{6}\])([ \uE0B0\uE0B4\uE0BC])(")'
-        replace: '\g<1>{{ round_right }}\g<3>'
+        regexp: "{{ slant_left }}"
+        replace: "{{ round_left }}"
 
     # ===================
-    # STARSHIP
+    # STARSHIP - Global replacement
     # ===================
-    - name: Update starship right separators
+    - name: Replace angle right with round in starship
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: '\[([ \uE0B0\uE0B4\uE0BC])\]\(fg:#'
-        replace: '[{{ round_right }}](fg:#'
+        regexp: "{{ arrow_right }}"
+        replace: "{{ round_right }}"
 
-    - name: Update starship left separators
+    - name: Replace angle left with round in starship
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: '\[([ \uE0B2\uE0B6\uE0BE])\]\(fg:#'
-        replace: '[{{ round_left }}](fg:#'
+        regexp: "{{ arrow_left }}"
+        replace: "{{ round_left }}"
 
-    - name: Update starship trailing right separators
+    - name: Replace slant right with round in starship
       ansible.builtin.replace:
         path: ~/.config/starship.toml
-        regexp: '\[([ \uE0B0\uE0B4\uE0BC])\]\(fg:#([0-9a-fA-F]{6})\)"$'
-        replace: '[{{ round_right }}](fg:#\g<2>)"'
+        regexp: "{{ slant_right }}"
+        replace: "{{ round_right }}"
+
+    - name: Replace slant left with round in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ slant_left }}"
+        replace: "{{ round_left }}"
 
     # ===================
-    # NEOVIM
+    # NEOVIM - Code replacement
     # ===================
-    - name: Update neovim right arrow from angled
+    - name: Update neovim right arrow from angle
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: "nr2char\\(0xe0b0\\)"
         replace: "nr2char(0xe0b4)"
 
-    - name: Update neovim left arrow from angled
+    - name: Update neovim left arrow from angle
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: "nr2char\\(0xe0b2\\)"
