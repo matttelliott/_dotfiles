@@ -1,5 +1,0 @@
-# Apply ice powerline separators (U+E0C8/U+E0CA)
-# Usage: ansible-playbook themes/style_ice.yml
-- import_playbook: _style.yml
-  vars:
-    style: ice

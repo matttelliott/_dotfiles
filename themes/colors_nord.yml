@@ -1,5 +1,0 @@
-# Apply Nord color scheme
-# Usage: ansible-playbook themes/colors_nord.yml
-- import_playbook: _color.yml
-  vars:
-    color: nord

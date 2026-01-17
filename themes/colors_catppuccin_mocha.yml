@@ -1,5 +1,0 @@
-# Apply Catppuccin Mocha color scheme
-# Usage: ansible-playbook themes/colors_catppuccin_mocha.yml
-- import_playbook: _color.yml
-  vars:
-    color: catppuccin_mocha

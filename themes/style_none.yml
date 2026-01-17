@@ -1,5 +1,0 @@
-# Apply no powerline separators (clean/minimal style)
-# Usage: ansible-playbook themes/style_none.yml
-- import_playbook: _style.yml
-  vars:
-    style: none

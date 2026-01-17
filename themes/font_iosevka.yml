@@ -1,5 +1,0 @@
-# Apply Iosevka Nerd Font
-# Usage: ansible-playbook themes/font_iosevka.yml
-- import_playbook: _font.yml
-  vars:
-    font: iosevka

@@ -1,5 +1,0 @@
-# Apply DejaVuSansM Nerd Font
-# Usage: ansible-playbook themes/font_dejavu.yml
-- import_playbook: _font.yml
-  vars:
-    font: dejavu

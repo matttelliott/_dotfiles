@@ -1,5 +1,0 @@
-# Apply slant/diagonal powerline separators (U+E0BC/U+E0BE)
-# Usage: ansible-playbook themes/style_slant.yml
-- import_playbook: _style.yml
-  vars:
-    style: slant

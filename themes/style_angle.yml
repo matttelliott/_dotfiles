@@ -1,5 +1,0 @@
-# Apply angled/chevron powerline separators (U+E0B0/U+E0B2)
-# Usage: ansible-playbook themes/style_angle.yml
-- import_playbook: _style.yml
-  vars:
-    style: angle

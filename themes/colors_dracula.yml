@@ -1,5 +1,0 @@
-# Apply Dracula color scheme
-# Usage: ansible-playbook themes/colors_dracula.yml
-- import_playbook: _color.yml
-  vars:
-    color: dracula

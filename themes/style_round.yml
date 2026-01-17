@@ -1,5 +1,0 @@
-# Apply round/semicircle powerline separators (U+E0B4/U+E0B6)
-# Usage: ansible-playbook themes/style_round.yml
-- import_playbook: _style.yml
-  vars:
-    style: round

@@ -1,5 +1,0 @@
-# Apply pixels powerline separators (U+E0C4/U+E0C6)
-# Usage: ansible-playbook themes/style_pixels.yml
-- import_playbook: _style.yml
-  vars:
-    style: pixels

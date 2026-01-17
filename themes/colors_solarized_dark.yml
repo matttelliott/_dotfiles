@@ -1,5 +1,0 @@
-# Apply Solarized Dark color scheme
-# Usage: ansible-playbook themes/colors_solarized_dark.yml
-- import_playbook: _color.yml
-  vars:
-    color: solarized_dark

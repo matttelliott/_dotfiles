@@ -1,5 +1,0 @@
-# Apply IBM Plex Mono Nerd Font
-# Usage: ansible-playbook themes/font_ibmplexmono.yml
-- import_playbook: _font.yml
-  vars:
-    font: ibmplexmono

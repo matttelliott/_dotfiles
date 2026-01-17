@@ -1,5 +1,0 @@
-# Apply flames powerline separators (U+E0C0/U+E0C2)
-# Usage: ansible-playbook themes/style_flames.yml
-- import_playbook: _style.yml
-  vars:
-    style: flames
