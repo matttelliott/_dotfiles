@@ -8,12 +8,12 @@
         creates: /opt/homebrew/bin/yamlfmt
       when: ansible_facts['os_family'] == "Darwin"
     - name: Install yamlfmt via go install (Debian)
-      shell: ~/go/bin/go install github.com/google/yamlfmt/cmd/yamlfmt@latest
+      shell: /usr/local/go/bin/go install github.com/google/yamlfmt/cmd/yamlfmt@latest
       args:
         creates: ~/go/bin/yamlfmt
       when: ansible_facts['os_family'] == "Debian"
     - name: Install yamlfmt via go install (Arch)
-      shell: ~/go/bin/go install github.com/google/yamlfmt/cmd/yamlfmt@latest
+      shell: /usr/local/go/bin/go install github.com/google/yamlfmt/cmd/yamlfmt@latest
       args:
         creates: ~/go/bin/yamlfmt
       when: ansible_facts['os_family'] == "Archlinux"
