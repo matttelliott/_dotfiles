@@ -19,6 +19,11 @@ all:
           ansible_user: matt
           ansible_ssh_timeout: 60
           ansible_python_interpreter: /usr/bin/python3
+        miniserver:
+          ansible_host: miniserver.home.lan
+          ansible_user: matt
+          ansible_ssh_timeout: 60
+          ansible_python_interpreter: /usr/bin/python3
     arch:
       hosts:
       # archbox:
