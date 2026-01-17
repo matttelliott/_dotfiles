@@ -82,11 +82,17 @@
         regexp: '(status-left.*)\]  "'
         replace: '\1]{{ arrow_right }} "'
 
-    - name: Restore trailing right separator in tmux (window-status)
+    - name: Restore trailing right separator in tmux (window-status, two spaces)
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: '(window-status-current.*)\]  "'
         replace: '\1]{{ arrow_right }} "'
+
+    - name: Restore trailing right separator in tmux (window-status, one space)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(window-status-current.*)\] "'
+        replace: '\1]{{ arrow_right }}"'
 
     - name: Restore trailing left separator in tmux (status-right)
       ansible.builtin.replace:
