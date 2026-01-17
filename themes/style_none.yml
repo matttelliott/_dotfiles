@@ -114,79 +114,42 @@
     # NEOVIM
     # ===================
     # Neovim uses vim.fn.nr2char(0xe0b0) format
-    # Replace with a simple space character (0x20)
-    - name: Update neovim arrow right to clean (0xe0b0 -> 0x20)
+    # Replace the ENTIRE expression with ' ' (not just the nr2char part)
+    - name: Update neovim arrow right to clean
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
-        regexp: 'nr2char\(0xe0b0\)'
+        regexp: 'vim\.fn\.nr2char\(0xe0b0\)'
         replace: "' '"
 
-    - name: Update neovim arrow left to clean (0xe0b2 -> 0x20)
+    - name: Update neovim arrow left to clean
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
-        regexp: 'nr2char\(0xe0b2\)'
+        regexp: 'vim\.fn\.nr2char\(0xe0b2\)'
         replace: "' '"
 
-    - name: Update neovim round right to clean (0xe0b4 -> 0x20)
+    - name: Update neovim round right to clean
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
-        regexp: 'nr2char\(0xe0b4\)'
+        regexp: 'vim\.fn\.nr2char\(0xe0b4\)'
         replace: "' '"
 
-    - name: Update neovim round left to clean (0xe0b6 -> 0x20)
+    - name: Update neovim round left to clean
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
-        regexp: 'nr2char\(0xe0b6\)'
+        regexp: 'vim\.fn\.nr2char\(0xe0b6\)'
         replace: "' '"
 
-    - name: Update neovim slant right to clean (0xe0bc -> 0x20)
+    - name: Update neovim slant right to clean
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
-        regexp: 'nr2char\(0xe0bc\)'
+        regexp: 'vim\.fn\.nr2char\(0xe0bc\)'
         replace: "' '"
 
-    - name: Update neovim slant left to clean (0xe0be -> 0x20)
+    - name: Update neovim slant left to clean
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
-        regexp: 'nr2char\(0xe0be\)'
+        regexp: 'vim\.fn\.nr2char\(0xe0be\)'
         replace: "' '"
-
-    # Handle direct glyph occurrences in comments
-    - name: Update neovim arrow comment (right arrow)
-      ansible.builtin.replace:
-        path: ~/.config/nvim/init.lua
-        regexp: "(--.*arrow.*){{ arrow_right }}"
-        replace: "\\1{{ clean }}"
-
-    - name: Update neovim arrow comment (left arrow)
-      ansible.builtin.replace:
-        path: ~/.config/nvim/init.lua
-        regexp: "(--.*arrow.*){{ arrow_left }}"
-        replace: "\\1{{ clean }}"
-
-    - name: Update neovim arrow comment (right round)
-      ansible.builtin.replace:
-        path: ~/.config/nvim/init.lua
-        regexp: "(--.*arrow.*){{ round_right }}"
-        replace: "\\1{{ clean }}"
-
-    - name: Update neovim arrow comment (left round)
-      ansible.builtin.replace:
-        path: ~/.config/nvim/init.lua
-        regexp: "(--.*arrow.*){{ round_left }}"
-        replace: "\\1{{ clean }}"
-
-    - name: Update neovim arrow comment (right slant)
-      ansible.builtin.replace:
-        path: ~/.config/nvim/init.lua
-        regexp: "(--.*arrow.*){{ slant_right }}"
-        replace: "\\1{{ clean }}"
-
-    - name: Update neovim arrow comment (left slant)
-      ansible.builtin.replace:
-        path: ~/.config/nvim/init.lua
-        regexp: "(--.*arrow.*){{ slant_left }}"
-        replace: "\\1{{ clean }}"
 
     - name: Done
       ansible.builtin.debug:
