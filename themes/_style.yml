@@ -1,0 +1,207 @@
+# Shared powerline separator style logic
+#
+# This playbook applies a powerline separator style by replacing ALL known
+# separator glyphs with the target style. Adding a new style only requires
+# adding an entry to the styles dict below.
+#
+# Do not run directly. Use wrapper playbooks:
+#   ansible-playbook themes/style_angle.yml
+#   ansible-playbook themes/style_round.yml
+#   etc.
+#
+# Or run with -e style=<name>:
+#   ansible-playbook themes/_style.yml -e style=angle
+- name: Apply powerline separator style
+  hosts: all
+  gather_facts: true
+  vars:
+    # All known separator styles - add new styles here
+    styles:
+      angle:  { right: "\uE0B0", left: "\uE0B2", right_code: "0xe0b0", left_code: "0xe0b2" }
+      round:  { right: "\uE0B4", left: "\uE0B6", right_code: "0xe0b4", left_code: "0xe0b6" }
+      slant:  { right: "\uE0BC", left: "\uE0BE", right_code: "0xe0bc", left_code: "0xe0be" }
+      pixels: { right: "\uE0C4", left: "\uE0C6", right_code: "0xe0c4", left_code: "0xe0c6" }
+      flames: { right: "\uE0C0", left: "\uE0C2", right_code: "0xe0c0", left_code: "0xe0c2" }
+      ice:    { right: "\uE0C8", left: "\uE0CA", right_code: "0xe0c8", left_code: "0xe0ca" }
+      none:   { right: " ",      left: " ",      right_code: "none",   left_code: "none" }
+    target: "{{ styles[style] }}"
+  tasks:
+    - name: Validate style parameter
+      ansible.builtin.fail:
+        msg: "Unknown style '{{ style }}'. Valid styles: {{ styles.keys() | list | join(', ') }}"
+      when: style not in styles
+
+    # ===================
+    # TMUX
+    # ===================
+    - name: Replace right separators in tmux
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ item.value.right }}"
+        replace: "{{ target.right }}"
+      loop: "{{ styles | dict2items }}"
+      when: item.key != style and item.key != 'none'
+
+    - name: Replace left separators in tmux
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "{{ item.value.left }}"
+        replace: "{{ target.left }}"
+      loop: "{{ styles | dict2items }}"
+      when: item.key != style and item.key != 'none'
+
+    # TMUX - Restore from none (space at separator positions)
+    - name: Restore right separator from none in tmux (status-left, pass 1)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(status-left.*?)\] #\[fg='
+        replace: '\1]{{ target.right }}#[fg='
+      when: style != 'none'
+
+    - name: Restore right separator from none in tmux (status-left, pass 2)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(status-left.*?)\] #\[fg='
+        replace: '\1]{{ target.right }}#[fg='
+      when: style != 'none'
+
+    - name: Restore right separator from none in tmux (window-status, pass 1)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(window-status.*?)\] #\[fg='
+        replace: '\1]{{ target.right }}#[fg='
+      when: style != 'none'
+
+    - name: Restore right separator from none in tmux (window-status, pass 2)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(window-status.*?)\] #\[fg='
+        replace: '\1]{{ target.right }}#[fg='
+      when: style != 'none'
+
+    - name: Restore left separator from none in tmux (status-right, pass 1)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(status-right.*?)\] #\[fg='
+        replace: '\1]{{ target.left }}#[fg='
+      when: style != 'none'
+
+    - name: Restore left separator from none in tmux (status-right, pass 2)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(status-right.*?)\] #\[fg='
+        replace: '\1]{{ target.left }}#[fg='
+      when: style != 'none'
+
+    - name: Restore trailing right separator in tmux (status-left)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(status-left.*?)\]  "'
+        replace: '\1]{{ target.right }} "'
+      when: style != 'none'
+
+    - name: Restore trailing right separator in tmux (window-status, two spaces)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(window-status-current.*?)\]  "'
+        replace: '\1]{{ target.right }} "'
+      when: style != 'none'
+
+    - name: Restore trailing right separator in tmux (window-status, one space)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(window-status-current.*?)\] "'
+        replace: '\1]{{ target.right }}"'
+      when: style != 'none'
+
+    - name: Restore trailing left separator in tmux (status-right)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: '(status-right.*?)\]  "'
+        replace: '\1]{{ target.left }} "'
+      when: style != 'none'
+
+    # ===================
+    # STARSHIP
+    # ===================
+    - name: Replace right separators in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ item.value.right }}"
+        replace: "{{ target.right }}"
+      loop: "{{ styles | dict2items }}"
+      when: item.key != style and item.key != 'none'
+
+    - name: Replace left separators in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: "{{ item.value.left }}"
+        replace: "{{ target.left }}"
+      loop: "{{ styles | dict2items }}"
+      when: item.key != style and item.key != 'none'
+
+    - name: Restore separator from none in starship
+      ansible.builtin.replace:
+        path: ~/.config/starship.toml
+        regexp: '\[ \]\(fg:'
+        replace: "[{{ target.right }}](fg:"
+      when: style != 'none'
+
+    # ===================
+    # NEOVIM
+    # ===================
+    - name: Replace right separators in neovim
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\({{ item.value.right_code }}\\)"
+        replace: "nr2char({{ target.right_code }})"
+      loop: "{{ styles | dict2items }}"
+      when: item.key != style and item.key != 'none' and target.right_code != 'none'
+
+    - name: Replace left separators in neovim
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "nr2char\\({{ item.value.left_code }}\\)"
+        replace: "nr2char({{ target.left_code }})"
+      loop: "{{ styles | dict2items }}"
+      when: item.key != style and item.key != 'none' and target.left_code != 'none'
+
+    # NEOVIM - To none (replace nr2char with space literal)
+    - name: Replace right separators in neovim to none
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "vim\\.fn\\.nr2char\\({{ item.value.right_code }}\\)"
+        replace: "' '"
+      loop: "{{ styles | dict2items }}"
+      when: style == 'none' and item.key != 'none'
+
+    - name: Replace left separators in neovim to none
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "vim\\.fn\\.nr2char\\({{ item.value.left_code }}\\)"
+        replace: "' '"
+      loop: "{{ styles | dict2items }}"
+      when: style == 'none' and item.key != 'none'
+
+    # NEOVIM - From none (restore from space literal)
+    - name: Restore neovim right arrow from none
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "(local arrow_right = )' '"
+        replace: "\\1vim.fn.nr2char({{ target.right_code }})"
+      when: style != 'none'
+
+    - name: Restore neovim left arrow from none
+      ansible.builtin.replace:
+        path: ~/.config/nvim/init.lua
+        regexp: "(local arrow_left = )' '"
+        replace: "\\1vim.fn.nr2char({{ target.left_code }})"
+      when: style != 'none'
+
+    - name: Done
+      ansible.builtin.debug:
+        msg: |
+          {{ style | capitalize }} powerline separators applied!
+          - tmux: run 'tmux source ~/.tmux.conf'
+          - starship: changes apply on next prompt
+          - neovim: restart neovim
