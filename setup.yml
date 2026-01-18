@@ -47,12 +47,20 @@
   vars:
     dotfiles_ssh_url: "git@github.com:{{ github_username }}/_dotfiles.git"
     dotfiles_https_url: "https://github.com/{{ github_username }}/_dotfiles.git"
-    use_ssh: "{{ inventory_hostname in groups['with_login_tools'] }}"
   tasks:
     - name: Check if dotfiles exists
       stat:
         path: ~/_dotfiles
       register: dotfiles_dir
+
+    - name: Check if SSH key exists
+      stat:
+        path: ~/.ssh/id_rsa
+      register: ssh_key_file
+
+    - name: Set use_ssh fact
+      set_fact:
+        use_ssh: "{{ (inventory_hostname in groups['with_login_tools']) and ssh_key_file.stat.exists }}"
 
     - name: Clone dotfiles via SSH
       git:
