@@ -94,5 +94,6 @@ squash_summary="Claude squashed auto-commits - $squash_summary"
 git reset --soft "$base_commit" 2>/dev/null || exit 0
 if ! git commit --no-gpg-sign --no-verify -m "$squash_summary" 2>&1; then
     echo "[auto-commit] Squash commit failed: $squash_summary" >&2
+else
+    git push
 fi
-git push
