@@ -1,6 +1,7 @@
 - wezterm cmd+enter to fullscreen
 - wezterm auto join tmux
 - fix git configs
+- add minikube, kubectl, etc
 - set up sops + age
 - set up kepler (disney)
 - set up amazon-q (disney)
