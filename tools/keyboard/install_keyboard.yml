@@ -41,6 +41,15 @@
       changed_when: false
       when: ansible_facts['os_family'] == "Debian"
 
+    - name: Add keyboard remap to xprofile (Debian)
+      lineinfile:
+        path: ~/.xprofile
+        regexp: '^setxkbmap.*ctrl:nocaps'
+        line: 'setxkbmap -option ctrl:nocaps'
+        create: yes
+        mode: '0644'
+      when: ansible_facts['os_family'] == "Debian"
+
     - name: Create xorg.conf.d directory (Arch)
       file:
         path: /etc/X11/xorg.conf.d
