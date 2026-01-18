@@ -34,73 +34,25 @@ read -p "with_ai_tools (Claude Code)? [y/n]: " AI
 
 echo
 
-# Age key setup for SOPS decryption
-AGE_KEY_DIR="$HOME/.config/sops/age"
-AGE_KEY_FILE="$AGE_KEY_DIR/keys.txt"
-
-if [[ ! -f "$AGE_KEY_FILE" ]]; then
-  echo "=== Age Key Setup (for SOPS encrypted secrets) ==="
-  echo
-  echo "An Age private key is required to decrypt personal info (git name, email, SSH keys)."
-  echo
-  echo "Options:"
-  echo "  1) Paste Age private key"
-  echo "  2) Provide path to existing keys.txt"
-  echo "  3) Generate new key (you'll need to re-encrypt personal-info.sops.yml)"
-  echo
-  read -p "Choose [1/2/3]: " AGE_CHOICE
-
-  mkdir -p "$AGE_KEY_DIR"
-
-  case $AGE_CHOICE in
-    1)
-      echo
-      echo "Paste your Age private key (starts with AGE-SECRET-KEY-), then press Enter:"
-      read -r AGE_SECRET
-      echo "$AGE_SECRET" > "$AGE_KEY_FILE"
-      ;;
-    2)
-      echo
-      read -p "Path to keys.txt: " AGE_PATH
-      cp "$AGE_PATH" "$AGE_KEY_FILE"
-      ;;
-    3)
-      echo
-      if command -v age-keygen &> /dev/null; then
-        age-keygen -o "$AGE_KEY_FILE"
-        echo
-        echo "New key generated. You'll need to re-encrypt personal-info.sops.yml with this public key."
-        echo "See: sops updatekeys group_vars/all/personal-info.sops.yml"
-      else
-        echo "age-keygen not found. It will be installed later, then run:"
-        echo "  age-keygen -o $AGE_KEY_FILE"
-        echo "  sops updatekeys group_vars/all/personal-info.sops.yml"
-      fi
-      ;;
-  esac
-
-  chmod 600 "$AGE_KEY_FILE" 2>/dev/null || true
-  echo
-fi
-
-# 1Password service account token setup (for SSH keys)
+# 1Password service account token setup (for secrets)
 OP_TOKEN_DIR="$HOME/.config/op"
 OP_TOKEN_FILE="$OP_TOKEN_DIR/service-account-token"
 
 if [[ ! -f "$OP_TOKEN_FILE" ]]; then
-  echo "=== 1Password Service Account Setup (for SSH keys) ==="
+  echo "=== 1Password Service Account Setup ==="
   echo
-  echo "A 1Password service account token is required to fetch SSH keys."
+  echo "A 1Password service account token fetches all secrets (Age key, SSH keys)."
   echo "Create one at: 1password.com → Developer → Service Accounts"
   echo
   echo "Options:"
   echo "  1) Paste service account token"
   echo "  2) Provide path to existing token file"
-  echo "  3) Skip (SSH keys won't be fetched from 1Password)"
+  echo "  3) Skip (secrets will need to be configured manually)"
   echo
   read -p "Choose [1/2/3]: " OP_CHOICE
 
   mkdir -p "$OP_TOKEN_DIR"
+  chmod 700 "$OP_TOKEN_DIR"
 
   case $OP_CHOICE in
     1)
@@ -115,7 +67,7 @@ if [[ ! -f "$OP_TOKEN_FILE" ]]; then
       cp "$OP_PATH" "$OP_TOKEN_FILE"
       ;;
     3)
-      echo "Skipping 1Password setup. SSH keys will need to be configured manually."
+      echo "Skipping 1Password setup."
       ;;
   esac
 
@@ -123,6 +75,74 @@ if [[ ! -f "$OP_TOKEN_FILE" ]]; then
     chmod 600 "$OP_TOKEN_FILE"
   fi
   echo
+fi
+
+# Age key setup for SOPS decryption
+AGE_KEY_DIR="$HOME/.config/sops/age"
+AGE_KEY_FILE="$AGE_KEY_DIR/keys.txt"
+
+if [[ ! -f "$AGE_KEY_FILE" ]]; then
+  mkdir -p "$AGE_KEY_DIR"
+
+  # Try to fetch from 1Password first
+  if [[ -f "$OP_TOKEN_FILE" ]] && command -v op &> /dev/null; then
+    echo "Fetching Age key from 1Password..."
+    export OP_SERVICE_ACCOUNT_TOKEN=$(cat "$OP_TOKEN_FILE")
+    AGE_PRIVATE_KEY=$(op read "op://Automation/Age Key/Private Key" 2>/dev/null || true)
+    AGE_PUBLIC_KEY=$(op read "op://Automation/Age Key/Public Key" 2>/dev/null || true)
+
+    if [[ -n "$AGE_PRIVATE_KEY" ]]; then
+      echo "# public key: $AGE_PUBLIC_KEY" > "$AGE_KEY_FILE"
+      echo "$AGE_PRIVATE_KEY" >> "$AGE_KEY_FILE"
+      chmod 600 "$AGE_KEY_FILE"
+      echo "Age key fetched successfully."
+      echo
+    fi
+  fi
+
+  # Fall back to manual setup if 1Password didn't work
+  if [[ ! -f "$AGE_KEY_FILE" ]] || [[ ! -s "$AGE_KEY_FILE" ]]; then
+    echo "=== Age Key Setup (for SOPS encrypted secrets) ==="
+    echo
+    echo "An Age private key is required to decrypt personal info."
+    echo
+    echo "Options:"
+    echo "  1) Paste Age private key"
+    echo "  2) Provide path to existing keys.txt"
+    echo "  3) Generate new key (you'll need to re-encrypt personal-info.sops.yml)"
+    echo
+    read -p "Choose [1/2/3]: " AGE_CHOICE
+
+    case $AGE_CHOICE in
+      1)
+        echo
+        echo "Paste your Age private key (starts with AGE-SECRET-KEY-), then press Enter:"
+        read -r AGE_SECRET
+        echo "$AGE_SECRET" > "$AGE_KEY_FILE"
+        ;;
+      2)
+        echo
+        read -p "Path to keys.txt: " AGE_PATH
+        cp "$AGE_PATH" "$AGE_KEY_FILE"
+        ;;
+      3)
+        echo
+        if command -v age-keygen &> /dev/null; then
+          age-keygen -o "$AGE_KEY_FILE"
+          echo
+          echo "New key generated. You'll need to re-encrypt personal-info.sops.yml with this public key."
+          echo "See: sops updatekeys group_vars/all/personal-info.sops.yml"
+        else
+          echo "age-keygen not found. It will be installed later, then run:"
+          echo "  age-keygen -o $AGE_KEY_FILE"
+          echo "  sops updatekeys group_vars/all/personal-info.sops.yml"
+        fi
+        ;;
+    esac
+
+    chmod 600 "$AGE_KEY_FILE" 2>/dev/null || true
+    echo
+  fi
 fi
 
 # Install dependencies
