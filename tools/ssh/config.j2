@@ -13,3 +13,10 @@ Host macbookair
 Host miniserver
     HostName miniserver.home.lan
     User matt
+
+Host *
+    AddKeysToAgent yes
+{% if ansible_facts['os_family'] == "Darwin" %}
+    UseKeychain yes
+{% endif %}
+    IdentityFile ~/.ssh/id_rsa
