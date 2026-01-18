@@ -133,7 +133,6 @@
 - import_playbook: tools/wireguard_gui/install_wireguard_gui.yml
 - import_playbook: tools/nas/install_nas.yml
 - import_playbook: tools/fail2ban/install_fail2ban.yml
-- import_playbook: tools/1password_cli/install_1password_cli.yml
 - import_playbook: tools/doctl/install_doctl.yml
 - import_playbook: tools/pulumi/install_pulumi.yml
 - import_playbook: tools/awscli/install_awscli.yml
