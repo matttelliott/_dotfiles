@@ -44,8 +44,8 @@
   hosts: all
   gather_facts: false
   vars:
-    dotfiles_ssh_url: git@github.com:matttelliott/_dotfiles.git
-    dotfiles_https_url: https://github.com/matttelliott/_dotfiles.git
+    dotfiles_ssh_url: "git@github.com:{{ github_username }}/_dotfiles.git"
+    dotfiles_https_url: "https://github.com/{{ github_username }}/_dotfiles.git"
     use_ssh: "{{ inventory_hostname in groups['with_login_tools'] }}"
   tasks:
     - name: Check if dotfiles exists

@@ -1,0 +1,21 @@
+git_user_name: ENC[AES256_GCM,data:tIQLpNSGEfvZaGvYO8U=,iv:C1EvgKReMSCTt6M1ciNyqouG15P5Fo5Teat5T6UXLP0=,tag:6lq/mij0HQAN2+1g/RiP6A==,type:str]
+git_user_email: ENC[AES256_GCM,data:hcFzUENiQ534JpoTTxY4rUiCu+vj,iv:rU1Pq0s+xccUK3DRR/HvXxcsm/M5pyPswRr5IRVNnz0=,tag:jTBPB9mSJeRGEUVCzskc4g==,type:str]
+git_signing_key: ENC[AES256_GCM,data:zwg8nlLl/yXig+S8itOysdq5yEQmGEQzFbXKVPKHSWzJuSG462BfeJbghHiwdSzHt9+2LYpZ40qSXOtBq4X6ofvpibbyE6Cw5ICXg7WS8KltBpdUuMJ1mzg91M7bM0K79C9GdB1CbUeN2Y8x2EMwouxaldEYSC3j9JTlXrVVzmluiT1XOGVR143KmNvcpfC7GCtddAYXmXP0UtlnLcYQtl3aSqmh3VHVLt3SQY8xLLV57iAZCZPYDVef6BH5hzUNjluEWMmMEu7FNiH70KTKhQ2NRkpqBSKrzwdZ8Z0BJlF+a+PMnSLNha38NES6a+KNcZ2Cy71gyIPH6aU5ykFtMM1Sn6w0ooFT1Hi4gfD4Ps86SQrV8mqt6UolGrepyu+r/xdmstpB8AuCJqtmUNjQpMjnnCwgnfdxWOFu/zP0uNVM67AzJADoHMBb2gT6cpDXjR8Khv/lGoamh3t5zfEn43CInFovkqgZIYu61hmpUhxNnQfU+wWPDDvwr3sVyCefxhwMbrt7wB8zZpS2k6u5+/aT3eWzwjYtkRo6L06anJyavRgkhV8CHWoDuB9Y0fH8STqiJYTsJI60Zf0c9Zwc2Q9RvxJuGxxTkXGQk+z0OoYC3WySkLVQgMcYyO/G+8CZTfkWPXBJ6ItwiMJhfI0NeVC6ArYgT3b8VDxZ+vdHdtdkzfHERrM8wm9WVUuvyLqKJKiNubLbGF8QbZ7rklvLye60fg5zWpoV,iv:rv9i6+sDMKyWwfYQxZo5pmHqxkAfq/jDlpheVKudh3w=,tag:LsdMPF9wVQGOb9DdJ3WSdg==,type:str]
+ssh_public_key: ENC[AES256_GCM,data:loKEWODynnUzBej+dmZQ6TCDsDhP8VGxbrKTrtTYuRv1YaErlld0YwkwEUZimoHd0nLYSjUL14hziCI/4LB/jDVaWjVFhmWSX6q2tbvEndinskxIJkalSKNvOj2OuB6ykHG6yYuA0cmOdfSGYQlh2QJk7/QxBIraIDVbcbOifWP1zbZ7/Gr7V/f1II075hhB639jhm/U/mzMtNghqGnPiUNhOea1lVqfDnL3u7bSO4d1mM0Fhy6KpBg2r8tjTTLp6zrc4B+JNa2bdvG3SHM/gZBwRfXwid0SFT9l/wPCK4qv+g8QFPk2e4Drrn6p81+kbInI8DB7uaV038bLZ4sLlys2Sx7ORhjmE7AjM7uU+HMF9gW0wga8pH0IcPzrFHfsmcktaXskZjdEXtC1YjfQPAeZX2p5wuzapx4rmfrbz4f57PrCpv1PyUUOO1UjrMrIvtzVX2i5YMtKvURQ70xzgbp1AksEtXg1oRmUTVY0DhGQhbl8aaeJczYMH987wjDKJ3PMsGZKljU7mN59ajEQXtvINq36TrzEJ0slXDLTOr2edGlRIVWLxJpCCEJ8GITGgrUZkpAqhGWXMnfKwY0oFDIBztdm79h6C1E0OUGnMhADlSLBzb5MJiDb2HBE9LklN5sjifqJJ1b2YcYszuE+S+eCYYTDtK9bI+e9I7B9WHVPBnLWlB8DBlzH23nruA72QvudXh1/nGlgofTMQI+ox/vIjlay8QkuewYPlY+9eZNUKm+svrZFg3i0OjXjRQ==,iv:iCo5SxcKZvHYuZxX8ydX1J/ILdpFuLqH/eYXK5n45IA=,tag:71a9cmjPhAjisICiJ6lcYg==,type:str]
+ssh_default_user: ENC[AES256_GCM,data:1udwew==,iv:SBAocs+YFBNe7EiTnVxMaPD2BdlueZjNkJosX+FO8Xc=,tag:gJXtogUOtkYL13LBuIq0rA==,type:str]
+github_username: ENC[AES256_GCM,data:n3VpSajNuhiNLpS7,iv:MSVRSugh/WHln5t9/3zAG6Q65OcIsBdU65CHuu1oDR8=,tag:oUGFBOOPr0GEAC3lztqt2w==,type:str]
+sops:
+    age:
+        - recipient: age13vqkx5d70vqhdvlnkm3y5htprafj0x0g6nngcqvn65at2lhs73hs3pgsgl
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA1M0dLOXp1Qk1RbFAvYmgw
+            RFE1M2pUd0RTdkUzdmtveWFoQVRiZFR3V0dNCk9LYVIxVU1MWHY1bFlncVczZWZa
+            L2Q5Zzk0eXNSVG1vTnV2TFdOWDhrdGsKLS0tIFhpUlVlWTV2RVNsU2hTOE43Qnln
+            MVk4UDdZQVJaWEtUaXVnK1VVVjlzZlEKR2relY/6QtxhNimXOR5OhSDHarfIwbM6
+            DuVld2oeiJQm+AJuVsRGuAmm3B8ZZF/igjLzRMx19+ByqsFFNg6zyg==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-01-18T01:48:32Z"
+    mac: ENC[AES256_GCM,data:YkvYHX4OzUZxnwH5HySLpUHAL4vVKmRLIVpCyJDSm7q9lbxJ0kz1A/VXJsXbC+peVxGZcPympH2KFLAYJ0XljKDEb89lkuVI6GmqwHqu2OJgLS5Cg6PU6ZaSevhY+s3TTp4xynY0LjcjR07ZZmx8iHlqnuREAJ4UQaFR94y/7wI=,iv:cQ3vvTSfZ9VQkBWaoICLoG5CAq5Fp9fDMjTlzcj+PkI=,tag:i4bbHvmodhNYmYH1UOs5JA==,type:str]
+    unencrypted_suffix: _unencrypted
+    version: 3.11.0
