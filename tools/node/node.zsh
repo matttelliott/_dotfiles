@@ -2,7 +2,7 @@
 export NVM_DIR="$HOME/.nvm"
 
 _load_nvm() {
-  unset -f nvm node npm npx
+  unset -f nvm node npm npx claude
   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
   [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
 }
