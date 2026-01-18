@@ -54,6 +54,12 @@ ansible-playbook tools/<tool>/install_<tool>.yml --connection=local --limit $(ho
 2. If issues, run `ansible-lint` to validate
 3. Apply changes after review
 
+### Run on All Hosts
+```bash
+./setup-all.sh
+```
+Runs `setup.yml` on localhost first, then all remote hosts. Passes any additional arguments to ansible-playbook.
+
 ### Run on Remote Host
 ```bash
 ansible-playbook setup.yml --limit macbookair
