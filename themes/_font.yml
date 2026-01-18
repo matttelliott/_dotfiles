@@ -166,13 +166,25 @@
         rm /tmp/{{ current.debian_tar }}.tar.xz
       when: ansible_facts['os_family'] == "Debian" and not font_check.stat.exists
 
-    # Update wezterm config
+    # Update wezterm config (GUI - skip if not installed)
+    - name: Check if wezterm config exists
+      ansible.builtin.stat:
+        path: ~/.wezterm.lua
+      register: wezterm_config
+
     - name: Update wezterm font
       ansible.builtin.replace:
         path: ~/.wezterm.lua
         regexp: 'config\.font = wezterm\.font\("[^"]+"\)'
         replace: 'config.font = wezterm.font("{{ current.wezterm_name }}")'
+      when: wezterm_config.stat.exists
 
-    - name: Done
+    - name: Done (with wezterm)
       ansible.builtin.debug:
         msg: "{{ current.name }} applied! Restart wezterm to see changes."
+      when: wezterm_config.stat.exists
+
+    - name: Done (without wezterm)
+      ansible.builtin.debug:
+        msg: "{{ current.name }} font installed (wezterm not configured - no ~/.wezterm.lua found)"
+      when: not wezterm_config.stat.exists

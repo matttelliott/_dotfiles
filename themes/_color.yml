@@ -217,14 +217,24 @@
         regexp: '^# .+ colors$'
         replace: '# {{ c.name }} colors'
 
+    - name: Reload tmux config
+      ansible.builtin.shell: tmux source-file ~/.tmux.conf
+      ignore_errors: true
+
     # ===================
-    # WEZTERM
+    # WEZTERM (GUI - skip if not installed)
     # ===================
+    - name: Check if wezterm config exists
+      ansible.builtin.stat:
+        path: ~/.wezterm.lua
+      register: wezterm_config
+
     - name: Update wezterm color scheme
       ansible.builtin.replace:
         path: ~/.wezterm.lua
         regexp: 'color_scheme = "[^"]+"'
         replace: 'color_scheme = "{{ c.wezterm }}"'
+      when: wezterm_config.stat.exists
 
     # ===================
     # STARSHIP

@@ -121,6 +121,10 @@
         replace: '\1]{{ target.left }} "'
       when: style != 'none'
 
+    - name: Reload tmux config
+      ansible.builtin.shell: tmux source-file ~/.tmux.conf
+      ignore_errors: true
+
     # ===================
     # STARSHIP
     # ===================
