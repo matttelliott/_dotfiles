@@ -206,6 +206,6 @@
       ansible.builtin.debug:
         msg: |
           {{ style | capitalize }} powerline separators applied!
-          - tmux: run 'tmux source ~/.tmux.conf'
+          - tmux: reloaded automatically
           - starship: changes apply on next prompt
           - neovim: restart neovim

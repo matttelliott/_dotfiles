@@ -193,6 +193,18 @@
         regexp: 'pane-active-border-style "fg=#[0-9a-fA-F]{6}"'
         replace: 'pane-active-border-style "fg={{ c.accent }}"'
 
+    - name: Update tmux window-style (inactive pane dimming)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "window-style 'fg=#[0-9a-fA-F]{6},bg=#[0-9a-fA-F]{6}'"
+        replace: "window-style 'fg={{ c.fg_dim }},bg={{ c.accent_dark }}'"
+
+    - name: Update tmux window-active-style (active pane)
+      ansible.builtin.replace:
+        path: ~/.tmux.conf
+        regexp: "window-active-style 'fg=#[0-9a-fA-F]{6},bg=#[0-9a-fA-F]{6}'"
+        replace: "window-active-style 'fg={{ c.fg }},bg={{ c.bg }}'"
+
     - name: Update tmux message-style
       ansible.builtin.replace:
         path: ~/.tmux.conf
@@ -566,15 +578,3 @@
         regexp: 'selectedLineBgColor:\n\s+- "#[0-9a-fA-F]{6}"'
         replace: 'selectedLineBgColor:\n      - "{{ c.bg_hl }}"'
 
-    - name: Done
-      ansible.builtin.debug:
-        msg: |
-          {{ c.name }} colors applied to all tools!
-          - tmux: run 'tmux source ~/.tmux.conf'
-          - wezterm: restart wezterm
-          - starship: changes apply on next prompt
-          - neovim: restart neovim
-          - lazygit: changes apply on next launch
-          - bat: changes apply on next use
-          - fzf: restart shell or source ~/.config/zsh/fzf.zsh
-          - lazydocker: changes apply on next launch

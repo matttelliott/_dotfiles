@@ -179,12 +179,3 @@
         replace: 'config.font = wezterm.font("{{ current.wezterm_name }}")'
       when: wezterm_config.stat.exists
 
-    - name: Done (with wezterm)
-      ansible.builtin.debug:
-        msg: "{{ current.name }} applied! Restart wezterm to see changes."
-      when: wezterm_config.stat.exists
-
-    - name: Done (without wezterm)
-      ansible.builtin.debug:
-        msg: "{{ current.name }} font installed (wezterm not configured - no ~/.wezterm.lua found)"
-      when: not wezterm_config.stat.exists
