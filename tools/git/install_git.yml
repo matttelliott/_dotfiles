@@ -19,20 +19,20 @@
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Install gitconfig (macOS with login)
-      copy:
-        src: gitconfig.darwin
+      template:
+        src: gitconfig.darwin.j2
         dest: ~/.gitconfig
       when: ansible_facts['os_family'] == "Darwin" and 'with_login_tools' in group_names
 
     - name: Install gitconfig (Linux with login)
-      copy:
-        src: gitconfig.debian
+      template:
+        src: gitconfig.debian.j2
         dest: ~/.gitconfig
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and 'with_login_tools' in group_names
 
     - name: Install gitconfig (minimal)
-      copy:
-        src: gitconfig.minimal
+      template:
+        src: gitconfig.minimal.j2
         dest: ~/.gitconfig
       when: "'with_login_tools' not in group_names"
 
