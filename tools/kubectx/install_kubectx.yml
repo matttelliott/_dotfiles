@@ -1,0 +1,25 @@
+---
+- name: Install kubectx
+  hosts: with_login_tools
+  gather_facts: true
+
+  tasks:
+    - name: Install kubectx via Homebrew (macOS)
+      shell: /opt/homebrew/bin/brew install kubectx
+      args:
+        creates: /opt/homebrew/bin/kubectx
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install kubectx via apt (Debian)
+      apt:
+        name: kubectx
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install kubectx via pacman (Arch)
+      pacman:
+        name: kubectx
+        state: present
+      become: yes
+      when: ansible_facts['os_family'] == "Archlinux"

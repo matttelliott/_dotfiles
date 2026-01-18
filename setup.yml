@@ -148,6 +148,8 @@
 - import_playbook: tools/gcloud/install_gcloud.yml
 - import_playbook: tools/kubectl/install_kubectl.yml
 - import_playbook: tools/k9s/install_k9s.yml
+- import_playbook: tools/helm/install_helm.yml
+- import_playbook: tools/kubectx/install_kubectx.yml
 - import_playbook: tools/claude-code/install_claude-code.yml
 - import_playbook: tools/claude-desktop/install_claude-desktop.yml
 - import_playbook: tools/chatgpt-desktop/install_chatgpt-desktop.yml

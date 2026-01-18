@@ -202,10 +202,3 @@
         replace: "\\1vim.fn.nr2char({{ target.left_code }})"
       when: style != 'none'
 
-    - name: Done
-      ansible.builtin.debug:
-        msg: |
-          {{ style | capitalize }} powerline separators applied!
-          - tmux: reloaded automatically
-          - starship: changes apply on next prompt
-          - neovim: restart neovim
