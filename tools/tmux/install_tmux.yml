@@ -28,3 +28,8 @@
       template:
         src: tmux.conf.j2
         dest: ~/.tmux.conf
+      register: tmux_config
+
+    - name: Reload tmux config
+      shell: tmux source-file ~/.tmux.conf
+      when: tmux_config.changed and lookup('env', 'TMUX') != ''
