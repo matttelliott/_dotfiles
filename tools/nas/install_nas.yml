@@ -77,15 +77,27 @@
       when: ansible_facts['os_family'] == "Debian"
       notify: Restart autofs Debian
     # Arch Linux setup using autofs
-    - name: Install autofs and cifs-utils (Arch)
+    - name: Install cifs-utils (Arch)
       pacman:
         name:
-          - autofs
           - cifs-utils
         state: present
         update_cache: yes
       become: yes
       when: ansible_facts['os_family'] == "Archlinux"
+
+    - name: Check if autofs is installed (Arch)
+      command: pacman -Q autofs
+      register: autofs_check
+      ignore_errors: yes
+      changed_when: false
+      when: ansible_facts['os_family'] == "Archlinux"
+
+    - name: Install autofs via yay (Arch)
+      command: yay -S --noconfirm autofs
+      when:
+        - ansible_facts['os_family'] == "Archlinux"
+        - autofs_check.rc != 0
     - name: Create NAS credentials file (Arch)
       copy:
         dest: "{{ ansible_env.HOME }}/.nas-credentials"
