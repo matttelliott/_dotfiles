@@ -5,5 +5,6 @@ config.font = wezterm.font("DejaVuSansM Nerd Font Mono")
 config.font_size = 18
 config.color_scheme = "tokyonight"
 config.enable_tab_bar = false
+config.default_prog = { "/bin/zsh", "-c", "tmux a || tmux" }
 
 return config

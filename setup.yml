@@ -65,21 +65,27 @@
         dest: ~/_dotfiles
       when: not dotfiles_dir.stat.exists and not use_ssh
 
-    - name: Update dotfiles repo
-      command: git -C ~/_dotfiles pull --ff-only
-      register: git_pull
-      changed_when: "'Already up to date' not in git_pull.stdout"
-      when: dotfiles_dir.stat.exists
-
     - name: Set remote to SSH
-      command: git -C ~/_dotfiles remote set-url origin {{ dotfiles_ssh_url }}
-      when: use_ssh
+      command: git remote set-url origin {{ dotfiles_ssh_url }}
+      args:
+        chdir: ~/_dotfiles
+      when: dotfiles_dir.stat.exists and use_ssh
       changed_when: false
 
     - name: Set remote to HTTPS
-      command: git -C ~/_dotfiles remote set-url origin {{ dotfiles_https_url }}
-      when: not use_ssh
+      command: git remote set-url origin {{ dotfiles_https_url }}
+      args:
+        chdir: ~/_dotfiles
+      when: dotfiles_dir.stat.exists and not use_ssh
       changed_when: false
+
+    - name: Update dotfiles repo
+      command: git pull --ff-only
+      args:
+        chdir: ~/_dotfiles
+      register: git_pull
+      changed_when: "'Already up to date' not in git_pull.stdout"
+      when: dotfiles_dir.stat.exists
 - import_playbook: tools/mosh/install_mosh.yml
 - import_playbook: tools/homebrew/install_homebrew.yml
 - import_playbook: tools/mas/install_mas.yml
