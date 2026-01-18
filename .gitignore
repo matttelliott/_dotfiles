@@ -7,3 +7,10 @@ wol_mac_addresses.yml
 
 # Claude Code personal overrides (team hooks are in .claude/settings.json)
 .claude/settings.local.json
+
+# Age private keys
+*.age.key
+.config/sops/
+
+# Unencrypted personal info
+group_vars/all/personal-info.yml

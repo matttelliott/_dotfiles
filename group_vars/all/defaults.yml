@@ -1,0 +1,24 @@
+# Personal Info Defaults
+# These values are overridden by personal-info.sops.yml (or personal-info.yml)
+#
+# For new users cloning this repo:
+# 1. Copy this file to personal-info.yml
+# 2. Fill in your values
+# 3. Optionally encrypt: sops -e -i personal-info.yml
+#    Then rename: mv personal-info.yml personal-info.sops.yml
+
+# Git user configuration
+git_user_name: "User"
+git_user_email: "user@example.com"
+
+# SSH key for git commit signing (leave empty to disable signing)
+git_signing_key: ""
+
+# SSH public key for authorized_keys
+ssh_public_key: ""
+
+# Default SSH username for connections
+ssh_default_user: "{{ ansible_user | default('user') }}"
+
+# GitHub username (used for dotfiles remote URL)
+github_username: "username"
