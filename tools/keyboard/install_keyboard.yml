@@ -80,8 +80,19 @@
       become: yes
       when: ansible_facts['os_family'] == "Archlinux"
 
+    - name: Add keyboard remap to xprofile (Arch)
+      lineinfile:
+        path: ~/.xprofile
+        regexp: '^setxkbmap.*ctrl:nocaps'
+        line: 'setxkbmap -option ctrl:nocaps'
+        create: yes
+        mode: '0644'
+      when: ansible_facts['os_family'] == "Archlinux"
+
     - name: Apply keyboard remap for current session (Arch)
       command: setxkbmap -option ctrl:nocaps
+      environment:
+        DISPLAY: ":0"
       changed_when: false
       failed_when: false
       when: ansible_facts['os_family'] == "Archlinux"
