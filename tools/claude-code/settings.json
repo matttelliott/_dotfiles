@@ -6,13 +6,6 @@
         "type": "command",
         "command": "~/.claude/hooks/auto-commit.sh"
       }]
-    }],
-    "Stop": [{
-      "matcher": "",
-      "hooks": [{
-        "type": "command",
-        "command": "~/.claude/hooks/update-prd.sh"
-      }]
     }]
   }
 }
