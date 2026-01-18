@@ -1,12 +1,2 @@
 {% include 'gitconfig.base.j2' %}
 {% include 'gitconfig.personal.j2' %}
-{% if git_signing_key %}
-[user]
-	signingkey = {{ git_signing_key }}
-[gpg]
-	format = ssh
-[gpg "ssh"]
-	program = /opt/1Password/op-ssh-sign
-[commit]
-	gpgsign = true
-{% endif %}

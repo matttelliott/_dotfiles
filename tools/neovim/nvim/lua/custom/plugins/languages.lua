@@ -1,32 +1,32 @@
 -- Language support (LSP, formatters, treesitter)
 -- Trimmed to: Web, Lua, Python, Bash, Rust, Markdown, Git
 
+-- Set up additional LSP servers after lspconfig loads
+vim.api.nvim_create_autocmd('User', {
+  pattern = 'VeryLazy',
+  callback = function()
+    local lspconfig = require 'lspconfig'
+    local capabilities = require('blink.cmp').get_lsp_capabilities()
+
+    -- Web
+    lspconfig.ts_ls.setup { capabilities = capabilities }
+    lspconfig.eslint.setup { capabilities = capabilities }
+    lspconfig.cssls.setup { capabilities = capabilities }
+    lspconfig.html.setup { capabilities = capabilities }
+    lspconfig.jsonls.setup { capabilities = capabilities }
+    lspconfig.tailwindcss.setup { capabilities = capabilities }
+    -- Python
+    lspconfig.pyright.setup { capabilities = capabilities }
+    -- Rust
+    lspconfig.rust_analyzer.setup { capabilities = capabilities }
+    -- Shell
+    lspconfig.bashls.setup { capabilities = capabilities }
+    -- YAML
+    lspconfig.yamlls.setup { capabilities = capabilities }
+  end,
+})
+
 return {
-  -- LSP servers
-  {
-    'neovim/nvim-lspconfig',
-    opts = {
-      servers = {
-        -- Web
-        ts_ls = {},
-        eslint = {},
-        cssls = {},
-        html = {},
-        jsonls = {},
-        tailwindcss = {},
-        -- Python
-        pyright = {},
-        -- Rust
-        rust_analyzer = {},
-        -- Lua
-        lua_ls = {},
-        -- Shell
-        bashls = {},
-        -- YAML/Markdown
-        yamlls = {},
-      },
-    },
-  },
 
   -- Mason: ensure tools are installed
   {
@@ -93,5 +93,4 @@ return {
       },
     },
   },
-
 }

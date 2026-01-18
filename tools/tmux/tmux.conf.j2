@@ -93,3 +93,6 @@ bind c new-window -c "#{pane_current_path}"
 
 # Mouse Support
 set -g mouse on
+
+# Click session name to switch sessions
+bind-key -T root MouseUp1StatusLeft choose-tree -s

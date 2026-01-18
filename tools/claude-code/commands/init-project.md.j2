@@ -9,16 +9,17 @@ Set up Claude Code configuration for this project using templates and project an
 
 Copy these files from `{{ ansible_env.HOME }}/_dotfiles/tools/claude-code/templates/` to the project:
 
-| Template             | Destination                  | Action                                 |
-| -------------------- | ---------------------------- | -------------------------------------- |
-| `mcp.json`           | `.mcp.json`                  | Copy exactly                           |
-| `settings.json`      | `.claude/settings.json`      | Copy, then customize hooks             |
-| `agents/reviewer.md` | `.claude/agents/reviewer.md` | Copy, then add project-specific checks |
-| `rules/tests.md`     | `.claude/rules/tests.md`     | Copy exactly                           |
-| `CLAUDE.md`          | `CLAUDE.md`                  | Copy skeleton, then fill in            |
-| `gitignore`          | Append to `.gitignore`       | Append if entries missing              |
+| Template                 | Destination                    | Action                                 |
+| ------------------------ | ------------------------------ | -------------------------------------- |
+| `mcp.json`               | `.mcp.json`                    | Copy exactly                           |
+| `settings.json`          | `.claude/settings.json`        | Copy, then customize hooks             |
+| `hooks/update-prd.sh`    | `.claude/hooks/update-prd.sh`  | Copy exactly, chmod +x                 |
+| `agents/reviewer.md`     | `.claude/agents/reviewer.md`   | Copy, then add project-specific checks |
+| `rules/tests.md`         | `.claude/rules/tests.md`       | Copy exactly                           |
+| `CLAUDE.md`              | `CLAUDE.md`                    | Copy skeleton, then fill in            |
+| `gitignore`              | Append to `.gitignore`         | Append if entries missing              |
 
-Create directories first: `.claude/agents/`, `.claude/rules/`
+Create directories first: `.claude/agents/`, `.claude/rules/`, `.claude/hooks/`
 
 ## Step 2: Detect Project Type
 
