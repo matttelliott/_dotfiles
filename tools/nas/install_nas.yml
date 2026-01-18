@@ -8,13 +8,20 @@
         mount_point: "{{ ansible_env.HOME }}/NAS/home"
   tasks:
     # macOS setup using autofs
-    - name: Create NAS mount directories (macOS)
+    - name: Check if NAS mount exists (macOS)
+      stat:
+        path: "{{ ansible_env.HOME }}/NAS"
+      register: nas_mount
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Create NAS base directory (macOS)
       file:
-        path: "{{ item.mount_point }}"
+        path: "{{ ansible_env.HOME }}/NAS"
         state: directory
         mode: "0755"
-      loop: "{{ nas_shares }}"
-      when: ansible_facts['os_family'] == "Darwin"
+      when:
+        - ansible_facts['os_family'] == "Darwin"
+        - not nas_mount.stat.exists
     - name: Create autofs map file (macOS)
       copy:
         dest: /etc/auto_nas
