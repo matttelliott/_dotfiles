@@ -47,7 +47,7 @@
         state: present
 
     - name: Install SSH config
-      copy:
-        src: config
+      template:
+        src: config.j2
         dest: ~/.ssh/config
         mode: '0600'
