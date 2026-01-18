@@ -20,6 +20,19 @@ return {
         mappings = {
           ['<leader>e'] = 'close_window',
           ['/'] = 'none', -- Disable the fuzzy finder mapping
+          ['O'] = {
+            function(state)
+              -- Open current directory in oil.nvim
+              local node = state.tree:get_node()
+              local path = node.path
+              if node.type == 'file' then
+                path = vim.fn.fnamemodify(path, ':h')
+              end
+              require('neo-tree.command').execute { action = 'close' }
+              require('oil').open_float(path)
+            end,
+            desc = 'Open in Oil (edit as buffer)',
+          },
         },
       },
     },
