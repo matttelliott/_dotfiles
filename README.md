@@ -34,6 +34,106 @@ ansible-playbook -i localhost.yml setup.yml
 ansible-playbook -i localhost.yml tools/neovim/install_neovim.yml
 ```
 
+## Secrets Management
+
+This repo uses **SOPS + Age** for encrypting sensitive data and **1Password CLI** for distributing secrets to machines.
+
+### How It Works
+
+1. Personal info (git email, SSH keys, etc.) is encrypted in `group_vars/all/personal-info.sops.yml`
+2. The Age private key decrypts the SOPS file during Ansible runs
+3. Both the Age key and SSH private key are stored in 1Password
+4. A 1Password service account token is the only secret you need to provide
+
+### Bootstrap Setup
+
+During `bootstrap.sh`, you'll be prompted for a **1Password service account token**. This token:
+- Fetches the Age key (for SOPS decryption)
+- Fetches SSH keys (for git signing and remote access)
+
+**Create a service account:**
+1. Go to [1password.com](https://1password.com) → Developer → Service Accounts
+2. Create a new service account
+3. Grant access to a vault containing:
+   - **Age Key** item with `Private Key` and `Public Key` fields
+   - **SSH Key** item with `Private Key` field
+
+### 1Password Vault Structure
+
+```
+Automation (vault)
+├── Age Key
+│   ├── Private Key: AGE-SECRET-KEY-...
+│   └── Public Key: age1...
+└── SSH Key
+    └── Private Key: -----BEGIN OPENSSH PRIVATE KEY-----...
+```
+
+### Setting Up a New Machine
+
+**Option 1: With 1Password (recommended)**
+```bash
+# Bootstrap will prompt for service account token
+curl -fsSL https://raw.githubusercontent.com/matttelliott/_dotfiles/master/bootstrap.sh | bash
+```
+
+**Option 2: Manual setup**
+```bash
+# Provide Age key manually during bootstrap
+mkdir -p ~/.config/sops/age
+echo "AGE-SECRET-KEY-..." > ~/.config/sops/age/keys.txt
+chmod 600 ~/.config/sops/age/keys.txt
+
+# Then run bootstrap (skip 1Password prompt)
+curl -fsSL https://raw.githubusercontent.com/matttelliott/_dotfiles/master/bootstrap.sh | bash
+```
+
+### Remote Machine Setup with 1Password
+
+For remote machines to fetch SSH keys via 1Password CLI:
+
+```bash
+# Copy service account token to remote machine
+ssh myserver "mkdir -p ~/.config/op && chmod 700 ~/.config/op"
+scp ~/.config/op/service-account-token myserver:~/.config/op/
+
+# Run playbook - SSH key will be fetched automatically
+ansible-playbook setup.yml --limit myserver
+```
+
+### Encrypting Personal Info
+
+To update encrypted values:
+
+```bash
+# Edit encrypted file (decrypts in editor, re-encrypts on save)
+SOPS_AGE_KEY_FILE=~/.config/sops/age/keys.txt sops group_vars/all/personal-info.sops.yml
+```
+
+### For New Users Cloning This Repo
+
+If you're forking this repo for your own use:
+
+1. Generate a new Age key:
+   ```bash
+   age-keygen -o ~/.config/sops/age/keys.txt
+   ```
+
+2. Update `.sops.yaml` with your public key:
+   ```yaml
+   creation_rules:
+     - path_regex: group_vars/.*\.sops\.yml$
+       age: age1your-public-key-here
+   ```
+
+3. Create your own `personal-info.sops.yml`:
+   ```bash
+   cp group_vars/all/defaults.yml group_vars/all/personal-info.yml
+   # Edit with your values
+   sops -e -i group_vars/all/personal-info.yml
+   mv group_vars/all/personal-info.yml group_vars/all/personal-info.sops.yml
+   ```
+
 ## Host Groups
 
 Hosts are added to groups to control which tools are installed:
