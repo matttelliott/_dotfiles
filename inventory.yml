@@ -31,6 +31,7 @@ all:
         macbookair:
         desktop:
         macmini:
+        miniserver:
     with_gui_tools:
       hosts:
         macbookair:
