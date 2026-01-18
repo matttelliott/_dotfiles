@@ -364,9 +364,17 @@ See `themes/style_angle.yml` and `themes/style_round.yml` for complete examples.
 _dotfiles/
 ├── bootstrap.sh          # Interactive bootstrap script
 ├── setup.yml             # Main playbook
+├── ansible.cfg           # Ansible config (SOPS plugin)
+├── .sops.yaml            # SOPS encryption config
+├── requirements.yml      # Ansible Galaxy dependencies
 ├── localhost.yml         # Local machine inventory (generated)
 ├── inventory.yml         # Remote machines inventory
+├── group_vars/
+│   └── all/
+│       ├── defaults.yml              # Default values for new users
+│       └── personal-info.sops.yml    # Encrypted personal data
 ├── infrastructure/       # Pulumi IaC
+├── themes/               # Color, font, and style themes
 └── tools/
     ├── arch/             # Arch-specific setup
     ├── debian/           # Debian-specific setup
