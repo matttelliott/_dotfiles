@@ -1,14 +1,19 @@
-# Lazy-load nvm (only loads when you use nvm/node/npm/npx)
+# Fast nvm loading
 export NVM_DIR="$HOME/.nvm"
 
-_load_nvm() {
-  unset -f nvm node npm npx claude
-  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-  [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
-}
+# Load nvm with --no-use (skips slow node activation)
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+  \. "$NVM_DIR/nvm.sh" --no-use
+elif [ -s "/opt/homebrew/opt/nvm/nvm.sh" ]; then
+  \. "/opt/homebrew/opt/nvm/nvm.sh" --no-use
+fi
 
-nvm() { _load_nvm && nvm "$@"; }
-node() { _load_nvm && node "$@"; }
-npm() { _load_nvm && npm "$@"; }
-npx() { _load_nvm && npx "$@"; }
-claude() { _load_nvm && claude "$@"; }
+# Manually add default node to PATH (much faster than nvm use)
+if [ -d "$NVM_DIR/versions/node" ]; then
+  NODE_DEFAULT="$NVM_DIR/alias/default"
+  if [ -f "$NODE_DEFAULT" ]; then
+    NODE_VERSION=$(cat "$NODE_DEFAULT")
+    NODE_PATH="$NVM_DIR/versions/node/v${NODE_VERSION#v}/bin"
+    [ -d "$NODE_PATH" ] && export PATH="$NODE_PATH:$PATH"
+  fi
+fi
