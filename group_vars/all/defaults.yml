@@ -17,6 +17,9 @@ git_signing_key: ""
 # SSH public key for authorized_keys
 ssh_public_key: ""
 
+# 1Password reference for SSH private key (e.g., "op://Personal/SSH Key/private key")
+op_ssh_private_key_ref: ""
+
 # Default SSH username for connections
 ssh_default_user: "{{ ansible_user | default('user') }}"
 

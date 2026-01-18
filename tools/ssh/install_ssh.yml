@@ -51,3 +51,40 @@
         src: config.j2
         dest: ~/.ssh/config
         mode: '0600'
+
+    - name: Check if 1Password service account token exists
+      stat:
+        path: ~/.config/op/service-account-token
+      register: op_token_file
+
+    - name: Check if op CLI is available
+      command: which op
+      register: op_cli_check
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Fetch SSH private key from 1Password
+      shell: |
+        export OP_SERVICE_ACCOUNT_TOKEN=$(cat ~/.config/op/service-account-token)
+        op read "{{ op_ssh_private_key_ref }}"
+      register: op_ssh_key
+      when:
+        - op_token_file.stat.exists
+        - op_cli_check.rc == 0
+        - op_ssh_private_key_ref is defined
+        - op_ssh_private_key_ref | length > 0
+      no_log: true
+
+    - name: Deploy SSH private key
+      copy:
+        content: "{{ op_ssh_key.stdout }}\n"
+        dest: ~/.ssh/id_rsa
+        mode: '0600'
+      when: op_ssh_key is defined and op_ssh_key.stdout is defined and op_ssh_key.stdout | length > 0
+      no_log: true
+
+    - name: Generate SSH public key from private key
+      shell: ssh-keygen -y -f ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub
+      args:
+        creates: ~/.ssh/id_rsa.pub
+      when: op_ssh_key is defined and op_ssh_key.stdout is defined and op_ssh_key.stdout | length > 0

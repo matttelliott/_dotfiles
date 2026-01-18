@@ -83,6 +83,48 @@ if [[ ! -f "$AGE_KEY_FILE" ]]; then
   echo
 fi
 
+# 1Password service account token setup (for SSH keys)
+OP_TOKEN_DIR="$HOME/.config/op"
+OP_TOKEN_FILE="$OP_TOKEN_DIR/service-account-token"
+
+if [[ ! -f "$OP_TOKEN_FILE" ]]; then
+  echo "=== 1Password Service Account Setup (for SSH keys) ==="
+  echo
+  echo "A 1Password service account token is required to fetch SSH keys."
+  echo "Create one at: 1password.com → Developer → Service Accounts"
+  echo
+  echo "Options:"
+  echo "  1) Paste service account token"
+  echo "  2) Provide path to existing token file"
+  echo "  3) Skip (SSH keys won't be fetched from 1Password)"
+  echo
+  read -p "Choose [1/2/3]: " OP_CHOICE
+
+  mkdir -p "$OP_TOKEN_DIR"
+
+  case $OP_CHOICE in
+    1)
+      echo
+      echo "Paste your service account token (starts with ops_), then press Enter:"
+      read -r OP_TOKEN
+      echo "$OP_TOKEN" > "$OP_TOKEN_FILE"
+      ;;
+    2)
+      echo
+      read -p "Path to token file: " OP_PATH
+      cp "$OP_PATH" "$OP_TOKEN_FILE"
+      ;;
+    3)
+      echo "Skipping 1Password setup. SSH keys will need to be configured manually."
+      ;;
+  esac
+
+  if [[ -f "$OP_TOKEN_FILE" ]]; then
+    chmod 600 "$OP_TOKEN_FILE"
+  fi
+  echo
+fi
+
 # Install dependencies
 if [[ "$OS" == "darwin" ]]; then
   if [ ! -f /Library/Developer/CommandLineTools/usr/bin/git ]; then

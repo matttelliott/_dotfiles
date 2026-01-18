@@ -12,5 +12,8 @@ wol_mac_addresses.yml
 *.age.key
 .config/sops/
 
+# 1Password service account token
+.config/op/service-account-token
+
 # Unencrypted personal info
 group_vars/all/personal-info.yml
