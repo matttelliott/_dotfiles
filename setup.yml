@@ -107,6 +107,7 @@
 - import_playbook: tools/lua/install_lua.yml
 - import_playbook: tools/tmux/install_tmux.yml
 - import_playbook: tools/neovim/install_neovim.yml
+- import_playbook: tools/nvim-ai/install_nvim-ai.yml
 - import_playbook: tools/sd/install_sd.yml
 - import_playbook: tools/fd/install_fd.yml
 - import_playbook: tools/ripgrep/install_ripgrep.yml

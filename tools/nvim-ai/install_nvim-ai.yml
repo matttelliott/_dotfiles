@@ -1,0 +1,41 @@
+---
+- name: Install nvim-ai
+  hosts: with_ai_tools
+  gather_facts: true
+
+  tasks:
+    - name: Remove existing nvim-ai config
+      ansible.builtin.file:
+        path: ~/.config/nvim-ai
+        state: absent
+
+    - name: Copy base neovim config to nvim-ai
+      ansible.builtin.copy:
+        src: ../neovim/nvim/
+        dest: ~/.config/nvim-ai/
+        mode: preserve
+
+    - name: Add AI plugins layer
+      ansible.builtin.copy:
+        src: nvim-ai/lua/custom/plugins/
+        dest: ~/.config/nvim-ai/lua/custom/plugins/
+        mode: preserve
+
+    - name: Create zsh config directory
+      ansible.builtin.file:
+        path: ~/.config/zsh
+        state: directory
+        mode: '0755'
+
+    - name: Install nvim-ai shell config
+      ansible.builtin.copy:
+        src: nvim-ai.zsh
+        dest: ~/.config/zsh/nvim-ai.zsh
+        mode: '0644'
+
+    - name: Source nvim-ai config in zshrc
+      ansible.builtin.lineinfile:
+        path: ~/.zshrc
+        line: 'source ~/.config/zsh/nvim-ai.zsh'
+        create: true
+        mode: '0644'
