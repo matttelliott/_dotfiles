@@ -117,6 +117,48 @@ Tools with shell config source their `<tool>.zsh` file in the zshrc.
 - Always use `become: yes` for package manager tasks on Linux
 - Use `creates:` for idempotent Homebrew shell commands
 
+## Claude Code Configuration
+
+### Three-Layer Architecture Overview
+
+Claude Code configuration follows a three-layer architecture, each with distinct ownership:
+
+1. **User Layer (`~/.claude/`)** - Global defaults deployed by Ansible, applies to all repos
+2. **Portable Layer (`~/.claude/<name>/`)** - Self-contained packages with their own installers (e.g., GSD)
+3. **Repo Layer (`.claude/`)** - Project-specific config committed to each repository
+
+### Layer Ownership Rules
+
+| Layer | Location | Ownership | Examples |
+|-------|----------|-----------|----------|
+| User | `~/.claude/` | Ansible (this repo) | Global CLAUDE.md, base settings.json |
+| Portable | `~/.claude/<name>/` | Package installer | GSD workflows, Context7 |
+| Repo | `.claude/` | Per-repository | Project rules, custom commands |
+
+### Current User-Level Structure
+
+```
+~/.claude/
+├── settings.json         # Global settings (hooks, permissions)
+├── CLAUDE.md             # Global instructions (if created)
+├── commands/             # User-level slash commands
+│   └── gsd/              # GSD namespace (from portable)
+├── agents/               # User-level subagents
+│   └── gsd-*.md          # GSD agents (from portable)
+├── hooks/                # Hook scripts
+│   └── *.js              # GSD hooks (from portable)
+└── get-shit-done/        # GSD portable config
+    ├── workflows/
+    ├── templates/
+    └── references/
+```
+
+### When to Use Each Layer
+
+- **User:** Machine-wide defaults (permissions, common tools), shared across all projects
+- **Portable:** Reusable workflow packages installed via npx, self-updating
+- **Repo:** Project-specific rules, commands, hooks committed with source code
+
 ## Nerd Font / Powerline Characters
 
 **IMPORTANT:** The tmux, starship, and neovim configs contain Nerd Font glyphs (Unicode Private Use Area: U+E0xx, U+F0xx, etc.). These characters are problematic for LLMs because they display as whitespace or render inconsistently.
