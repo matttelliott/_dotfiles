@@ -41,10 +41,10 @@ Plans:
   2. Each layer (user/portable/repo) has documented ownership rules
   3. Ansible playbook creates user-level scaffold on deployment
   4. Repo-level `.claude/` has clean scaffold ready for future work
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 02-01: TBD
+- [ ] 02-01-PLAN.md — Document architecture in CLAUDE.md, create repo scaffold, update Ansible playbook
 
 ## Progress
 
@@ -54,4 +54,4 @@ Phases execute in numeric order: 1 -> 2
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Cleanup | 2/2 | Complete | 2026-01-19 |
-| 2. Structure | 0/? | Not started | - |
+| 2. Structure | 0/1 | Not started | - |
