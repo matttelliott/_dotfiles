@@ -6,22 +6,22 @@
   gather_facts: true
 
   tasks:
-    - name: Install Claude Code via npm (macOS)
+    - name: Install/update Claude Code via npm (macOS)
       shell: |
         export NVM_DIR="$HOME/.nvm"
         . /opt/homebrew/opt/nvm/nvm.sh
-        npm install -g @anthropic-ai/claude-code
-      args:
-        creates: ~/.nvm/versions/node/*/bin/claude
+        npm install -g @anthropic-ai/claude-code@latest
+      register: claude_install_mac
+      changed_when: "'added' in claude_install_mac.stdout or 'updated' in claude_install_mac.stderr"
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install Claude Code via npm (Linux)
+    - name: Install/update Claude Code via npm (Linux)
       shell: |
         export NVM_DIR="$HOME/.nvm"
         . ~/.nvm/nvm.sh
-        npm install -g @anthropic-ai/claude-code
-      args:
-        creates: ~/.nvm/versions/node/*/bin/claude
+        npm install -g @anthropic-ai/claude-code@latest
+      register: claude_install_linux
+      changed_when: "'added' in claude_install_linux.stdout or 'updated' in claude_install_linux.stderr"
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
 
     - name: Create Claude config directory
@@ -43,22 +43,7 @@
       copy:
         src: hooks/auto-commit.sh
         dest: ~/.claude/hooks/auto-commit.sh
-        mode: '0755'
-
-    - name: Create Claude commands directory
-      file:
-        path: ~/.claude/commands
-        state: directory
-
-    - name: Install Claude Code commands
-      copy:
-        src: commands/
-        dest: ~/.claude/commands/
-
-    - name: Template init-project command with resolved home path
-      template:
-        src: commands/init-project.md.j2
-        dest: ~/.claude/commands/init-project.md
+        mode: "0755"
 
     - name: Create Claude agents directory
       file:
@@ -80,7 +65,7 @@
         src: output-styles/
         dest: ~/.claude/output-styles/
 
-    - name: Add Sequential Thinking MCP server (user level)
+    - name: Add/update Sequential Thinking MCP server (user level)
       shell: |
         export NVM_DIR="$HOME/.nvm"
         {% if ansible_facts['os_family'] == "Darwin" %}
@@ -88,12 +73,12 @@
         {% else %}
         . ~/.nvm/nvm.sh
         {% endif %}
-        claude mcp add --scope user --transport stdio thinking -- npx -y @modelcontextprotocol/server-sequential-thinking
-      register: mcp_result
-      changed_when: "'Added' in mcp_result.stdout"
+        claude mcp remove --scope user thinking 2>/dev/null || true
+        claude mcp add --scope user --transport stdio thinking -- npx -y @modelcontextprotocol/server-sequential-thinking@latest
+      changed_when: true
       failed_when: false
 
-    - name: Add Playwright MCP server (user level)
+    - name: Add/update Playwright MCP server (user level)
       shell: |
         export NVM_DIR="$HOME/.nvm"
         {% if ansible_facts['os_family'] == "Darwin" %}
@@ -101,7 +86,18 @@
         {% else %}
         . ~/.nvm/nvm.sh
         {% endif %}
-        claude mcp add --scope user --transport stdio playwright -- npx -y @playwright/mcp
-      register: mcp_playwright_result
-      changed_when: "'Added' in mcp_playwright_result.stdout"
+        claude mcp remove --scope user playwright 2>/dev/null || true
+        claude mcp add --scope user --transport stdio playwright -- npx -y @playwright/mcp@latest
+      changed_when: true
       failed_when: false
+
+    - name: Install/update Get Shit Done (GSD) commands (user level)
+      shell: |
+        export NVM_DIR="$HOME/.nvm"
+        {% if ansible_facts['os_family'] == "Darwin" %}
+        . /opt/homebrew/opt/nvm/nvm.sh
+        {% else %}
+        . ~/.nvm/nvm.sh
+        {% endif %}
+        npx -y get-shit-done-cc@latest --global
+      changed_when: true
