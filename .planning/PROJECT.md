@@ -32,6 +32,7 @@ Clean, organized config structure that makes it obvious where things belong — 
 ## Context
 
 Brownfield project. The dotfiles repo is mature and working. Previous Claude Code customization attempts were clunky:
+
 - Autocommit hook works but Claude doesn't know about it, tries to commit when nothing to commit
 - Commit messages from hook are poor quality
 - Multiple agents create mangled git history
@@ -47,11 +48,12 @@ Starting fresh with just GSD + credentials, then building intentionally.
 
 ## Key Decisions
 
-| Decision | Rationale | Outcome |
-|----------|-----------|---------|
-| Keep only GSD + creds | Previous experiments weren't working well, clean slate | — Pending |
-| Three-layer config architecture | Clear separation: global, portable, project-specific | — Pending |
-| Cleanup before building | Foundation first, features later | — Pending |
+| Decision                        | Rationale                                              | Outcome   |
+| ------------------------------- | ------------------------------------------------------ | --------- |
+| Keep only GSD + creds           | Previous experiments weren't working well, clean slate | — Pending |
+| Three-layer config architecture | Clear separation: global, portable, project-specific   | — Pending |
+| Cleanup before building         | Foundation first, features later                       | — Pending |
 
 ---
-*Last updated: 2026-01-18 after initialization*
+
+_Last updated: 2026-01-18 after initialization_

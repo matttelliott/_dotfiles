@@ -44,37 +44,39 @@
 
 ## Out of Scope
 
-| Feature | Reason |
-|---------|--------|
-| MCP server configuration | Complexity; defer until needed |
+| Feature                        | Reason                           |
+| ------------------------------ | -------------------------------- |
+| MCP server configuration       | Complexity; defer until needed   |
 | Plugin marketplace integration | Previous experiment didn't stick |
-| Output styles | Not used; can recreate if needed |
+| Output styles                  | Not used; can recreate if needed |
 
 ## Traceability
 
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| CLEAN-01 | Phase 1 | Complete |
-| CLEAN-02 | Phase 1 | Complete |
-| CLEAN-03 | Phase 1 | Complete |
-| CLEAN-04 | Phase 1 | Complete |
-| CLEAN-05 | Phase 1 | Complete |
-| CLEAN-06 | Phase 1 | Complete |
-| CLEAN-07 | Phase 1 | Complete |
-| CLEAN-08 | Phase 1 | Complete |
-| CLEAN-09 | Phase 1 | Complete |
-| CLEAN-10 | Phase 1 | Complete |
-| CLEAN-11 | Phase 1 | Complete |
-| STRUCT-01 | Phase 2 | Complete |
-| STRUCT-02 | Phase 2 | Complete |
-| STRUCT-03 | Phase 2 | Complete |
-| STRUCT-04 | Phase 2 | Complete |
+| Requirement | Phase   | Status   |
+| ----------- | ------- | -------- |
+| CLEAN-01    | Phase 1 | Complete |
+| CLEAN-02    | Phase 1 | Complete |
+| CLEAN-03    | Phase 1 | Complete |
+| CLEAN-04    | Phase 1 | Complete |
+| CLEAN-05    | Phase 1 | Complete |
+| CLEAN-06    | Phase 1 | Complete |
+| CLEAN-07    | Phase 1 | Complete |
+| CLEAN-08    | Phase 1 | Complete |
+| CLEAN-09    | Phase 1 | Complete |
+| CLEAN-10    | Phase 1 | Complete |
+| CLEAN-11    | Phase 1 | Complete |
+| STRUCT-01   | Phase 2 | Complete |
+| STRUCT-02   | Phase 2 | Complete |
+| STRUCT-03   | Phase 2 | Complete |
+| STRUCT-04   | Phase 2 | Complete |
 
 **Coverage:**
+
 - v1 requirements: 15 total
 - Mapped to phases: 15
 - Unmapped: 0
 
 ---
-*Requirements defined: 2026-01-18*
-*Last updated: 2026-01-19 after Phase 2 completion (milestone complete)*
+
+_Requirements defined: 2026-01-18_
+_Last updated: 2026-01-19 after Phase 2 completion (milestone complete)_

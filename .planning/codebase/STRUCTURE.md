@@ -51,31 +51,37 @@ _dotfiles/
 ## Directory Purposes
 
 **Root Files:**
+
 - Purpose: Core orchestration and configuration
 - Contains: Main playbook, bootstrap script, Ansible config
 - Key files: `setup.yml`, `bootstrap.sh`, `ansible.cfg`, `inventory.yml`
 
 **`group_vars/all/`:**
+
 - Purpose: Shared variables for all hosts
 - Contains: Default values, encrypted personal info
 - Key files: `defaults.yml` (templates), `personal-info.sops.yml` (real secrets)
 
 **`tools/`:**
+
 - Purpose: Self-contained tool modules (90+ tools)
 - Contains: Installation playbooks, shell configs, application configs
 - Key files: Each tool has `install_<tool>.yml` at minimum
 
 **`themes/`:**
+
 - Purpose: Visual theming across tmux, starship, neovim
 - Contains: Ansible playbooks that modify deployed configs
 - Key files: `_color.yml`, `_style.yml`, `_font.yml`
 
 **`infrastructure/`:**
+
 - Purpose: Cloud resource provisioning via Pulumi
 - Contains: TypeScript IaC for DigitalOcean
 - Key files: `index.ts`, `Pulumi.yaml`
 
 **`.claude/`:**
+
 - Purpose: Claude Code AI assistant configuration
 - Contains: Settings, agents, commands, hooks, rules
 - Key files: `settings.json`, `commands/*.md`
@@ -83,30 +89,36 @@ _dotfiles/
 ## Key File Locations
 
 **Entry Points:**
+
 - `bootstrap.sh`: New machine setup
 - `setup.yml`: Full system configuration
 - `setup-all.sh`: Fleet-wide deployment
 
 **Configuration:**
+
 - `ansible.cfg`: Ansible behavior settings
 - `inventory.yml`: Remote host definitions
 - `localhost.yml`: Local host (generated)
 - `.sops.yaml`: Encryption configuration
 
 **Core Logic:**
+
 - `setup.yml`: Tool import order, pre/post tasks
 - `tools/*/install_*.yml`: Per-tool installation logic
 - `themes/_*.yml`: Theme application logic
 
 **Variables:**
+
 - `group_vars/all/defaults.yml`: Default values, templates
 - `group_vars/all/personal-info.sops.yml`: Encrypted secrets
 
 **Shell Integration:**
+
 - `tools/zsh/zshrc`: Base zsh configuration
 - `tools/*/\*.zsh`: Per-tool shell configs (13 tools)
 
 **Templates:**
+
 - `tools/git/gitconfig.*.j2`: Git config variants (4 templates)
 - `tools/ssh/config.j2`: SSH config template
 - `tools/tmux/tmux.conf.j2`: Tmux config template
@@ -115,26 +127,31 @@ _dotfiles/
 ## Naming Conventions
 
 **Files:**
+
 - Ansible playbooks: `install_<tool>.yml`
 - Shell configs: `<tool>.zsh`
 - Jinja2 templates: `<name>.j2` or `<name>.<variant>.j2`
 - SOPS encrypted: `*.sops.yml`
 
 **Directories:**
+
 - Tool directories: lowercase, hyphen-separated (e.g., `claude-code`, `1password_cli`)
 - All lowercase, no spaces
 
 **Variables (in playbooks):**
+
 - Snake case: `git_user_name`, `ssh_public_key`
 - Group names: `with_` prefix (e.g., `with_login_tools`)
 
 **Tasks:**
+
 - Name format: "Action tool via method (OS)"
 - Examples: "Install tmux via Homebrew", "Install zsh via apt (Debian)"
 
 ## Where to Add New Code
 
 **New Tool:**
+
 1. Create `tools/<tool>/install_<tool>.yml`
 2. Follow OS detection pattern (Darwin/Debian/Archlinux conditionals)
 3. Add shell config if needed: `tools/<tool>/<tool>.zsh`
@@ -142,53 +159,64 @@ _dotfiles/
 5. Reference: Use `tools/tmux/install_tmux.yml` as template
 
 **New Shell Alias/Function:**
+
 1. Add to existing `tools/<tool>/<tool>.zsh` if tool-specific
 2. Or add to `tools/zsh/zshrc` if generic
 
 **New Tool Configuration:**
+
 1. For static configs: `tools/<tool>/config.*` with `copy:` module
 2. For templated configs: `tools/<tool>/<config>.j2` with `template:` module
 
 **New Host Group:**
+
 1. Add group definition in `inventory.yml` under `all.children`
 2. Reference in playbook `hosts:` directive
 3. Update `bootstrap.sh` if group should be user-selectable
 
 **New Variable:**
+
 1. Add default to `group_vars/all/defaults.yml`
 2. Add real value to `group_vars/all/personal-info.sops.yml` (encrypted)
 
 **New Theme Option:**
+
 1. Add entry to styles dict in `themes/_style.yml` (for separators)
 2. Or add color/font entry to respective theme file
 
 **New Claude Command:**
+
 1. Add markdown file to `.claude/commands/<command>.md`
 
 ## Special Directories
 
 **`.git/`:**
+
 - Purpose: Git repository metadata
 - Generated: Yes (by git)
 - Committed: No (excluded)
 
 **`.ansible/`:**
+
 - Purpose: Ansible runtime data (collections, roles)
 - Generated: Partially (collections installed by Galaxy)
 - Committed: No (in .gitignore)
 
 **`.planning/`:**
+
 - Purpose: GSD planning and codebase analysis
 - Generated: Yes (by GSD tools)
 - Committed: Yes
 
 **`tools/neovim/nvim/`:**
+
 - Purpose: Full Neovim configuration (kickstart.nvim based)
 - Generated: No (maintained config)
 - Committed: Yes
 - Note: Contains complete Lua config tree copied to `~/.config/nvim/`
 
 **`node_modules/` (in infrastructure/):**
+
 - Purpose: Pulumi dependencies
 - Generated: Yes (by npm)
 - Committed: No (in .gitignore)
@@ -221,4 +249,4 @@ _dotfiles/
 
 ---
 
-*Structure analysis: 2026-01-18*
+_Structure analysis: 2026-01-18_

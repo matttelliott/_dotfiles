@@ -30,12 +30,12 @@ Claude Code uses a well-defined hierarchical configuration system with clear pre
 
 ### Settings File Locations
 
-| Scope | Location | Shared | Git | Purpose |
-|-------|----------|--------|-----|---------|
-| Managed | `/etc/claude-code/` (Linux) or `/Library/Application Support/ClaudeCode/` (macOS) | Yes (IT) | N/A | Org-wide policies, cannot be overridden |
-| User | `~/.claude/settings.json` | No | No | Personal defaults for all projects |
-| Project | `.claude/settings.json` | Yes | Committed | Team-shared settings |
-| Local | `.claude/settings.local.json` | No | Gitignored | Personal project-specific overrides |
+| Scope   | Location                                                                          | Shared   | Git        | Purpose                                 |
+| ------- | --------------------------------------------------------------------------------- | -------- | ---------- | --------------------------------------- |
+| Managed | `/etc/claude-code/` (Linux) or `/Library/Application Support/ClaudeCode/` (macOS) | Yes (IT) | N/A        | Org-wide policies, cannot be overridden |
+| User    | `~/.claude/settings.json`                                                         | No       | No         | Personal defaults for all projects      |
+| Project | `.claude/settings.json`                                                           | Yes      | Committed  | Team-shared settings                    |
+| Local   | `.claude/settings.local.json`                                                     | No       | Gitignored | Personal project-specific overrides     |
 
 ### CLAUDE.md Memory Files
 
@@ -253,6 +253,7 @@ Layer 3: Repo Config (.claude/)
 ### Ansible Responsibilities
 
 **Ansible should manage:**
+
 - `~/.claude/CLAUDE.md` (templated based on host groups)
 - `~/.claude/settings.json` (user-level settings)
 - `~/.claude/agents/` (user agents)
@@ -261,6 +262,7 @@ Layer 3: Repo Config (.claude/)
 - `~/.claude/output-styles/` (output styles)
 
 **Ansible should NOT manage:**
+
 - Portable configs (they have their own installers)
 - Project-level configs (repo-specific)
 - `settings.local.json` (personal overrides)

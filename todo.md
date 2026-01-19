@@ -5,3 +5,4 @@
 - set up sops + age
 - set up kepler (disney)
 - set up amazon-q (disney)
+- review GSD installation for docker db requirements

@@ -19,22 +19,24 @@ Progress: [==========] 100% (All phases complete)
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 3
 - Average duration: 2.3 min
 - Total execution time: 7 min
 
 **By Phase:**
 
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 1. Cleanup | 2 | 5 min | 2.5 min |
-| 2. Structure | 1 | 2 min | 2 min |
+| Phase        | Plans | Total | Avg/Plan |
+| ------------ | ----- | ----- | -------- |
+| 1. Cleanup   | 2     | 5 min | 2.5 min  |
+| 2. Structure | 1     | 2 min | 2 min    |
 
 **Recent Trend:**
+
 - Last 5 plans: 02-01 (2 min), 01-02 (2 min), 01-01 (3 min)
 - Trend: Consistent
 
-*Updated after each plan completion*
+_Updated after each plan completion_
 
 ## Accumulated Context
 

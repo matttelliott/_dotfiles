@@ -5,16 +5,19 @@
 ## Test Framework
 
 **Current State:**
+
 - No automated test framework configured
 - No unit tests, integration tests, or E2E tests present
 - Manual testing via Ansible check mode (dry-run)
 
 **Validation Tools:**
+
 - `ansible-lint` - Static analysis for Ansible playbooks
 - `shellcheck` - Static analysis for shell scripts (referenced in CLAUDE.md)
 - No TypeScript/JavaScript test runner for infrastructure code
 
 **Run Commands:**
+
 ```bash
 # Dry-run (check mode) - preview changes without applying
 ansible-playbook setup.yml --connection=local --limit $(hostname -s) --check --diff
@@ -27,11 +30,13 @@ ansible-lint tools/*/install_*.yml
 ## Test File Organization
 
 **Location:**
+
 - No dedicated test directories
 - No `tests/`, `spec/`, or `__tests__/` directories
 - No `*.test.*` or `*.spec.*` files
 
 **Recommended Structure (if adding tests):**
+
 ```
 _dotfiles/
 ├── tests/
@@ -49,6 +54,7 @@ _dotfiles/
 ## Manual Testing Strategy
 
 **Ansible Check Mode:**
+
 ```bash
 # Preview all changes
 ansible-playbook setup.yml --connection=local --limit $(hostname -s) --check --diff
@@ -58,11 +64,13 @@ ansible-playbook tools/<tool>/install_<tool>.yml --connection=local --limit $(ho
 ```
 
 **Check mode shows:**
+
 - What tasks would run
 - What files would change (with `--diff`)
 - Any syntax or variable errors
 
 **Limitations:**
+
 - Some shell tasks cannot be checked (no `creates:` prediction)
 - External API calls still execute in some modules
 - Does not verify actual functionality
@@ -70,6 +78,7 @@ ansible-playbook tools/<tool>/install_<tool>.yml --connection=local --limit $(ho
 ## Linting
 
 **Ansible Lint:**
+
 ```bash
 # Lint main playbook
 ansible-lint setup.yml
@@ -82,12 +91,14 @@ ansible-lint tools/git/install_git.yml
 ```
 
 **Common rules enforced:**
+
 - Tasks must have names
 - Use FQCN for modules (e.g., `ansible.builtin.copy`)
 - Avoid deprecated modules
 - Idempotency requirements
 
 **Shell Lint:**
+
 ```bash
 # Check shell scripts
 shellcheck bootstrap.sh
@@ -99,12 +110,14 @@ shellcheck setup-all.sh
 **Framework:** None implemented
 
 **What would need mocking for tests:**
+
 - 1Password CLI responses
 - Package manager operations
 - Network requests (curl, git clone)
 - File system state
 
 **Ansible Molecule approach (recommended):**
+
 ```yaml
 # molecule/default/molecule.yml
 dependency:
@@ -125,11 +138,13 @@ verifier:
 ## Fixtures and Factories
 
 **Test Data:**
+
 - No test fixtures defined
 - Production secrets in `group_vars/all/personal-info.sops.yml`
 - Would need test-specific vars files for CI
 
 **Example test vars file:**
+
 ```yaml
 # tests/vars/test-vars.yml
 git_user_name: "Test User"
@@ -145,11 +160,13 @@ github_username: "testuser"
 **Requirements:** None enforced
 
 **Current gaps:**
+
 - No coverage metrics
 - No CI/CD pipeline to enforce coverage
 - All testing is manual
 
 **What would be measured:**
+
 - Percentage of tools with molecule tests
 - OS variants covered (macOS, Debian, Arch)
 - Host group coverage (with_login_tools, with_gui_tools, etc.)
@@ -157,21 +174,25 @@ github_username: "testuser"
 ## Test Types
 
 **Unit Tests:**
+
 - Not implemented
 - Would test individual playbooks in isolation
 - Use molecule with single-tool converge
 
 **Integration Tests:**
+
 - Not implemented
 - Would test full `setup.yml` on clean systems
 - Requires VM or container environment
 
 **E2E Tests:**
+
 - Not implemented
 - Would verify tools work after installation
 - Example: Run `nvim --version`, `docker --version`, etc.
 
 **Smoke Tests (manual):**
+
 ```bash
 # After running playbook, verify key tools
 nvim --version
@@ -183,6 +204,7 @@ starship --version
 ## Common Patterns
 
 **Idempotency Testing:**
+
 ```bash
 # Run twice - second run should show no changes
 ansible-playbook setup.yml --connection=local --limit $(hostname -s)
@@ -191,6 +213,7 @@ ansible-playbook setup.yml --connection=local --limit $(hostname -s)
 ```
 
 **Cross-Platform Testing (manual):**
+
 ```bash
 # Test on each platform
 # macOS
@@ -204,6 +227,7 @@ ansible-playbook setup.yml --limit desktop
 ```
 
 **Template Verification:**
+
 ```bash
 # Check template renders correctly
 ansible-playbook tools/git/install_git.yml --check --diff
@@ -213,6 +237,7 @@ ansible-playbook tools/git/install_git.yml --check --diff
 ## Recommended Testing Improvements
 
 **1. Add Ansible Molecule:**
+
 ```bash
 pip install molecule molecule-plugins[docker]
 cd tools/git
@@ -220,6 +245,7 @@ molecule init scenario
 ```
 
 **2. Add CI Pipeline:**
+
 ```yaml
 # .github/workflows/test.yml
 name: Test
@@ -236,6 +262,7 @@ jobs:
 ```
 
 **3. Add Per-Tool Verification:**
+
 ```yaml
 # tools/git/molecule/default/verify.yml
 - name: Verify git installation
@@ -255,16 +282,19 @@ jobs:
 ## Infrastructure Testing (Pulumi)
 
 **Current State:**
+
 - No tests for `infrastructure/index.ts`
 - Pulumi has built-in preview functionality
 
 **Preview Changes:**
+
 ```bash
 cd infrastructure
 pulumi preview
 ```
 
 **Recommended: Add Pulumi Tests:**
+
 ```typescript
 // infrastructure/index.test.ts
 import * as pulumi from "@pulumi/pulumi";
@@ -280,6 +310,7 @@ describe("Infrastructure", () => {
 ## Project Rules for Testing
 
 From `.claude/rules/tests.md`:
+
 - Focus on test coverage and edge cases
 - Use project's existing test patterns
 - Mock external dependencies
@@ -287,4 +318,4 @@ From `.claude/rules/tests.md`:
 
 ---
 
-*Testing analysis: 2026-01-18*
+_Testing analysis: 2026-01-18_

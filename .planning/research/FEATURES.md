@@ -8,44 +8,44 @@
 
 Features users expect from a dotfiles-managed Claude Code configuration.
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Global CLAUDE.md | Defines AI behavior across all projects | Low | Template with Jinja2 for host groups |
-| User settings.json | Permission rules, environment vars | Low | Static JSON deployed via Ansible |
-| Project .claude/ structure | Standard project config location | Low | Already exists in this repo |
-| Git-aware permissions | Allow git commands, protect secrets | Low | Permission rules in settings.json |
-| Shell tool permissions | Allow common CLI tools | Low | Bash patterns in allow list |
-| Gitignore settings.local.json | Personal overrides not committed | Low | Claude Code handles automatically |
+| Feature                       | Why Expected                            | Complexity | Notes                                |
+| ----------------------------- | --------------------------------------- | ---------- | ------------------------------------ |
+| Global CLAUDE.md              | Defines AI behavior across all projects | Low        | Template with Jinja2 for host groups |
+| User settings.json            | Permission rules, environment vars      | Low        | Static JSON deployed via Ansible     |
+| Project .claude/ structure    | Standard project config location        | Low        | Already exists in this repo          |
+| Git-aware permissions         | Allow git commands, protect secrets     | Low        | Permission rules in settings.json    |
+| Shell tool permissions        | Allow common CLI tools                  | Low        | Bash patterns in allow list          |
+| Gitignore settings.local.json | Personal overrides not committed        | Low        | Claude Code handles automatically    |
 
 ## Differentiators
 
 Features that enhance the configuration beyond basics.
 
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| Custom slash commands | Codify common workflows | Low | Markdown files in .claude/commands/ |
-| Custom subagents | Specialized AI assistants | Medium | Requires prompt engineering |
-| Pre/Post hooks | Automated linting, formatting | Medium | Shell scripts with JSON stdin |
-| Conditional rules | File-type-specific instructions | Low | YAML frontmatter with paths |
-| MCP servers | External tool integrations | Medium | Depends on which servers needed |
-| Context injection | Dynamic session context | Medium | SessionStart hooks |
-| Host-specific config | Different configs per machine | Medium | Ansible templating with group_names |
-| Agent Skills | Modular, reusable capabilities | Medium | SKILL.md with frontmatter |
+| Feature               | Value Proposition               | Complexity | Notes                               |
+| --------------------- | ------------------------------- | ---------- | ----------------------------------- |
+| Custom slash commands | Codify common workflows         | Low        | Markdown files in .claude/commands/ |
+| Custom subagents      | Specialized AI assistants       | Medium     | Requires prompt engineering         |
+| Pre/Post hooks        | Automated linting, formatting   | Medium     | Shell scripts with JSON stdin       |
+| Conditional rules     | File-type-specific instructions | Low        | YAML frontmatter with paths         |
+| MCP servers           | External tool integrations      | Medium     | Depends on which servers needed     |
+| Context injection     | Dynamic session context         | Medium     | SessionStart hooks                  |
+| Host-specific config  | Different configs per machine   | Medium     | Ansible templating with group_names |
+| Agent Skills          | Modular, reusable capabilities  | Medium     | SKILL.md with frontmatter           |
 
 ## Anti-Features
 
 Features to explicitly NOT build. Common mistakes in this domain.
 
-| Anti-Feature | Why Avoid | What to Do Instead |
-|--------------|-----------|-------------------|
-| Overly permissive rules | Security risk, defeats purpose | Specific tool patterns with wildcards |
-| Hardcoded absolute paths | Breaks across machines | Use $CLAUDE_PROJECT_DIR, $HOME |
-| Complex hook chains | Hard to debug, fragile | Simple, focused scripts |
-| Duplicated instructions | Context bloat, conflicts | Import syntax in CLAUDE.md |
-| Secrets in settings | Security vulnerability | Environment vars, apiKeyHelper |
-| bypassPermissions mode | Removes safety guardrails | Use specific allow rules instead |
-| Managed settings locally | Requires admin, overkill | Use user/project settings |
-| MCP in settings.json | Wrong file, won't work | Use .mcp.json instead |
+| Anti-Feature             | Why Avoid                      | What to Do Instead                    |
+| ------------------------ | ------------------------------ | ------------------------------------- |
+| Overly permissive rules  | Security risk, defeats purpose | Specific tool patterns with wildcards |
+| Hardcoded absolute paths | Breaks across machines         | Use $CLAUDE_PROJECT_DIR, $HOME        |
+| Complex hook chains      | Hard to debug, fragile         | Simple, focused scripts               |
+| Duplicated instructions  | Context bloat, conflicts       | Import syntax in CLAUDE.md            |
+| Secrets in settings      | Security vulnerability         | Environment vars, apiKeyHelper        |
+| bypassPermissions mode   | Removes safety guardrails      | Use specific allow rules instead      |
+| Managed settings locally | Requires admin, overkill       | Use user/project settings             |
+| MCP in settings.json     | Wrong file, won't work         | Use .mcp.json instead                 |
 
 ---
 
@@ -53,14 +53,15 @@ Features to explicitly NOT build. Common mistakes in this domain.
 
 Claude Code uses a multi-tier configuration system with clear precedence rules. Configuration flows from most general (enterprise) to most specific (local project), with higher specificity taking precedence.
 
-| Priority | Level | Location | Shared | Purpose |
-|----------|-------|----------|--------|---------|
-| 1 (highest) | Managed/Enterprise | System directories | Org-wide | IT policies, compliance |
-| 2 | Project Local | `.claude/settings.local.json` | No (gitignored) | Personal project overrides |
-| 3 | Project (committed) | `.claude/settings.json` | Team via git | Shared team config |
-| 4 | User | `~/.claude/settings.json` | No | Personal preferences |
+| Priority    | Level               | Location                      | Shared          | Purpose                    |
+| ----------- | ------------------- | ----------------------------- | --------------- | -------------------------- |
+| 1 (highest) | Managed/Enterprise  | System directories            | Org-wide        | IT policies, compliance    |
+| 2           | Project Local       | `.claude/settings.local.json` | No (gitignored) | Personal project overrides |
+| 3           | Project (committed) | `.claude/settings.json`       | Team via git    | Shared team config         |
+| 4           | User                | `~/.claude/settings.json`     | No              | Personal preferences       |
 
 **For dotfiles three-layer goal:**
+
 - **User layer:** `~/.claude/` (deployed via Ansible)
 - **Portable layer:** Symlinked directories or imported files
 - **Repo-specific layer:** `.claude/` in each repository
@@ -71,19 +72,20 @@ Claude Code uses a multi-tier configuration system with clear precedence rules. 
 
 ### 1. Memory Files (CLAUDE.md)
 
-Instructions and context that Claude loads at startup. These are markdown files that Claude treats as authoritative system rules.
+Instructions and context that Claude loads at startup. These are markdown files that Claude treats as suggestions
 
-| Feature | User Level | Project Level | Notes |
-|---------|------------|---------------|-------|
-| `CLAUDE.md` | `~/.claude/CLAUDE.md` | `./CLAUDE.md` or `./.claude/CLAUDE.md` | Project overrides user |
-| `CLAUDE.local.md` | N/A | `./CLAUDE.local.md` | Auto-gitignored, personal project prefs |
-| Rules directory | `~/.claude/rules/*.md` | `.claude/rules/*.md` | Modular instructions |
-| Path-scoped rules | Both | Both | Use `paths:` frontmatter for conditional loading |
-| Parent directory recursion | N/A | Yes | Walks up from cwd to find CLAUDE.md files |
-| Subdirectory discovery | N/A | Yes | Loads on-demand when accessing files in subtree |
-| Imports (`@path/to/file`) | Both | Both | Max 5 hops depth, relative/absolute paths |
+| Feature                    | User Level             | Project Level                          | Notes                                            |
+| -------------------------- | ---------------------- | -------------------------------------- | ------------------------------------------------ |
+| `CLAUDE.md`                | `~/.claude/CLAUDE.md`  | `./CLAUDE.md` or `./.claude/CLAUDE.md` | Project overrides user                           |
+| `CLAUDE.local.md`          | N/A                    | `./CLAUDE.local.md`                    | Auto-gitignored, personal project prefs          |
+| Rules directory            | `~/.claude/rules/*.md` | `.claude/rules/*.md`                   | Modular instructions                             |
+| Path-scoped rules          | Both                   | Both                                   | Use `paths:` frontmatter for conditional loading |
+| Parent directory recursion | N/A                    | Yes                                    | Walks up from cwd to find CLAUDE.md files        |
+| Subdirectory discovery     | N/A                    | Yes                                    | Loads on-demand when accessing files in subtree  |
+| Imports (`@path/to/file`)  | Both                   | Both                                   | Max 5 hops depth, relative/absolute paths        |
 
 **Loading order (first loaded = lower priority):**
+
 1. Enterprise policy (system directories)
 2. User-level (`~/.claude/CLAUDE.md`)
 3. Parent directory CLAUDE.md files (walking up from cwd)
@@ -98,40 +100,42 @@ Instructions and context that Claude loads at startup. These are markdown files 
 
 JSON configuration for permissions, environment, hooks, and behavior settings.
 
-| File | Location | Shared | Priority |
-|------|----------|--------|----------|
-| `managed-settings.json` | System dirs | Org-wide | 1 (highest, cannot be overridden) |
-| `settings.local.json` | `.claude/` | No (gitignored) | 2 |
-| `settings.json` | `.claude/` | Yes (git) | 3 |
-| `settings.json` | `~/.claude/` | No | 4 |
+| File                    | Location     | Shared          | Priority                          |
+| ----------------------- | ------------ | --------------- | --------------------------------- |
+| `managed-settings.json` | System dirs  | Org-wide        | 1 (highest, cannot be overridden) |
+| `settings.local.json`   | `.claude/`   | No (gitignored) | 2                                 |
+| `settings.json`         | `.claude/`   | Yes (git)       | 3                                 |
+| `settings.json`         | `~/.claude/` | No              | 4                                 |
 
 **System directories for managed settings:**
+
 - macOS: `/Library/Application Support/ClaudeCode/`
 - Linux: `/etc/claude-code/`
 - Windows: `C:\Program Files\ClaudeCode\`
 
 #### Core Settings
 
-| Setting | User | Project | Description |
-|---------|------|---------|-------------|
-| `model` | Yes | Yes | Override default model |
-| `language` | Yes | Yes | Claude's response language |
-| `env` | Yes | Yes | Environment variables for sessions |
-| `cleanupPeriodDays` | Yes | Yes | Session cleanup period (default: 30) |
-| `outputStyle` | Yes | Yes | Adjust output verbosity |
+| Setting             | User | Project | Description                          |
+| ------------------- | ---- | ------- | ------------------------------------ |
+| `model`             | Yes  | Yes     | Override default model               |
+| `language`          | Yes  | Yes     | Claude's response language           |
+| `env`               | Yes  | Yes     | Environment variables for sessions   |
+| `cleanupPeriodDays` | Yes  | Yes     | Session cleanup period (default: 30) |
+| `outputStyle`       | Yes  | Yes     | Adjust output verbosity              |
 
 #### Permission Settings
 
-| Setting | User | Project | Description |
-|---------|------|---------|-------------|
-| `permissions.allow` | Yes | Yes | Allowed tool patterns |
-| `permissions.ask` | Yes | Yes | Tools requiring confirmation |
-| `permissions.deny` | Yes | Yes | Blocked tool patterns |
-| `permissions.additionalDirectories` | Yes | Yes | Extra working directories |
-| `permissions.defaultMode` | Yes | Yes | Startup permission mode |
-| `permissions.disableBypassPermissionsMode` | Managed only | No | Disable dangerous bypass flag |
+| Setting                                    | User         | Project | Description                   |
+| ------------------------------------------ | ------------ | ------- | ----------------------------- |
+| `permissions.allow`                        | Yes          | Yes     | Allowed tool patterns         |
+| `permissions.ask`                          | Yes          | Yes     | Tools requiring confirmation  |
+| `permissions.deny`                         | Yes          | Yes     | Blocked tool patterns         |
+| `permissions.additionalDirectories`        | Yes          | Yes     | Extra working directories     |
+| `permissions.defaultMode`                  | Yes          | Yes     | Startup permission mode       |
+| `permissions.disableBypassPermissionsMode` | Managed only | No      | Disable dangerous bypass flag |
 
 **Permission rule syntax:**
+
 ```json
 {
   "permissions": {
@@ -140,22 +144,19 @@ JSON configuration for permissions, environment, hooks, and behavior settings.
       "Read(./.env)",
       "WebFetch(domain:example.com)"
     ],
-    "deny": [
-      "Bash(curl:*)",
-      "Read(./.env.*)"
-    ]
+    "deny": ["Bash(curl:*)", "Read(./.env.*)"]
   }
 }
 ```
 
 #### Sandbox Settings
 
-| Setting | User | Project | Description |
-|---------|------|---------|-------------|
-| `sandbox.enabled` | Yes | Yes | Enable bash sandboxing |
-| `sandbox.autoAllowBashIfSandboxed` | Yes | Yes | Auto-approve bash when sandboxed |
-| `sandbox.excludedCommands` | Yes | Yes | Commands run outside sandbox |
-| `sandbox.network.*` | Yes | Yes | Network proxy settings |
+| Setting                            | User | Project | Description                      |
+| ---------------------------------- | ---- | ------- | -------------------------------- |
+| `sandbox.enabled`                  | Yes  | Yes     | Enable bash sandboxing           |
+| `sandbox.autoAllowBashIfSandboxed` | Yes  | Yes     | Auto-approve bash when sandboxed |
+| `sandbox.excludedCommands`         | Yes  | Yes     | Commands run outside sandbox     |
+| `sandbox.network.*`                | Yes  | Yes     | Network proxy settings           |
 
 ---
 
@@ -163,34 +164,34 @@ JSON configuration for permissions, environment, hooks, and behavior settings.
 
 Shell commands that run at specific lifecycle events.
 
-| Event | Matcher | Purpose |
-|-------|---------|---------|
-| `PreToolUse` | Yes | Before tool execution, can modify input or block |
-| `PostToolUse` | Yes | After tool success, can add context |
-| `PermissionRequest` | Yes | When permission dialog shown |
-| `UserPromptSubmit` | No | When user submits prompt |
-| `SessionStart` | Yes | On session start/resume |
-| `SessionEnd` | No | On session end |
-| `Stop` | No | When Claude finishes responding |
-| `SubagentStop` | No | When subagent finishes |
-| `PreCompact` | Yes | Before context compaction |
-| `Notification` | Yes | On notifications |
+| Event               | Matcher | Purpose                                          |
+| ------------------- | ------- | ------------------------------------------------ |
+| `PreToolUse`        | Yes     | Before tool execution, can modify input or block |
+| `PostToolUse`       | Yes     | After tool success, can add context              |
+| `PermissionRequest` | Yes     | When permission dialog shown                     |
+| `UserPromptSubmit`  | No      | When user submits prompt                         |
+| `SessionStart`      | Yes     | On session start/resume                          |
+| `SessionEnd`        | No      | On session end                                   |
+| `Stop`              | No      | When Claude finishes responding                  |
+| `SubagentStop`      | No      | When subagent finishes                           |
+| `PreCompact`        | Yes     | Before context compaction                        |
+| `Notification`      | Yes     | On notifications                                 |
 
 #### Hook Environment Variables
 
-| Variable | Availability | Description |
-|----------|--------------|-------------|
-| `CLAUDE_PROJECT_DIR` | All hooks | Project root path |
-| `CLAUDE_CODE_REMOTE` | All hooks | "true" for web environment |
-| `CLAUDE_ENV_FILE` | SessionStart only | File path for persisting env vars |
+| Variable             | Availability      | Description                       |
+| -------------------- | ----------------- | --------------------------------- |
+| `CLAUDE_PROJECT_DIR` | All hooks         | Project root path                 |
+| `CLAUDE_CODE_REMOTE` | All hooks         | "true" for web environment        |
+| `CLAUDE_ENV_FILE`    | SessionStart only | File path for persisting env vars |
 
 #### Hook Exit Codes
 
-| Exit Code | Behavior |
-|-----------|----------|
-| 0 | Success, parse stdout for JSON control |
-| 2 | Blocking error, stderr shown to user |
-| Other | Non-blocking error, logged |
+| Exit Code | Behavior                               |
+| --------- | -------------------------------------- |
+| 0         | Success, parse stdout for JSON control |
+| 2         | Blocking error, stderr shown to user   |
+| Other     | Non-blocking error, logged             |
 
 ---
 
@@ -198,30 +199,30 @@ Shell commands that run at specific lifecycle events.
 
 Markdown files that define reusable prompts invoked with `/command-name`.
 
-| Location | Scope | Priority |
-|----------|-------|----------|
-| `.claude/commands/` | Project (shared) | Higher |
-| `~/.claude/commands/` | User (personal) | Lower |
+| Location              | Scope            | Priority |
+| --------------------- | ---------------- | -------- |
+| `.claude/commands/`   | Project (shared) | Higher   |
+| `~/.claude/commands/` | User (personal)  | Lower    |
 
 **Project commands override user commands with the same name.**
 
 #### Command Frontmatter Options
 
-| Option | Description |
-|--------|-------------|
-| `description` | Brief command description |
-| `argument-hint` | Expected arguments display |
-| `allowed-tools` | Tools the command can use |
-| `model` | Specific model to use |
-| `context` | `fork` for sub-agent context |
-| `agent` | Agent type when using fork |
-| `hooks` | Define execution hooks |
+| Option          | Description                  |
+| --------------- | ---------------------------- |
+| `description`   | Brief command description    |
+| `argument-hint` | Expected arguments display   |
+| `allowed-tools` | Tools the command can use    |
+| `model`         | Specific model to use        |
+| `context`       | `fork` for sub-agent context |
+| `agent`         | Agent type when using fork   |
+| `hooks`         | Define execution hooks       |
 
 #### Argument Handling
 
-| Placeholder | Description |
-|-------------|-------------|
-| `$ARGUMENTS` | All passed arguments |
+| Placeholder      | Description                     |
+| ---------------- | ------------------------------- |
+| `$ARGUMENTS`     | All passed arguments            |
 | `$1`, `$2`, etc. | Individual positional arguments |
 
 ---
@@ -230,25 +231,25 @@ Markdown files that define reusable prompts invoked with `/command-name`.
 
 Specialized AI assistants with isolated context and custom tool access.
 
-| Location | Scope | Priority |
-|----------|-------|----------|
+| Location            | Scope           | Priority    |
+| ------------------- | --------------- | ----------- |
 | `--agents` CLI flag | Current session | 1 (highest) |
-| `.claude/agents/` | Project | 2 |
-| `~/.claude/agents/` | User | 3 |
-| Plugin `agents/` | Plugin scope | 4 (lowest) |
+| `.claude/agents/`   | Project         | 2           |
+| `~/.claude/agents/` | User            | 3           |
+| Plugin `agents/`    | Plugin scope    | 4 (lowest)  |
 
 #### Subagent Frontmatter Options
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `name` | Yes | Unique identifier |
-| `description` | Yes | When to delegate to this agent |
-| `tools` | No | Allowed tools (inherits all if omitted) |
-| `disallowedTools` | No | Tools to deny |
-| `model` | No | `sonnet`, `opus`, `haiku`, or `inherit` |
-| `permissionMode` | No | Permission handling mode |
-| `skills` | No | Skills to load at startup |
-| `hooks` | No | Lifecycle hooks scoped to this agent |
+| Field             | Required | Description                             |
+| ----------------- | -------- | --------------------------------------- |
+| `name`            | Yes      | Unique identifier                       |
+| `description`     | Yes      | When to delegate to this agent          |
+| `tools`           | No       | Allowed tools (inherits all if omitted) |
+| `disallowedTools` | No       | Tools to deny                           |
+| `model`           | No       | `sonnet`, `opus`, `haiku`, or `inherit` |
+| `permissionMode`  | No       | Permission handling mode                |
+| `skills`          | No       | Skills to load at startup               |
+| `hooks`           | No       | Lifecycle hooks scoped to this agent    |
 
 ---
 
@@ -256,11 +257,11 @@ Specialized AI assistants with isolated context and custom tool access.
 
 External tool servers that extend Claude's capabilities.
 
-| File | Location | Scope |
-|------|----------|-------|
-| `.claude.json` | `~/.claude.json` | User (all projects) |
-| `.mcp.json` | Project root | Project (shared via git) |
-| `managed-mcp.json` | System dirs | Managed (org-wide) |
+| File               | Location         | Scope                    |
+| ------------------ | ---------------- | ------------------------ |
+| `.claude.json`     | `~/.claude.json` | User (all projects)      |
+| `.mcp.json`        | Project root     | Project (shared via git) |
+| `managed-mcp.json` | System dirs      | Managed (org-wide)       |
 
 **IMPORTANT:** MCP servers are NOT configured in `settings.json`. They use separate files.
 
@@ -317,6 +318,7 @@ For MVP, prioritize:
 3. **Enhance existing project .claude/** - Add missing pieces
 
 Defer to post-MVP:
+
 - **Portable configs**: Complex, may not be needed
 - **MCP servers**: Project-specific, not dotfiles concern
 - **Complex hooks**: Start simple, add as needed
@@ -344,12 +346,14 @@ Deployed via Ansible to all machines:
 Shareable configurations (like GSD) that can be added to any repo:
 
 **Option A: Symlinks**
+
 ```bash
 ln -s ~/portable-configs/gsd-agents .claude/agents/gsd
 ln -s ~/portable-configs/gsd-commands .claude/commands/gsd
 ```
 
 **Option B: Imports in CLAUDE.md**
+
 ```markdown
 # Project Instructions
 
