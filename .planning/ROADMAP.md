@@ -26,10 +26,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. User-level `~/.claude/settings.json` references only GSD hooks (no legacy entries)
   3. Repo-level `.claude/` is empty or contains only placeholder
   4. GSD commands (`/gsd:*`) continue to work after cleanup
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: TBD
+- [ ] 01-01-PLAN.md — Remove legacy user-level ~/.claude/ files and update settings.json
+- [ ] 01-02-PLAN.md — Remove repo-level .claude/ contents and add .gitkeep placeholder
 
 ### Phase 2: Structure
 **Goal**: Document three-layer architecture and create clean scaffolds at each layer
@@ -52,5 +53,5 @@ Phases execute in numeric order: 1 -> 2
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Cleanup | 0/? | Not started | - |
+| 1. Cleanup | 0/2 | Planned | - |
 | 2. Structure | 0/? | Not started | - |
