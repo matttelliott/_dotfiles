@@ -8,6 +8,19 @@ Personal dotfiles for provisioning new machines with a consistent development en
 
 When you sit down at a new machine, one command gets you your environment.
 
+## Current Milestone: v0.1 Lint & Tooling
+
+**Goal:** Clean up ansible-lint violations and add Claude Code quality hook.
+
+**Target features:**
+- Fix all ansible-lint errors (1122 violations)
+- Add Claude Code post-write hook for ansible-lint
+- Document lint patterns in CLAUDE.md
+
+**Future milestones:**
+- v0.2: Test infrastructure + test plan
+- v0.3+: Bug fixes (SSH known_hosts, non-free repos), architecture portability, idempotency
+
 ## Requirements
 
 ### Validated
@@ -28,7 +41,9 @@ When you sit down at a new machine, one command gets you your environment.
 
 <!-- Current scope. Building toward these. -->
 
-(None currently — add items as new work arises)
+- [ ] All playbooks pass ansible-lint
+- [ ] Claude Code hook validates YAML on write
+- [ ] Lint patterns documented in CLAUDE.md
 
 ### Out of Scope
 
@@ -68,4 +83,4 @@ Work typically involves: adding new tools, updating configs, fixing breakage aft
 | Host groups for features | Flexible per-machine customization without duplication | ✓ Good |
 
 ---
-*Last updated: 2026-01-19 after initialization*
+*Last updated: 2026-01-19 after starting v0.1 milestone*

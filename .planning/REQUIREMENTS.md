@@ -1,51 +1,71 @@
-# Requirements: _dotfiles
+# Requirements: _dotfiles v0.1
 
 **Defined:** 2026-01-19
 **Core Value:** One command gets you your environment on any new machine
 
-## Validated
+## v1 Requirements
 
-<!-- Shipped and confirmed valuable. These are what the dotfiles already do. -->
+### Lint Fixes
 
-### Bootstrap
-- ✓ **BOOT-01**: New machine provisioned via `curl | bash`
-- ✓ **BOOT-02**: OS auto-detected (macOS, Debian, Arch)
-- ✓ **BOOT-03**: Interactive host group selection during bootstrap
+- [ ] **LINT-01**: Fix all `fqcn[action-core]` violations (413) — use `ansible.builtin.*`
+- [ ] **LINT-02**: Fix all `yaml[truthy]` violations (264) — use `true`/`false` not `yes`/`no`
+- [ ] **LINT-03**: Fix all `name[play]` violations (100) — add names to plays
+- [ ] **LINT-04**: Fix all `fqcn[action]` violations (64) — use fully qualified collection names
+- [ ] **LINT-05**: Fix all `yaml[line-length]` violations (12) — wrap long lines
+- [ ] **LINT-06**: Fix all `latest[git]` violations (3) — pin git versions
 
-### Tools
-- ✓ **TOOL-01**: 100+ tools installed and configured
-- ✓ **TOOL-02**: Per-tool modularity (can install one or all)
-- ✓ **TOOL-03**: OS-specific installation paths (brew/apt/pacman)
-- ✓ **TOOL-04**: Shell integrations sourced automatically
+### Validation
 
-### Configuration
-- ✓ **CONF-01**: Host group feature flags (GUI, browsers, AI tools)
-- ✓ **CONF-02**: Coordinated theming across tmux/starship/neovim
-- ✓ **CONF-03**: Idempotent execution (safe to re-run)
+- [ ] **VALID-01**: All playbooks pass `ansible-playbook --syntax-check`
+- [ ] **VALID-02**: `setup.yml` runs successfully on all hosts (`./setup-all.sh`)
 
-### Security
-- ✓ **SECR-01**: Secrets encrypted via SOPS + Age
-- ✓ **SECR-02**: SSH keys from 1Password
-- ✓ **SECR-03**: No secrets committed to git
+### Tooling
 
-### Remote
-- ✓ **REMT-01**: Provision remote hosts via SSH
-- ✓ **REMT-02**: DigitalOcean droplet management via Pulumi
+- [ ] **TOOL-01**: Claude Code post-write hook runs ansible-lint on YAML files
+- [ ] **TOOL-02**: Hook reports lint errors clearly
 
-## Active
+## v2 Requirements
 
-<!-- Current work. Add items when starting new improvements. -->
+Deferred to future milestones:
 
-(None currently)
+### v0.2 — Test Infrastructure
+- Test infrastructure setup (CI/CD, possibly Molecule)
+- Test plan for what needs automated tests
+
+### v0.3+ — Fixes
+- SSH known_hosts marker bug
+- Debian non-free repos issue
+- Hardcoded architectures (amd64/arm64)
+- Shell task idempotency (creates:/changed_when:)
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Windows support | Different paradigm, WSL sufficient |
-| GUI config tool | CLI/playbook interface works fine |
-| Auto-updates | Manual control preferred |
+| Full test suite | Deferred to v0.2 |
+| Bug fixes | Deferred to v0.3+ |
+| Cross-platform container testing | Overkill for lint fixes |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| LINT-01 | TBD | Pending |
+| LINT-02 | TBD | Pending |
+| LINT-03 | TBD | Pending |
+| LINT-04 | TBD | Pending |
+| LINT-05 | TBD | Pending |
+| LINT-06 | TBD | Pending |
+| VALID-01 | TBD | Pending |
+| VALID-02 | TBD | Pending |
+| TOOL-01 | TBD | Pending |
+| TOOL-02 | TBD | Pending |
+
+**Coverage:**
+- v1 requirements: 10 total
+- Mapped to phases: 0
+- Unmapped: 10
 
 ---
 *Requirements defined: 2026-01-19*
-*Last updated: 2026-01-19 after initialization*
+*Last updated: 2026-01-19 after definition*
