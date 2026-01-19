@@ -29,6 +29,15 @@
         path: ~/.claude
         state: directory
 
+    - name: Create Claude config scaffold directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      loop:
+        - ~/.claude/commands
+        - ~/.claude/agents
+        - ~/.claude/hooks
+
     - name: Add/update Sequential Thinking MCP server (user level)
       shell: |
         export NVM_DIR="$HOME/.nvm"
