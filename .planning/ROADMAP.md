@@ -13,7 +13,7 @@ This project cleans up legacy Claude Code configuration and establishes a clean 
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Cleanup** - Remove old/broken configs, preserve only GSD + credentials
-- [ ] **Phase 2: Structure** - Document architecture and scaffold clean directories
+- [x] **Phase 2: Structure** - Document architecture and scaffold clean directories
 
 ## Phase Details
 
@@ -44,7 +44,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 02-01-PLAN.md — Document architecture in CLAUDE.md, create repo scaffold, update Ansible playbook
+- [x] 02-01-PLAN.md — Document architecture in CLAUDE.md, create repo scaffold, update Ansible playbook
 
 ## Progress
 
@@ -54,4 +54,4 @@ Phases execute in numeric order: 1 -> 2
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Cleanup | 2/2 | Complete | 2026-01-19 |
-| 2. Structure | 0/1 | Not started | - |
+| 2. Structure | 1/1 | Complete | 2026-01-19 |
