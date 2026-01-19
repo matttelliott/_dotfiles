@@ -146,7 +146,7 @@ Hosts are added to groups to control which tools are installed:
 | `with_login_tools` | Git signing, SSH keys, cloud CLIs, dotfiles repo clone |
 | `with_gui_tools` | WezTerm, 1Password, DBeaver |
 | `with_browsers` | Chrome, Firefox, Brave, Arc, etc. |
-| `with_ai_tools` | Claude Code |
+| `with_ai_tools` | Claude Code, nvim-ai |
 | `with_nas` | Automount NAS shares from nas.home.lan |
 
 ## What's Included
