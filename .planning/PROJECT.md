@@ -11,6 +11,16 @@ The three-layer Claude Code configuration architecture is now established:
 
 Documentation lives in `CLAUDE.md` under "## Claude Code Configuration".
 
+## Current Milestone: v1.1 Multi-agent Safety
+
+**Goal:** Make multi-agent work safe through git worktree isolation integrated with GSD workflows.
+
+**Target features:**
+- Git worktree strategy for multi-agent isolation (each agent gets its own branch/directory)
+- GSD integration (execute-phase sets up worktree, completion merges/squashes)
+- Squash-on-merge for clean commit history on master
+- Claude awareness (stop retrying commits when nothing to commit)
+
 ## What This Is
 
 Cleanup and restructuring of Claude Code configuration for the dotfiles repo. Establishing a clean three-layer config architecture (user / portable / repo-specific) as a foundation for future Claude integrations.
@@ -30,13 +40,16 @@ Clean, organized config structure that makes it obvious where things belong — 
 
 ### Active
 
-(None — define for next milestone)
+- [ ] Git worktree isolation for multi-agent work
+- [ ] GSD integration with worktree workflow
+- [ ] Squash-on-merge for clean history
+- [ ] Claude awareness of autocommit (stop retrying empty commits)
 
 ### Out of Scope
 
-- Autocommit fixes (Claude awareness, better messages, multi-agent git) — future milestone
 - Feature explorer workflow (explore → propose → demo → configure → promote) — future milestone
 - MCP server configuration — complexity; defer until needed
+- Applied repo multi-agent strategy (dotfiles, k8s) — needs more thought, defer
 
 ## Context
 
@@ -68,4 +81,4 @@ Foundation now clean and ready for intentional development.
 
 ---
 
-_Last updated: 2026-01-19 after v1.0 milestone_
+_Last updated: 2026-01-19 after v1.1 milestone initialization_
