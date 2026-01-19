@@ -29,47 +29,6 @@
         path: ~/.claude
         state: directory
 
-    - name: Install global CLAUDE.md
-      template:
-        src: CLAUDE.md.j2
-        dest: ~/.claude/CLAUDE.md
-
-    - name: Create Claude hooks directory
-      file:
-        path: ~/.claude/hooks
-        state: directory
-
-    - name: Install Claude Code settings
-      copy:
-        src: settings.json
-        dest: ~/.claude/settings.json
-
-    - name: Install Claude Code auto-commit hook
-      copy:
-        src: hooks/auto-commit.sh
-        dest: ~/.claude/hooks/auto-commit.sh
-        mode: "0755"
-
-    - name: Create Claude agents directory
-      file:
-        path: ~/.claude/agents
-        state: directory
-
-    - name: Install Claude Code custom agents
-      copy:
-        src: agents/
-        dest: ~/.claude/agents/
-
-    - name: Create Claude output-styles directory
-      file:
-        path: ~/.claude/output-styles
-        state: directory
-
-    - name: Install Claude Code output styles
-      copy:
-        src: output-styles/
-        dest: ~/.claude/output-styles/
-
     - name: Add/update Sequential Thinking MCP server (user level)
       shell: |
         export NVM_DIR="$HOME/.nvm"
