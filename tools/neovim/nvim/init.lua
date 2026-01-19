@@ -1112,6 +1112,7 @@ require('lazy').setup({
 --
 -- nvim-spectre: Keybinding conflicts (<leader>sr used by telescope, <leader>sR triggers Replace mode)
 -- nvim-ufo: Skipped
+-- nvim-treesitter-context: Not showing correct lines
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
