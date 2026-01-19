@@ -13,12 +13,12 @@ Documentation lives in `CLAUDE.md` under "## Claude Code Configuration".
 
 ## Current Milestone: v1.1 Multi-agent Safety
 
-**Goal:** Make multi-agent work safe through git worktree isolation integrated with GSD workflows.
+**Goal:** Make multi-agent work safe through git worktree isolation, support parallel feature development.
 
 **Target features:**
-- Git worktree strategy for multi-agent isolation (each agent gets its own branch/directory)
-- GSD integration (execute-phase sets up worktree, completion merges/squashes)
-- Squash-on-merge for clean commit history on master
+- Worktree management shell commands for branch isolation
+- Parallel GSD features (each feature in own worktree with independent `.planning/`)
+- Merge workflow with planning distillation (squash code, extract key decisions to master)
 - Claude awareness (stop retrying commits when nothing to commit)
 
 ## What This Is
@@ -40,9 +40,9 @@ Clean, organized config structure that makes it obvious where things belong — 
 
 ### Active
 
-- [ ] Git worktree isolation for multi-agent work
-- [ ] GSD integration with worktree workflow
-- [ ] Squash-on-merge for clean history
+- [ ] Worktree management shell commands (create, list, remove, merge)
+- [ ] Parallel feature support (each feature in own worktree with own .planning/)
+- [ ] Merge workflow with distillation (squash code, extract decisions to master)
 - [ ] Claude awareness of autocommit (stop retrying empty commits)
 
 ### Out of Scope

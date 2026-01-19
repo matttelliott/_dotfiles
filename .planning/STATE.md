@@ -5,42 +5,42 @@
 See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Core value:** Clean, organized config structure that makes it obvious where things belong
-**Current focus:** Planning next milestone
+**Current focus:** Phase 3 - Worktree Foundation
 
 ## Current Position
 
-Phase: Complete (v1.0 shipped)
-Plan: N/A
-Status: Ready for next milestone
-Last activity: 2026-01-19 — v1.0 milestone complete
+Phase: 3 of 5 (Worktree Foundation)
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-01-19 — v1.1 roadmap created
 
-Progress: [==========] 100% (v1.0 complete)
+Progress: [=====-----] 50% (v1.0 complete, v1.1 starting)
 
 ## Performance Metrics
 
 **Velocity:**
-
 - Total plans completed: 3
 - Average duration: 2.3 min
 - Total execution time: 7 min
 
 **By Phase:**
 
-| Phase        | Plans | Total | Avg/Plan |
-| ------------ | ----- | ----- | -------- |
-| 1. Cleanup   | 2     | 5 min | 2.5 min  |
-| 2. Structure | 1     | 2 min | 2 min    |
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| 1. Cleanup | 2 | 5 min | 2.5 min |
+| 2. Structure | 1 | 2 min | 2 min |
 
 ## Accumulated Context
 
 ### Decisions
 
-Key decisions are logged in PROJECT.md. All v1.0 decisions resolved:
+Key decisions are logged in PROJECT.md. Recent decisions:
 
-- Keep only GSD + credentials (clean slate)
-- Three-layer config architecture
-- User layer (Ansible) owns scaffold structure
-- Subdirectory .gitkeeps for repo-level .claude/
+- v1.0: Three-layer config architecture (user/portable/repo)
+- v1.0: User layer (Ansible) owns scaffold structure
+- v1.1: Git worktree for multi-agent isolation (zero deps)
+- v1.1: Parallel features in separate worktrees (each has own .planning/)
+- v1.1: Distill key planning context on merge (decisions, requirements → master's PROJECT.md)
 
 ### Pending Todos
 
@@ -56,12 +56,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-19
-Stopped at: v1.0 milestone complete
+Stopped at: v1.1 roadmap created
 Resume file: None
 
 ## Next Steps
 
-Run `/gsd:new-milestone` to:
-- Define next milestone scope (autocommit improvements? feature explorer?)
-- Gather requirements
-- Create roadmap
+Run `/gsd:plan-phase 3` to plan Worktree Foundation phase.
