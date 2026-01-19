@@ -11,12 +11,12 @@ Requirements for v1.1 Multi-agent Safety milestone.
 
 Shell commands for managing git worktrees (used by both manual agents and GSD features).
 
-- [ ] **WT-01**: Create worktree with dedicated branch (`gsd-worktree-add {name}`)
-- [ ] **WT-02**: List active worktrees with status (`gsd-worktree-list`)
-- [ ] **WT-03**: Remove worktree and cleanup metadata (`gsd-worktree-remove {name}`)
-- [ ] **WT-04**: Squash merge worktree branch to master (`gsd-worktree-merge {name}`)
-- [ ] **WT-05**: Sibling directory naming convention (`../{repo}-{name}/`)
-- [ ] **WT-06**: Conflict detection before merge attempt
+- [x] **WT-01**: Create worktree with dedicated branch (`gsd-worktree-add {name}`)
+- [x] **WT-02**: List active worktrees with status (`gsd-worktree-list`)
+- [x] **WT-03**: Remove worktree and cleanup metadata (`gsd-worktree-remove {name}`)
+- [x] **WT-04**: Squash merge worktree branch to master (`gsd-worktree-merge {name}`)
+- [x] **WT-05**: Sibling directory naming convention (`../{repo}-{name}/`)
+- [x] **WT-06**: Conflict detection before merge attempt
 
 ### Parallel Feature Support (PF)
 
@@ -68,12 +68,12 @@ Deferred to future release.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| WT-01 | Phase 3 | Pending |
-| WT-02 | Phase 3 | Pending |
-| WT-03 | Phase 3 | Pending |
-| WT-04 | Phase 3 | Pending |
-| WT-05 | Phase 3 | Pending |
-| WT-06 | Phase 3 | Pending |
+| WT-01 | Phase 3 | Complete |
+| WT-02 | Phase 3 | Complete |
+| WT-03 | Phase 3 | Complete |
+| WT-04 | Phase 3 | Complete |
+| WT-05 | Phase 3 | Complete |
+| WT-06 | Phase 3 | Complete |
 | PF-01 | Phase 4 | Pending |
 | PF-02 | Phase 4 | Pending |
 | PF-03 | Phase 4 | Pending |
@@ -92,4 +92,4 @@ Deferred to future release.
 
 ---
 *Requirements defined: 2026-01-19*
-*Last updated: 2026-01-19 after scope refinement*
+*Last updated: 2026-01-19 after Phase 3 completion*

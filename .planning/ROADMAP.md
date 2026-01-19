@@ -24,7 +24,7 @@
 
 **Milestone Goal:** Make multi-agent work safe through worktree isolation, support parallel feature development with planning distillation on merge.
 
-- [ ] **Phase 3: Worktree Foundation** — Shell commands for worktree management
+- [x] **Phase 3: Worktree Foundation** — Shell commands for worktree management
 - [ ] **Phase 4: Parallel Features** — GSD features in isolated worktrees
 - [ ] **Phase 5: Merge Workflow** — Squash merge with planning distillation
 
@@ -41,9 +41,9 @@
   3. User can remove a worktree with `gsd-worktree-remove {name}` (cleans metadata)
   4. User can squash merge with `gsd-worktree-merge {name}` (checks for conflicts first)
   5. Worktree directories follow sibling pattern: `../{repo}-{name}/`
-**Plans**: 1 plan
+**Plans**: 1 plan (completed)
 Plans:
-- [ ] 03-01-PLAN.md — Create gsd-worktree shell functions and Ansible deployment
+- [x] 03-01-PLAN.md — Create gsd-worktree shell functions and Ansible deployment
 
 ### Phase 4: Parallel Features
 
@@ -78,10 +78,10 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 1. Cleanup | v1.0 | 2/2 | Complete | 2026-01-19 |
 | 2. Structure | v1.0 | 1/1 | Complete | 2026-01-19 |
-| 3. Worktree Foundation | v1.1 | 0/1 | Planned | - |
+| 3. Worktree Foundation | v1.1 | 1/1 | Complete | 2026-01-19 |
 | 4. Parallel Features | v1.1 | 0/TBD | Not started | - |
 | 5. Merge Workflow | v1.1 | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-01-19*
-*Last updated: 2026-01-19 after Phase 3 planning*
+*Last updated: 2026-01-19 after Phase 3 execution*
