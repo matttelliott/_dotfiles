@@ -44,9 +44,10 @@ Key decisions are logged in PROJECT.md. All v1.0 decisions resolved:
 
 ### Pending Todos
 
-2 pending todos in `.planning/todos/pending/`:
+3 pending todos in `.planning/todos/pending/`:
 - Verify GSD installation at latest version (tooling)
 - Fix lint errors and GSD concerns (tooling)
+- Support containerized environments for Claude (tooling)
 
 ### Blockers/Concerns
 
