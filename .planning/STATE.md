@@ -44,7 +44,8 @@ Key decisions are logged in PROJECT.md. All v1.0 decisions resolved:
 
 ### Pending Todos
 
-None.
+1 pending todo in `.planning/todos/pending/`:
+- Verify GSD installation at latest version (tooling)
 
 ### Blockers/Concerns
 
