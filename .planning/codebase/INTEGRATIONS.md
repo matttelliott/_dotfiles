@@ -2,196 +2,193 @@
 
 **Analysis Date:** 2026-01-19
 
+## APIs & External Services
+
+**GitHub:**
+- GitHub CLI (`gh`) for repository operations
+- SSH key-based authentication
+- Dotfiles cloned from `github.com/matttelliott/_dotfiles`
+- Config: `tools/gh/install_gh.yml`
+
+**1Password:**
+- 1Password CLI (`op`) for secrets management
+- Service account token authentication
+- Retrieves SSH private keys, Age keys
+- Token location: `~/.config/op/service-account-token`
+- Config: `tools/1password_cli/install_1password_cli.yml`
+
+**Anthropic (Claude):**
+- Claude Code CLI (`@anthropic-ai/claude-code`)
+- Claude Desktop application
+- MCP servers: Sequential Thinking, Playwright
+- Get Shit Done (GSD) workflow tools
+- Config: `tools/claude-code/install_claude-code.yml`
+
+**OpenAI:**
+- ChatGPT Desktop application
+- OpenAI Codex CLI
+- Config: `tools/chatgpt-desktop/install_chatgpt-desktop.yml`, `tools/codex/install_codex.yml`
+
 ## Cloud Providers
 
 **DigitalOcean:**
-- Purpose: Primary cloud infrastructure
-- IaC: Pulumi in `infrastructure/index.ts`
-- CLI: doctl (v1.104.0)
-- SDK: `@pulumi/digitalocean 4.56.0`
-- Resources: Droplets (Debian 12, nyc1 region, s-2vcpu-4gb)
-- Auth: `sshKeyFingerprint` via Pulumi config
-- Install: `tools/doctl/install_doctl.yml`
+- Managed via Pulumi IaC (`infrastructure/index.ts`)
+- doctl CLI for manual operations
+- Droplet provisioning (Debian 12, nyc1, s-2vcpu-4gb)
+- SSH key authentication via fingerprint
+- Config: `tools/doctl/install_doctl.yml`
 
 **AWS:**
-- Purpose: Available for cloud services
-- CLI: awscli (v2, official installer)
-- Auth: AWS credentials (configured separately)
-- Install: `tools/awscli/install_awscli.yml`
+- AWS CLI v2 installed
+- No active IaC management
+- Config: `tools/awscli/install_awscli.yml`
 
 **Google Cloud:**
-- Purpose: Available for cloud services
-- CLI: gcloud (google-cloud-cli)
-- Auth: gcloud auth (configured separately)
-- Install: `tools/gcloud/install_gcloud.yml`
+- gcloud CLI installed
+- No active IaC management
+- Config: `tools/gcloud/install_gcloud.yml`
 
-## Secret Management
+## Data Storage
 
-**1Password:**
-- Purpose: Secrets retrieval during bootstrap and deployment
-- CLI: op (`1password-cli`)
-- Auth: Service account token at `~/.config/op/service-account-token`
-- Usage: Fetch SSH keys, Age encryption keys
-- References in playbooks:
-  - `op://Automation/Age Key/Private Key`
-  - `op://Automation/Age Key/Public Key`
-  - `{{ op_ssh_private_key_ref }}` - SSH private key reference
-- Install: `tools/1password_cli/install_1password_cli.yml`
+**Databases:**
+- DBeaver GUI client installed
+- No managed database infrastructure
+- Config: `tools/dbeaver/install_dbeaver.yml`
+
+**File Storage:**
+- NAS automount via SMB/CIFS
+- Server: `nas.home.lan`
+- Shares: `home` mounted to `~/NAS/home`
+- Credentials: `~/.nas-credentials` (guest access)
+- Config: `tools/nas/install_nas.yml`
+
+**Caching:**
+- None (local development only)
+
+## Secrets Management
 
 **SOPS + Age:**
-- Purpose: Encrypted secrets in git
-- Config: `.sops.yaml` - Defines encryption rules
-- Encrypted vars: `group_vars/all/personal-info.sops.yml`
-- Key location: `~/.config/sops/age/keys.txt`
-- Public key: `age13vqkx5d70vqhdvlnkm3y5htprafj0x0g6nngcqvn65at2lhs73hs3pgsgl`
+- Age encryption for SOPS files
+- Age key location: `~/.config/sops/age/keys.txt`
+- Encrypted file: `group_vars/all/personal-info.sops.yml`
 - Ansible collection: `community.sops`
-- Install: `tools/sops/install_sops.yml`, `tools/age/install_age.yml`
+- Config: `ansible.cfg`, `tools/sops/install_sops.yml`, `tools/age/install_age.yml`
+
+**1Password Integration:**
+- Service account for automation
+- SSH private key retrieval: `op://Automation/SSH Key/private key`
+- Age key retrieval: `op://Automation/Age Key/Private Key`
+- Bootstrap flow handles token setup
 
 **Encrypted Variables:**
-- `git_user_name` - Git commit name
-- `git_user_email` - Git commit email
-- `git_signing_key` - GPG/SSH signing key
-- `ssh_public_key` - SSH public key for authorized_keys
-- `ssh_default_user` - Default SSH username
-- `github_username` - GitHub username
-- `op_ssh_private_key_ref` - 1Password reference for SSH key
+```yaml
+# group_vars/all/personal-info.sops.yml
+git_user_name: [encrypted]
+git_user_email: [encrypted]
+git_signing_key: [encrypted]
+ssh_public_key: [encrypted]
+github_username: [encrypted]
+op_ssh_private_key_ref: [encrypted]
+```
 
-## Version Control
+## Authentication & Identity
 
-**GitHub:**
-- Purpose: Repository hosting, CI/CD
-- CLI: gh (`github-cli`)
-- Auth: `gh auth login` (configured separately)
-- Dotfiles repo: `github.com/matttelliott/_dotfiles`
-- Install: `tools/gh/install_gh.yml`
+**SSH:**
+- Key-based authentication to all hosts
+- Public key deployed to `~/.ssh/authorized_keys`
+- Private key fetched from 1Password
+- Config: `tools/ssh/install_ssh.yml`
 
-**Git:**
-- Signing: GPG/SSH key from encrypted vars
-- Config templates:
-  - `tools/git/gitconfig.darwin.j2` - macOS with login tools
-  - `tools/git/gitconfig.debian.j2` - Linux with login tools
-  - `tools/git/gitconfig.minimal.j2` - Minimal config
-- Install: `tools/git/install_git.yml`
+**Git Signing:**
+- SSH key signing enabled
+- Signing key from encrypted vars
+- Templates: `tools/git/gitconfig.darwin.j2`, `tools/git/gitconfig.debian.j2`
 
-## Container Runtime
+## Networking
 
-**Docker:**
-- macOS: Colima + docker CLI (no Docker Desktop)
-- Linux: docker-ce (Docker Community Edition)
-- Compose: docker-compose / docker-compose-plugin
-- Service: systemd on Linux
-- Install: `tools/docker/install_docker.yml`
+**WireGuard VPN:**
+- wireguard-tools installed
+- Config: `tools/wireguard/install_wireguard.yml`
 
-**Kubernetes:**
-- kubectl - Kubernetes CLI
-- k9s - Terminal UI for Kubernetes
-- helm - Kubernetes package manager
-- kubectx - Context/namespace switcher
-- Install: `tools/kubectl/install_kubectl.yml`, etc.
-
-## AI Services
-
-**Claude Code:**
-- Purpose: AI coding assistant
-- Package: `@anthropic-ai/claude-code@latest` (npm)
-- MCP Servers:
-  - `@modelcontextprotocol/server-sequential-thinking@latest`
-  - `@playwright/mcp@latest`
-- Extensions: get-shit-done-cc (GSD workflow)
-- Auth: Anthropic API key (configured separately)
-- Install: `tools/claude-code/install_claude-code.yml`
-
-**Neovim AI (nvim-ai):**
-- Purpose: AI integration in Neovim
-- Install: `tools/nvim-ai/install_nvim-ai.yml`
-
-## Network Storage
-
-**NAS:**
-- Protocol: SMB/CIFS via autofs
-- Server: `nas.home.lan`
-- Shares: `home` mounted at `~/NAS/home`
-- Auth: Guest (no password)
-- Platforms: macOS (autofs), Debian (autofs), Arch (autofs)
-- Install: `tools/nas/install_nas.yml`
-
-## Network Security
-
-**WireGuard:**
-- Purpose: VPN
-- CLI: wireguard-tools (wg)
-- GUI: Available on GUI hosts
-- Install: `tools/wireguard/install_wireguard.yml`
+**Mullvad VPN:**
+- GUI client available
+- Config: `tools/mullvad/install_mullvad.yml`
 
 **fail2ban:**
-- Purpose: Intrusion prevention
-- Config: `tools/fail2ban/jail.local`
-- Service: systemd on Linux
-- Install: `tools/fail2ban/install_fail2ban.yml`
+- SSH brute-force protection on Linux hosts
+- Config: `tools/fail2ban/install_fail2ban.yml`
 
-**Mullvad:**
-- Purpose: Commercial VPN service
-- Install: `tools/mullvad/install_mullvad.yml`
+## Monitoring & Observability
 
-## SSH
+**Error Tracking:**
+- None (local development focus)
 
-**OpenSSH:**
-- Server: openssh-server (Debian), openssh (Arch)
-- Service: ssh (Debian), sshd (Arch)
-- Config template: `tools/ssh/config.j2`
-- Known hosts: macbookair, macmini, desktop, miniserver (all `.home.lan`)
-- Key management: Fetched from 1Password
-- Install: `tools/ssh/install_ssh.yml`
+**Logs:**
+- System default logging
+- fail2ban for security events
 
-## Host Groups
+## CI/CD & Deployment
 
-Defined in `inventory.yml`:
+**Hosting:**
+- DigitalOcean Droplets (managed via Pulumi)
+- Self-hosted infrastructure on home network
 
-| Group | Hosts | Purpose |
-|-------|-------|---------|
-| `macs` | macbookair, macmini | macOS machines |
-| `debian` | miniserver | Debian servers |
-| `arch` | desktop | Arch workstations |
-| `with_login_tools` | all 4 | Git signing, SSH, cloud CLIs |
-| `with_gui_tools` | macbookair, desktop, macmini | GUI applications |
-| `with_browsers` | macbookair, desktop, macmini | Browser suite |
-| `with_ai_tools` | macbookair, desktop, macmini | Claude Code, nvim-ai |
-| `with_nas` | macbookair, desktop, macmini | NAS automount |
+**CI Pipeline:**
+- None (manual ansible-playbook execution)
+- Bootstrap via curl: `curl -fsSL https://raw.githubusercontent.com/matttelliott/_dotfiles/master/bootstrap.sh | bash`
+
+**Deployment Flow:**
+1. Bootstrap installs Ansible dependencies
+2. User selects host groups (login_tools, gui_tools, browsers, ai_tools)
+3. `ansible-playbook setup.yml` runs all tool playbooks
+4. Remote hosts: `./setup-all.sh` or `ansible-playbook setup.yml --limit <host>`
 
 ## Environment Configuration
 
-**Required for bootstrap:**
-- 1Password service account token (or manual secret entry)
-- Age private key (or generate new)
-- Network access to GitHub
+**Required env vars:**
+- None required at runtime (all in files)
 
-**Required env vars (post-bootstrap):**
-- `OP_SERVICE_ACCOUNT_TOKEN` - 1Password (read from file)
-- Various cloud CLIs require their own auth (configured separately)
+**Critical paths:**
+- `~/.config/sops/age/keys.txt` - Age decryption key
+- `~/.config/op/service-account-token` - 1Password automation
+- `~/.ssh/id_rsa` - SSH private key
+- `~/.nvm/` - Node.js version manager
 
 **Secrets location:**
-- 1Password token: `~/.config/op/service-account-token`
-- Age key: `~/.config/sops/age/keys.txt`
-- SSH key: `~/.ssh/id_rsa` (deployed from 1Password)
+- 1Password vault: "Automation"
+- Local encrypted: `group_vars/all/personal-info.sops.yml`
+
+## Container & Orchestration
+
+**Docker:**
+- macOS: Colima + docker CLI (no Docker Desktop)
+- Linux: docker-ce from official repos
+- Config: `tools/docker/install_docker.yml`
+
+**Kubernetes:**
+- kubectl CLI
+- k9s TUI dashboard
+- Helm package manager
+- kubectx context switcher
+- No managed clusters (CLI tools only)
 
 ## Webhooks & Callbacks
 
-**Incoming:** None (dotfiles repo, no CI)
+**Incoming:**
+- None
 
-**Outgoing:** None
+**Outgoing:**
+- None
 
-## Local Network
+## Home Network Hosts
 
-**Hosts:**
-- macbookair.home.lan
-- macmini.home.lan
-- desktop.home.lan
-- miniserver.home.lan
-- nas.home.lan
-
-**Services:**
-- SSH on all hosts
-- NAS (SMB) on nas.home.lan
+**Managed hosts (inventory.yml):**
+| Host | OS | IP | Groups |
+|------|----|----|--------|
+| macbookair | macOS | macbookair.home.lan | macs, with_login_tools, with_gui_tools, with_browsers, with_ai_tools, with_nas |
+| macmini | macOS | macmini.home.lan | macs, with_login_tools, with_gui_tools, with_browsers, with_ai_tools, with_nas |
+| desktop | Arch | desktop.home.lan | arch, with_login_tools, with_gui_tools, with_browsers, with_ai_tools, with_nas |
+| miniserver | Debian | miniserver.home.lan | debian, with_login_tools |
 
 ---
 

@@ -4,192 +4,178 @@
 
 ## Test Framework
 
-**Runner:** None (no automated test suite)
+**Runner:** None
 
-**Validation Approach:**
-- Manual testing via Ansible dry-run (check mode)
-- Linting tools for static analysis
-- Manual deployment to test machines
+This codebase has **no automated test framework**. Testing is performed manually via:
 
-**Run Commands:**
+1. Ansible check mode (dry-run)
+2. ansible-lint for validation
+3. Manual execution on target machines
+
+## Validation Commands
+
+**Dry-run (Check Mode):**
 ```bash
-# Dry-run (check mode) - preview changes without applying
 ansible-playbook setup.yml --connection=local --limit $(hostname -s) --check --diff
-
-# Lint Ansible playbooks
-ansible-lint setup.yml
-ansible-lint tools/*/install_*.yml
-
-# Lint Lua code (neovim config)
-stylua --check tools/neovim/nvim/
 ```
 
-## Test File Organization
-
-**Location:** No dedicated test files or directories
-
-**Validation Files:**
-- Neovim health check: `tools/neovim/nvim/lua/kickstart/health.lua`
-- GitHub Actions workflow (upstream kickstart): `tools/neovim/nvim/.github/workflows/stylua.yml`
-
-## Validation Strategy
-
-**Ansible Check Mode:**
-```bash
-# Preview all changes for local machine
-ansible-playbook setup.yml --connection=local --limit $(hostname -s) --check --diff
-
-# Preview specific tool
-ansible-playbook tools/<tool>/install_<tool>.yml --connection=local --limit $(hostname -s) --check --diff
-```
-
-**What Check Mode Validates:**
-- File creation/modification (shows diff)
-- Package installation (shows what would be installed)
-- Template rendering (shows resulting content)
-
-**What Check Mode Cannot Validate:**
-- Shell commands (marked as changed but not executed)
-- Commands with `creates:` (may show false positives)
-- Service state after changes
-
-## Linting
-
-**Ansible Lint:**
+**Lint Playbooks:**
 ```bash
 ansible-lint setup.yml
 ansible-lint tools/*/install_*.yml
 ```
 
-**StyLua (Lua):**
+**Lua Formatting Check:**
 ```bash
-# Check formatting
 stylua --check tools/neovim/nvim/
-
-# Auto-fix formatting
-stylua tools/neovim/nvim/
 ```
 
-Config: `tools/neovim/nvim/.stylua.toml`
-
-**ShellCheck (Shell):**
+**Shell Script Validation:**
 ```bash
-# Manual invocation (no CI integration)
 shellcheck bootstrap.sh setup-all.sh
 ```
 
-## Mocking
+## Manual Testing Patterns
 
-**Framework:** Not applicable
-
-**Patterns:** Not applicable
-
-**What to Mock:** Not applicable (infrastructure automation)
-
-**What NOT to Mock:** Not applicable
-
-## Fixtures and Factories
-
-**Test Data:** Not applicable
-
-**Location:** Not applicable
-
-## Coverage
-
-**Requirements:** None enforced
-
-**View Coverage:** Not applicable
-
-## Test Types
-
-**Unit Tests:** None
-
-**Integration Tests:** None (manual validation only)
-
-**E2E Tests:** None
-
-**Manual Validation Process:**
-1. Run check mode to preview changes
-2. Apply to test machine first (e.g., `miniserver` for headless, `desktop` for GUI)
-3. Verify functionality manually
-4. Apply to remaining machines
-
-## Common Patterns
-
-**Validating Playbook Syntax:**
+**Single Tool Testing:**
 ```bash
-# Syntax check only
-ansible-playbook setup.yml --syntax-check
+ansible-playbook tools/<tool>/install_<tool>.yml --connection=local --limit $(hostname -s)
 ```
 
-**Validating Specific Host:**
-```bash
-# Target specific host
-ansible-playbook setup.yml --limit desktop --check --diff
-```
-
-**Validating Host Groups:**
-```bash
-# All macOS hosts
-ansible-playbook setup.yml --limit macs --check --diff
-
-# All hosts with GUI tools
-ansible-playbook setup.yml --limit with_gui_tools --check --diff
-```
-
-**Testing Idempotency:**
-Run playbook twice; second run should show no changes:
+**Full Setup Testing:**
 ```bash
 ansible-playbook setup.yml --connection=local --limit $(hostname -s)
-# Re-run - should show "changed=0" for all tasks
-ansible-playbook setup.yml --connection=local --limit $(hostname -s)
 ```
 
-## Health Checks
+**Remote Testing:**
+```bash
+ansible-playbook setup.yml --limit macbookair
+```
 
-**Neovim:**
+## Idempotency Testing
+
+**Pattern:** Run playbook twice, expect no changes on second run.
+
+**Verification:**
+```bash
+# First run - expect changes
+ansible-playbook tools/<tool>/install_<tool>.yml --connection=local --limit $(hostname -s)
+
+# Second run - expect "ok" with no "changed"
+ansible-playbook tools/<tool>/install_<tool>.yml --connection=local --limit $(hostname -s)
+```
+
+**Idempotency Mechanisms:**
+- `creates:` argument for shell commands
+- `state: present` for package managers
+- `stat` + `when` for conditional execution
+
+## Theme Testing
+
+**Color Theme Application:**
+```bash
+ansible-playbook themes/_color.yml -i "localhost," --connection=local -e "color=nord"
+```
+
+**Style Theme Application:**
+```bash
+ansible-playbook themes/_style.yml -i "localhost," --connection=local -e "style=angle"
+```
+
+**Verification:** Visual inspection of:
+- tmux status bar
+- starship prompt
+- neovim colorscheme
+- fzf colors
+- lazygit colors
+
+## Cross-Platform Testing
+
+**Target Platforms:**
+| Platform | Test Host |
+|----------|-----------|
+| macOS | macbookair, macmini |
+| Debian | miniserver |
+| Arch Linux | desktop |
+
+**Platform-specific validation:**
+```bash
+# Test macOS-only tasks
+ansible-playbook setup.yml --limit macs --check
+
+# Test Linux-only tasks
+ansible-playbook setup.yml --limit 'debian:arch' --check
+```
+
+## Neovim Health Checks
+
+**Built-in health check:**
 ```vim
 :checkhealth
 ```
-Uses: `tools/neovim/nvim/lua/kickstart/health.lua`
 
-**Ansible:**
-```bash
-# Verify inventory
-ansible-inventory --list
-
-# Ping all hosts
-ansible all -m ping
+**LSP verification:**
+```vim
+:LspInfo
+:Mason
 ```
 
-## CI/CD Status
+**Plugin status:**
+```vim
+:Lazy
+```
 
-**This Repository:** No CI/CD pipeline configured
+## Infrastructure Testing
 
-**Upstream (Kickstart.nvim):**
-- GitHub Actions workflow for StyLua checks
-- File: `tools/neovim/nvim/.github/workflows/stylua.yml`
-- Triggered on pull requests
+**Pulumi Preview:**
+```bash
+cd infrastructure
+pulumi preview
+```
+
+**Pulumi Deployment:**
+```bash
+pulumi up
+```
+
+## Coverage Gaps
+
+**Not Tested:**
+- Shell function behavior (zshrc functions)
+- Complex conditionals in playbooks
+- Template rendering edge cases
+- Theme color accuracy
+
+**Partially Tested:**
+- Idempotency (manual verification)
+- Cross-platform compatibility (per-platform manual runs)
+
+## Test Data
+
+**Test Fixtures:** None
+
+**Test Variables:**
+- Defaults in `group_vars/all/defaults.yml`
+- Can override with `-e` flag: `-e "git_user_name=Test"`
 
 ## Recommended Testing Workflow
 
-**Before Committing:**
-1. Run `ansible-lint` on modified playbooks
-2. Run `stylua --check` on modified Lua files
-3. Run check mode on local machine
+1. **Before changes:** Run `ansible-lint` on modified files
+2. **Dry-run:** Use `--check --diff` to preview changes
+3. **Local test:** Apply to local machine first
+4. **Remote test:** Apply to remote hosts after local verification
+5. **Idempotency check:** Run twice to verify no unintended changes
 
-**Before Deploying:**
-1. Test on least critical machine first
-2. Verify idempotency (run twice)
-3. Check application functionality manually
+## CI/CD
 
-**New Tool Playbook:**
-1. Create `tools/<tool>/install_<tool>.yml`
-2. Run `ansible-lint` on the new file
-3. Test with check mode
-4. Apply to local machine
-5. Verify installation manually
-6. Test on other OS variants if cross-platform
+**GitHub Actions:** `tools/neovim/nvim/.github/workflows/stylua.yml`
+- Runs StyLua format check on neovim config
+- Not a comprehensive CI pipeline
+
+**No automated testing pipeline** for:
+- Playbook execution
+- Cross-platform validation
+- Integration testing
 
 ---
 

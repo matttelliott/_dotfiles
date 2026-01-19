@@ -2,238 +2,260 @@
 
 **Analysis Date:** 2026-01-19
 
+## File Organization
+
+**Ansible Playbooks:**
+- Location: `tools/<toolname>/install_<toolname>.yml`
+- One playbook per tool
+- Naming: lowercase with hyphens for multi-word tools (e.g., `build-essential`, `chrome_canary`)
+
+**Shell Configuration:**
+- Location: `tools/<toolname>/<toolname>.zsh`
+- Sourced from `~/.zshrc` via lineinfile task
+- Destination: `~/.config/zsh/<toolname>.zsh`
+
+**Jinja Templates:**
+- Location: `tools/<toolname>/<filename>.j2`
+- Use for configs requiring variable substitution (gitconfig, tmux.conf)
+
+**Lua (Neovim):**
+- Location: `tools/neovim/nvim/`
+- Structure follows kickstart.nvim pattern
+- Custom plugins: `lua/custom/plugins/*.lua`
+- Kickstart plugins: `lua/kickstart/plugins/*.lua`
+
 ## Naming Patterns
 
 **Files:**
-- Ansible playbooks: `install_<tool>.yml` (lowercase, underscores for compound names)
-- Shell configs: `<tool>.zsh` (lowercase, matches tool name)
-- Config templates: `<config>.j2` (Jinja2 templates) or `<config>.<ext>` (static)
-- Inventory files: `<purpose>.yml` (e.g., `localhost.yml`, `inventory.yml`)
+- Playbooks: `install_<toolname>.yml`
+- Shell configs: `<toolname>.zsh`
+- Templates: `<filename>.j2`
+- Lua modules: lowercase with hyphens or underscores
 
-**Directories:**
-- Tool directories: `tools/<tool>/` (lowercase, hyphens for compound names like `build-essential`)
-- Config dirs: Use singular nouns (`themes/`, `group_vars/`)
+**Ansible Task Names:**
+- Descriptive, action-first: "Install X via Y", "Create Z directory"
+- Include OS context in conditional tasks: "(macOS)", "(Debian)", "(Arch)", "(Linux)"
 
-**Variables (Ansible):**
-- Snake_case for all variables: `git_user_name`, `ssh_public_key`
-- Boolean prefixes avoided; use descriptive names: `op_ssh_private_key_ref`
-- Registered variables describe content: `docker_ce_check`, `nvim_check`, `tmux_config`
+**Variables:**
+- snake_case for Ansible variables: `git_user_name`, `nvm_dir`
+- SCREAMING_SNAKE_CASE for shell exports: `FZF_DEFAULT_OPTS`, `EZA_COLORS`
 
-**Functions (Lua):**
-- Snake_case for local functions: `set_statusline_hl`, `update_git_branch`
-- Global functions use `_G.` prefix: `_G.get_mode_name()`, `_G.get_git_branch()`
-- Helper functions defined inline within configs
+**Lua:**
+- snake_case for variables and functions
+- Descriptive plugin spec names
 
-## Code Style
+## Indentation
 
-**YAML (Ansible):**
-- 2-space indentation (standard Ansible)
-- Document separator `---` at file start (playbooks only, not always used)
-- No trailing whitespace
-- Quoted strings for shell commands containing special characters
-- Unquoted strings for simple values
-
-**Lua (Neovim):**
-- 2-space indentation
-- Single quotes preferred (per `.stylua.toml`: `quote_style = "AutoPreferSingle"`)
-- No call parentheses for single-argument string/table calls (per `.stylua.toml`: `call_parentheses = "None"`)
-- 160 character line width limit (per `.stylua.toml`)
-- Unix line endings
-
-**Lua Style Config:** `tools/neovim/nvim/.stylua.toml`
-```toml
-column_width = 160
-line_endings = "Unix"
-indent_type = "Spaces"
-indent_width = 2
-quote_style = "AutoPreferSingle"
-call_parentheses = "None"
+**YAML (Ansible):** 2 spaces
+```yaml
+- name: Install package
+  apt:
+    name: package
+    state: present
+  become: yes
 ```
 
-**Shell (Bash/Zsh):**
-- Use `set -e` for scripts that should fail on error
-- Use `set -euo pipefail` for strict error handling: `setup-all.sh`
-- Double quotes around variables: `"$HOME"`, `"$OSTYPE"`
-- Use `[[ ]]` for conditionals (bash-specific)
-- Prefer `$(command)` over backticks
+**Lua:** 2 spaces
+```lua
+require('lazy').setup({
+  { 'plugin/name', opts = {} },
+})
+```
 
-**WezTerm Lua:**
-- Tab indentation (differs from neovim style)
-- Double quotes for strings
-- Concise single-file configuration: `tools/wezterm/wezterm.lua`
+**Bash:** 2 spaces
+```bash
+if [[ "$OS" == "darwin" ]]; then
+  echo "macOS"
+fi
+```
 
-## Import Organization
+## Ansible Playbook Structure
 
-**Lua (Neovim):**
-1. Built-in requires (`require 'telescope.builtin'`)
-2. Plugin specs in order of loading
-3. Local variables at top of functions
+**Standard Pattern:**
+```yaml
+- name: Install <tool>
+  hosts: all
+  gather_facts: true
 
-**Path Aliases:**
-- Neovim custom plugins: `custom.plugins.*` maps to `lua/custom/plugins/*.lua`
-- Kickstart plugins: `kickstart.plugins.*` maps to `lua/kickstart/plugins/*.lua`
+  tasks:
+    - name: macOS task
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Debian task
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Arch task
+      when: ansible_facts['os_family'] == "Archlinux"
+
+    - name: Linux-only task
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
+```
+
+**OS Detection:**
+- Use `gather_facts: true` for OS-conditional tasks
+- Use `gather_facts: false` when no OS detection needed
+- OS family values: `"Darwin"`, `"Debian"`, `"Archlinux"`
+
+**Package Manager Patterns:**
+```yaml
+# macOS: Homebrew via shell (not module)
+- name: Install via Homebrew
+  shell: /opt/homebrew/bin/brew install <package>
+  args:
+    creates: /opt/homebrew/bin/<binary>
+  when: ansible_facts['os_family'] == "Darwin"
+
+# Debian: apt module
+- name: Install via apt
+  apt:
+    name: <package>
+    state: present
+  become: yes
+  when: ansible_facts['os_family'] == "Debian"
+
+# Arch: pacman module
+- name: Install via pacman
+  pacman:
+    name: <package>
+    state: present
+  become: yes
+  when: ansible_facts['os_family'] == "Archlinux"
+```
+
+**Idempotency:**
+- Use `creates:` for shell commands that install binaries
+- Use `stat` + `when` for conditional installs
+- Use `changed_when: false` for read-only commands
+
+## Shell Configuration Pattern
+
+**ZSH Config Installation:**
+```yaml
+- name: Create zsh config directory
+  file:
+    path: ~/.config/zsh
+    state: directory
+
+- name: Install <tool> zsh config
+  copy:
+    src: <tool>.zsh
+    dest: ~/.config/zsh/<tool>.zsh
+
+- name: Source <tool> config in zshrc
+  lineinfile:
+    path: ~/.zshrc
+    line: 'source ~/.config/zsh/<tool>.zsh'
+    create: yes
+```
+
+**ZSH File Structure:**
+```bash
+# Comment describing purpose
+export VAR="value"
+alias name='command'
+```
+
+## Lua (Neovim) Conventions
+
+**Plugin Specification:**
+```lua
+return {
+  {
+    'author/plugin-name',
+    event = 'VimEnter',
+    opts = {
+      option = value,
+    },
+  },
+}
+```
+
+**Keymap Definition:**
+```lua
+vim.keymap.set('n', '<leader>x', function()
+  -- action
+end, { desc = '[X] Description' })
+```
+
+**Leader Key Descriptions:**
+- Use `[X]` pattern for searchable descriptions
+- Example: `[S]earch [F]iles`, `[G]oto [D]efinition`
+
+**Formatting (StyLua):**
+- Config: `tools/neovim/nvim/.stylua.toml`
+- Column width: 160
+- Indent: 2 spaces
+- Quote style: AutoPreferSingle
+- Call parentheses: None
 
 ## Error Handling
 
 **Ansible:**
 - Use `failed_when: false` for commands that may legitimately fail
-- Use `ignore_errors: yes` for optional operations (e.g., reloading tmux when not running)
-- Use `changed_when: false` for read-only commands that should never show as changed
-- Use `changed_when: "'text' in result.stdout"` for accurate change detection
-- Register results and check `.stat.exists` for file operations
-- Use `no_log: true` for tasks handling secrets
+- Use `register` + `when` for conditional execution based on results
+- Use `ignore_errors: true` sparingly (only for truly optional operations)
 
-**Shell:**
-- Use `|| true` to continue on failure: `claude mcp remove ... || true`
-- Use `2>/dev/null` to suppress expected errors
-- Check command existence with `command -v` before use
-
-**Lua:**
-- Use `pcall()` for potentially failing operations: `pcall(require, 'nvim-treesitter.configs')`
-- Check for nil before accessing: `if client and client_supports_method(...)`
-
-## Logging
-
-**Framework:** Ansible built-in output
-
-**Patterns:**
-- Task names describe the action: `Install git via apt (Debian)`
-- Include OS/platform context in task names when OS-specific
-- Use comments for documentation, not task names
-
-**Shell scripts:**
-- Use `echo` for user feedback
-- Section headers with `===`: `echo "=== Dotfiles Bootstrap ==="`
+**Bash:**
+- Always use `set -e` for scripts
+- Use `set -euo pipefail` for strict mode
+- Check command existence before use: `command -v <cmd> &> /dev/null`
 
 ## Comments
 
-**When to Comment:**
-- Explain WHY, not WHAT (task names explain what)
-- Document non-obvious decisions or workarounds
-- Explain complex regex patterns
-- Mark OS-specific sections
-
-**Ansible Comment Style:**
+**Ansible:**
+- Block comments for explaining complex logic
+- Inline comments for non-obvious conditionals
 ```yaml
-# macOS: Colima + docker CLI + docker-compose
-- name: Install Colima and Docker via Homebrew (macOS)
+# Docker Installation
+#
+# macOS: Uses Colima + docker CLI (free alternative to Docker Desktop)
+# Linux: Uses docker-ce (Docker Community Edition)
+
+- name: Install Docker
+  # ...
 ```
 
-**Lua Comment Style:**
-```lua
--- Block comments for sections
--- [[ Setting options ]]
+**Lua:**
+- Use `--[[  ]]--` for multi-line documentation
+- Use `-- NOTE:`, `-- WARN:`, `-- TODO:` for annotations
+- Document rejected plugins with reasons
 
--- Inline comments for non-obvious code
-local arrow_right = vim.fn.nr2char(0xe0b0) --
+## Template Variables
+
+**Jinja2 Templates:**
+- Use variables from `group_vars/all/defaults.yml`
+- Encrypted overrides in `personal-info.sops.yml`
+- Conditional blocks for optional features:
+```jinja2
+{% if git_signing_key %}
+[commit]
+	gpgsign = true
+{% endif %}
 ```
 
-**JSDoc/TSDoc:** Not applicable (no TypeScript in configs)
+## Host Groups
 
-## Function Design
+**Group-based feature flags:**
+- `with_login_tools`: Git signing, SSH keys, cloud CLIs
+- `with_gui_tools`: GUI applications (WezTerm, etc.)
+- `with_browsers`: Browser suite
+- `with_ai_tools`: AI tools (Claude Code, etc.)
 
-**Ansible Tasks:**
-- One logical action per task
-- Use `block:` sparingly; prefer separate tasks
-- Group related tasks without explicit blocks
-
-**Lua Functions:**
-- Small, focused functions
-- Define helpers inline when used once
-- Use callbacks for autocommands
-
-**Shell Functions:**
-- Minimal use; prefer scripts
-- When used, define at script top
-
-## Module Design
-
-**Ansible Playbook Structure:**
+**Usage in playbooks:**
 ```yaml
-- name: Install <tool>
-  hosts: all
-  gather_facts: true
-  vars:  # Optional
-    key: value
-  tasks:
-    - name: macOS task
-      when: ansible_facts['os_family'] == "Darwin"
-    - name: Debian task
-      when: ansible_facts['os_family'] == "Debian"
-    - name: Arch task
-      when: ansible_facts['os_family'] == "Archlinux"
+when: "'with_login_tools' in group_names"
 ```
 
-**Standard OS Conditionals:**
-- macOS: `ansible_facts['os_family'] == "Darwin"`
-- Debian/Ubuntu: `ansible_facts['os_family'] == "Debian"`
-- Arch Linux: `ansible_facts['os_family'] == "Archlinux"`
-- Linux (both): `ansible_facts['os_family'] in ["Debian", "Archlinux"]`
+## Theme System
 
-**Exports (Lua):**
-- Plugin specs return tables with lazy.nvim structure
-- Custom modules return single tables
+**Color definitions:** `themes/_color.yml`
+- Centralized color schemes with semantic names
+- Applied via regex replacement to config files
 
-**Barrel Files:** Not used
-
-## Ansible-Specific Patterns
-
-**Idempotency:**
-- Use `creates:` for shell commands to check if action needed
-- Use `stat:` + `register:` to check file existence before actions
-- Use package modules (`apt`, `pacman`) over shell when possible
-
-**Homebrew on macOS:**
-- Always use full path: `/opt/homebrew/bin/brew`
-- Use `creates:` to make shell commands idempotent:
-```yaml
-- name: Install via Homebrew
-  shell: /opt/homebrew/bin/brew install <package>
-  args:
-    creates: /opt/homebrew/bin/<binary>
-```
-
-**Privilege Escalation:**
-- Use `become: yes` for package manager tasks on Linux
-- Never use `become: yes` for Homebrew (user-level install)
-- Use `become: yes` for systemd operations
-
-**File Deployment:**
-- Use `copy:` for static files
-- Use `template:` for files needing variable interpolation (`.j2` extension)
-- Use `lineinfile:` for adding single lines to existing files
-- Use `blockinfile:` for multi-line additions with markers
-
-**Shell Configuration Pattern:**
-1. Create `~/.config/zsh` directory
-2. Copy `<tool>.zsh` to that directory
-3. Add `source ~/.config/zsh/<tool>.zsh` to `~/.zshrc`
-
-## Nerd Font Characters
-
-**CRITICAL:** Do not edit Nerd Font glyphs directly. Use escape sequences.
-
-**Files with special characters:**
-- `tools/tmux/tmux.conf.j2`
-- `tools/starship/starship.toml`
-- `tools/neovim/nvim/init.lua`
-
-**Code Point Reference:**
-| Style  | Right   | Left    | Code Points    |
-| ------ | ------- | ------- | -------------- |
-| Angled | U+E0B0  | U+E0B2  | `\uE0B0`, `\uE0B2` |
-| Round  | U+E0B4  | U+E0B6  | `\uE0B4`, `\uE0B6` |
-
-**Editing Approaches:**
-- Ansible: Use `\uXXXX` escape sequences in variables
-- Lua: Use `vim.fn.nr2char(0xe0b0)`
-- Python: Use `chr(0xE0B0)`
-
-Example from `tools/neovim/nvim/init.lua`:
-```lua
-local arrow_right = vim.fn.nr2char(0xe0b0)
-local arrow_left = vim.fn.nr2char(0xe0b2)
-```
+**Special characters:**
+- Nerd Font glyphs require special handling
+- Use `vim.fn.nr2char(0xe0b0)` in Lua
+- Use `\uXXXX` escape sequences in Ansible
 
 ---
 

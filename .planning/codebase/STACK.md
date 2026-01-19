@@ -5,150 +5,143 @@
 ## Languages
 
 **Primary:**
-- YAML - Ansible playbooks for tool installation and configuration
-- Bash - Bootstrap script (`bootstrap.sh`) and shell configurations
+- YAML - Ansible playbooks and configurations (all `tools/*/install_*.yml`)
+- Bash - Bootstrap script and shell configurations (`bootstrap.sh`, `tools/*/*.zsh`)
 
 **Secondary:**
-- TypeScript - Pulumi IaC in `/infrastructure/`
-- Lua - Neovim configuration in `tools/neovim/nvim/`
-- Zsh - Shell configuration snippets in `tools/*/\*.zsh`
+- TypeScript - Pulumi infrastructure code (`infrastructure/index.ts`)
+- Lua - Neovim configuration (`tools/neovim/nvim/init.lua`)
+- Jinja2 - Ansible templates (`tools/*/*.j2`)
 
 ## Runtime
 
 **Environment:**
-- Python 3 - Required by Ansible
+- Ansible 2.x+ (core automation framework)
+- Python 3 (required by Ansible)
   - macOS: `/opt/homebrew/bin/python3`
-  - Debian/Arch: `/usr/bin/python3`
+  - Linux: `/usr/bin/python3`
 
-**Package Managers:**
-- Homebrew - macOS package management
-- apt - Debian/Ubuntu package management
-- pacman - Arch Linux package management
-- yay - AUR helper for Arch Linux
-
-**No lockfiles** - Ansible playbooks install tools via system package managers at latest versions.
+**Package Manager:**
+- None for root project (Ansible collections only)
+- npm/pnpm for infrastructure (`infrastructure/package.json`)
+- Lockfile: Not present in infrastructure/
 
 ## Frameworks
 
 **Core:**
-- Ansible - Primary automation framework for deployment and configuration
-  - Version: System-installed via package managers
-  - Collections: `community.sops >=1.6.0` (see `requirements.yml`)
+- Ansible - Configuration management and deployment automation
+- community.sops (>=1.6.0) - Encrypted secrets support via `requirements.yml`
 
 **Infrastructure:**
-- Pulumi ^3.113.0 - Infrastructure as Code for DigitalOcean
-  - Runtime: Node.js (nodejs)
-  - SDK: `@pulumi/digitalocean 4.56.0`
+- Pulumi ^3.113.0 - Infrastructure as Code for cloud resources
+- @pulumi/digitalocean 4.56.0 - DigitalOcean provider
 
-**Shell:**
-- Zsh - Default shell with plugins:
-  - zsh-autosuggestions
-  - zsh-syntax-highlighting
-- Starship - Cross-shell prompt
-
-**Editor:**
-- Neovim - Configured via `tools/neovim/nvim/init.lua`
-- Mason - LSP/tool installer for Neovim
+**Build/Dev:**
+- TypeScript ^5.0.0 - For infrastructure code compilation
+- @types/node ^18 - Node.js type definitions
 
 ## Key Dependencies
 
 **Ansible Collections:**
-- `community.sops` - Decryption of SOPS-encrypted variables
+- `community.sops` - Decrypts SOPS-encrypted variables (Age encryption)
 
-**Infrastructure (Pulumi):**
-- `@pulumi/pulumi ^3.113.0` - Core Pulumi SDK
-- `@pulumi/digitalocean 4.56.0` - DigitalOcean provider
-- `typescript ^5.0.0` - TypeScript compiler
-- `@types/node ^18` - Node.js type definitions
-
-**Node.js Global Packages (installed via Ansible):**
-- `@anthropic-ai/claude-code@latest` - Claude Code AI assistant
-- `typescript` - TypeScript compiler
-- `@fsouza/prettierd` - Prettier daemon
-- `eslint_d` - ESLint daemon
-
-**Python Tools (via uv):**
-- `ruff` - Python linter
-- `black` - Python formatter
-- `isort` - Import sorter
-
-## Language Runtimes Installed
-
-**Node.js:**
-- Manager: nvm (v0.40.1 on Linux, Homebrew on macOS)
-- Version: LTS (default)
-- Config: `tools/node/install_node.yml`
-
-**Python:**
-- Manager: uv (Astral)
-- Version: System default
-- Config: `tools/python/install_python.yml`
-
-**Rust:**
-- Manager: rustup
-- Components: rustfmt, clippy, rust-analyzer
-- Config: `tools/rust/install_rust.yml`
-
-**Go:**
-- Version: 1.23.4 (hardcoded in playbook)
-- Tools: gofumpt, goimports, gopls
-- Config: `tools/go/install_go.yml`
-
-**Lua:**
-- Version: 5.4 (Debian), latest (others)
-- Tools: stylua
-- Config: `tools/lua/install_lua.yml`
+**Infrastructure (npm):**
+- `@pulumi/pulumi` - Pulumi SDK
+- `@pulumi/digitalocean` - DigitalOcean resource management
 
 ## Configuration
 
 **Environment:**
-- Secrets: SOPS-encrypted YAML in `group_vars/all/personal-info.sops.yml`
-- Encryption: Age encryption (key at `~/.config/sops/age/keys.txt`)
-- 1Password: Service account token at `~/.config/op/service-account-token`
+- `~/.config/sops/age/keys.txt` - Age private key for SOPS decryption
+- `~/.config/op/service-account-token` - 1Password service account token
+- Configuration via Ansible group_vars:
+  - `group_vars/all/defaults.yml` - Default values
+  - `group_vars/all/personal-info.sops.yml` - Encrypted personal data
 
-**Ansible Config (`ansible.cfg`):**
-```ini
-inventory = inventory.yml
-collections_path = ~/.ansible/collections
-vars_plugins_enabled = host_group_vars,community.sops.sops
-age_keyfile = ~/.config/sops/age/keys.txt
-```
+**Inventory:**
+- `ansible.cfg` - Ansible configuration
+- `inventory.yml` - Remote machine inventory
+- `localhost.yml` - Generated local inventory (not committed)
 
-**Build (Pulumi):**
-- `infrastructure/Pulumi.yaml` - Project definition
-- `infrastructure/Pulumi.dev.yaml` - Dev stack config
-- `infrastructure/tsconfig.json` - TypeScript config (ES2020, strict mode)
+**Build:**
+- `infrastructure/tsconfig.json` - TypeScript compiler config (ES2020, CommonJS)
 
-## Platform Support
+## Managed Languages/Runtimes
 
-**Operating Systems:**
-- macOS (Darwin) - Apple Silicon (ARM64)
-- Debian/Ubuntu - x86_64
-- Arch Linux - x86_64
+The playbooks install and configure these development environments:
 
-**OS Detection:** `ansible_facts['os_family']` with values:
-- `Darwin` - macOS
-- `Debian` - Debian/Ubuntu
-- `Archlinux` - Arch Linux
+**Node.js:**
+- Installed via NVM (Node Version Manager)
+- LTS version by default
+- Global packages: typescript, @fsouza/prettierd, eslint_d
+- Config: `tools/node/install_node.yml`
+
+**Python:**
+- Managed via UV (Astral's Python package manager)
+- Dev tools: ruff, black, isort
+- Config: `tools/python/install_python.yml`
+
+**Rust:**
+- Installed via rustup.rs
+- Components: rustfmt, clippy, rust-analyzer
+- Config: `tools/rust/install_rust.yml`
+
+**Go:**
+- Version 1.23.4
+- Dev tools: gofumpt, goimports, gopls
+- Config: `tools/go/install_go.yml`
+
+**Lua:**
+- Lua 5.4
+- Dev tools: stylua (formatter)
+- Config: `tools/lua/install_lua.yml`
+
+## Platform Requirements
+
+**Supported Operating Systems:**
+- macOS (Darwin) - Package manager: Homebrew
+- Debian/Ubuntu - Package manager: apt
+- Arch Linux - Package managers: pacman, yay (AUR)
+
+**Development Prerequisites:**
+- SSH access for remote hosts
+- sudo/become access for package installation
+- Age key for secrets decryption (optional)
+- 1Password service account for SSH key retrieval (optional)
+
+**Production:**
+- DigitalOcean Droplets (managed via Pulumi)
+- Debian 12 (debian-12-x64) droplet image
+- Region: nyc1
+- Size: s-2vcpu-4gb
 
 ## Tool Count
 
-**Total Tools:** 101 directories in `tools/`
-**Install Playbooks:** ~3,856 lines across all `install_*.yml` files
+The repository manages **101 tools** across these categories:
 
-## Key Configuration Patterns
+**Development:**
+- Editors: neovim, nvim-ai
+- Languages: node, python, rust, go, lua
+- Version control: git, gh, lazygit
 
-**Jinja2 Templates:**
-- `tools/*/\*.j2` - Templated configs (tmux, git, ssh)
-- Variables from `group_vars/all/personal-info.sops.yml` (encrypted)
+**DevOps/Cloud:**
+- Container: docker, lazydocker
+- Kubernetes: kubectl, k9s, helm, kubectx
+- Cloud CLIs: doctl, awscli, gcloud, pulumi
 
-**Shell Configuration:**
-- Tool-specific: `tools/*/*.zsh` sourced in `~/.zshrc`
-- Base zshrc: `tools/zsh/zshrc`
+**Security:**
+- Secrets: 1password, 1password_cli, age, sops
+- Network: wireguard, fail2ban, mullvad
 
-**Neovim:**
-- Single-file config: `tools/neovim/nvim/init.lua` (~45k characters)
-- Formatting: `tools/neovim/nvim/.stylua.toml`
+**CLI Utilities:**
+- Search: ripgrep, fd, fzf
+- File viewing: bat, eza, tree
+- System: htop, btop, procs, duf, dust
+
+**GUI Applications:**
+- Terminals: wezterm
+- Browsers: chrome, firefox, brave, librewolf, zen, etc.
+- AI: claude-code, claude-desktop, chatgpt-desktop
 
 ---
 
