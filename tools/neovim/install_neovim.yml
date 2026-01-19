@@ -49,3 +49,8 @@
         path: ~/.zshrc
         line: 'source ~/.config/zsh/neovim.zsh'
         create: yes
+    - name: Install Mason language servers
+      shell: |
+        nvim --headless -c "MasonInstall typescript-language-server eslint-lsp css-lsp html-lsp json-lsp tailwindcss-language-server pyright rust-analyzer bash-language-server yaml-language-server prettierd stylua shfmt shellcheck black isort ruff" -c "sleep 30" -c "qa"
+      args:
+        creates: ~/.local/share/nvim/mason/bin/typescript-language-server

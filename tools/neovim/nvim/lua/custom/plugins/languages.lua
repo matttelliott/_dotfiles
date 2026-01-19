@@ -1,32 +1,34 @@
 -- Language support (LSP, formatters, treesitter)
 -- Trimmed to: Web, Lua, Python, Bash, Rust, Markdown, Git
 
--- Set up additional LSP servers after lspconfig loads
-vim.api.nvim_create_autocmd('User', {
-  pattern = 'VeryLazy',
-  callback = function()
-    local lspconfig = require 'lspconfig'
-    local capabilities = require('blink.cmp').get_lsp_capabilities()
-
-    -- Web
-    lspconfig.ts_ls.setup { capabilities = capabilities }
-    lspconfig.eslint.setup { capabilities = capabilities }
-    lspconfig.cssls.setup { capabilities = capabilities }
-    lspconfig.html.setup { capabilities = capabilities }
-    lspconfig.jsonls.setup { capabilities = capabilities }
-    lspconfig.tailwindcss.setup { capabilities = capabilities }
-    -- Python
-    lspconfig.pyright.setup { capabilities = capabilities }
-    -- Rust
-    lspconfig.rust_analyzer.setup { capabilities = capabilities }
-    -- Shell
-    lspconfig.bashls.setup { capabilities = capabilities }
-    -- YAML
-    lspconfig.yamlls.setup { capabilities = capabilities }
-  end,
-})
-
 return {
+  -- LSP setup helper (runs after lspconfig is loaded)
+  {
+    dir = vim.fn.stdpath 'config' .. '/lua/custom',
+    name = 'custom-lsp-setup',
+    dependencies = { 'neovim/nvim-lspconfig', 'saghen/blink.cmp' },
+    config = function()
+      local capabilities = require('blink.cmp').get_lsp_capabilities()
+
+      local servers = {
+        'ts_ls',
+        'eslint',
+        'cssls',
+        'html',
+        'jsonls',
+        'tailwindcss',
+        'pyright',
+        'rust_analyzer',
+        'bashls',
+        'yamlls',
+      }
+
+      for _, server in ipairs(servers) do
+        vim.lsp.config(server, { capabilities = capabilities })
+        vim.lsp.enable(server)
+      end
+    end,
+  },
 
   -- Mason: ensure tools are installed
   {
