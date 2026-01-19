@@ -91,6 +91,7 @@
       changed_when: true
       failed_when: false
 
+    # https://github.com/glittercowboy/get-shit-done
     - name: Install/update Get Shit Done (GSD) commands (user level)
       shell: |
         export NVM_DIR="$HOME/.nvm"
