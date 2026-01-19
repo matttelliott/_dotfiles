@@ -22,10 +22,12 @@ Clean up ansible-lint violations and add tooling to prevent regressions. Three p
   3. All `ansible.builtin.*` FQCNs used (no bare module names)
   4. All booleans use `true`/`false` (no `yes`/`no`)
   5. All plays have names
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: TBD
+- [ ] 01-01-PLAN.md — Fix FQCN and truthy violations across all playbooks
+- [ ] 01-02-PLAN.md — Add names to all plays (import_playbook directives)
+- [ ] 01-03-PLAN.md — Fix line-length and latest[git] violations
 
 ### Phase 2: Validation
 **Goal**: Confirm lint fixes didn't break anything
@@ -57,7 +59,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Lint Cleanup | 0/? | Not started | - |
+| 1. Lint Cleanup | 0/3 | Planned | - |
 | 2. Validation | 0/? | Not started | - |
 | 3. Tooling | 0/? | Not started | - |
 
