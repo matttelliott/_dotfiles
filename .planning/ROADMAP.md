@@ -12,7 +12,7 @@ This project cleans up legacy Claude Code configuration and establishes a clean 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Cleanup** - Remove old/broken configs, preserve only GSD + credentials
+- [x] **Phase 1: Cleanup** - Remove old/broken configs, preserve only GSD + credentials
 - [ ] **Phase 2: Structure** - Document architecture and scaffold clean directories
 
 ## Phase Details
@@ -29,8 +29,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Remove legacy user-level ~/.claude/ files and update settings.json
-- [ ] 01-02-PLAN.md — Remove repo-level .claude/ contents and add .gitkeep placeholder
+- [x] 01-01-PLAN.md — Remove legacy user-level ~/.claude/ files and update settings.json
+- [x] 01-02-PLAN.md — Remove repo-level .claude/ contents and add .gitkeep placeholder
 
 ### Phase 2: Structure
 **Goal**: Document three-layer architecture and create clean scaffolds at each layer
@@ -53,5 +53,5 @@ Phases execute in numeric order: 1 -> 2
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Cleanup | 0/2 | Planned | - |
+| 1. Cleanup | 2/2 | Complete | 2026-01-19 |
 | 2. Structure | 0/? | Not started | - |
