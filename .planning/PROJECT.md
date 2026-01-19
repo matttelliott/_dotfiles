@@ -1,5 +1,16 @@
 # Claude Code Configuration
 
+## Current State
+
+**Shipped:** v1.0 Config Cleanup (2026-01-19)
+
+The three-layer Claude Code configuration architecture is now established:
+- **User layer** (`~/.claude/`): Clean with only GSD + credentials
+- **Portable layer** (`~/.claude/<name>/`): GSD installed via npx
+- **Repo layer** (`.claude/`): Scaffolded with README and subdirectories
+
+Documentation lives in `CLAUDE.md` under "## Claude Code Configuration".
+
 ## What This Is
 
 Cleanup and restructuring of Claude Code configuration for the dotfiles repo. Establishing a clean three-layer config architecture (user / portable / repo-specific) as a foundation for future Claude integrations.
@@ -12,37 +23,36 @@ Clean, organized config structure that makes it obvious where things belong — 
 
 ### Validated
 
-- GSD installed and working at user level (`~/.claude/get-shit-done/`)
-- Auth credentials functional (`~/.claude/.credentials.json`)
-- Dotfiles repo has working Ansible automation for 90+ tools
+- ✓ Remove legacy Claude configs (user + repo level) — v1.0
+- ✓ Design config layer structure (user / portable / repo-specific) — v1.0
+- ✓ Implement clean directory structure at each layer — v1.0
+- ✓ Document what belongs where — v1.0
 
 ### Active
 
-- [ ] Remove old/broken claude configs (everything except GSD + creds)
-- [ ] Design config layer structure (user / portable / repo-specific)
-- [ ] Implement clean directory structure at each layer
-- [ ] Document what belongs where
+(None — define for next milestone)
 
 ### Out of Scope
 
 - Autocommit fixes (Claude awareness, better messages, multi-agent git) — future milestone
 - Feature explorer workflow (explore → propose → demo → configure → promote) — future milestone
-- New hooks or commands — get structure right first
+- MCP server configuration — complexity; defer until needed
 
 ## Context
 
-Brownfield project. The dotfiles repo is mature and working. Previous Claude Code customization attempts were clunky:
+**Tech stack:** Ansible, Bash, YAML
+**Codebase:** Dotfiles repo with 90+ tools, mature and working
 
-- Autocommit hook works but Claude doesn't know about it, tries to commit when nothing to commit
+Previous Claude Code customization attempts were clunky:
+- Autocommit hook works but Claude doesn't know about it
 - Commit messages from hook are poor quality
 - Multiple agents create mangled git history
-- Various experiments (output-styles, plugins, old commands) didn't stick
 
-Starting fresh with just GSD + credentials, then building intentionally.
+Foundation now clean and ready for intentional development.
 
 ## Constraints
 
-- **Preserve GSD**: All GSD functionality must continue working after cleanup
+- **Preserve GSD**: All GSD functionality must continue working
 - **Preserve auth**: Credentials file untouched
 - **Three layers**: user (`~/.claude/`), portable (`~/.claude/<name>/`), repo (`.claude/`)
 
@@ -50,10 +60,12 @@ Starting fresh with just GSD + credentials, then building intentionally.
 
 | Decision                        | Rationale                                              | Outcome   |
 | ------------------------------- | ------------------------------------------------------ | --------- |
-| Keep only GSD + creds           | Previous experiments weren't working well, clean slate | — Pending |
-| Three-layer config architecture | Clear separation: global, portable, project-specific   | — Pending |
-| Cleanup before building         | Foundation first, features later                       | — Pending |
+| Keep only GSD + creds           | Previous experiments weren't working well, clean slate | ✓ v1.0    |
+| Three-layer config architecture | Clear separation: global, portable, project-specific   | ✓ v1.0    |
+| Cleanup before building         | Foundation first, features later                       | ✓ v1.0    |
+| User layer owns scaffold        | Ansible creates dirs, portables populate content       | ✓ v1.0    |
+| Subdirectory .gitkeeps          | Cleaner structure than single root .gitkeep            | ✓ v1.0    |
 
 ---
 
-_Last updated: 2026-01-18 after initialization_
+_Last updated: 2026-01-19 after v1.0 milestone_
