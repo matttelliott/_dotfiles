@@ -1,316 +1,488 @@
-# Architecture: Claude Code Configuration Layering
+# Architecture Research: GSD + Worktree Integration
 
-**Domain:** Claude Code configuration system for dotfiles repo
-**Researched:** 2026-01-18
-**Confidence:** HIGH (verified against official documentation)
+**Domain:** Multi-agent safety through git worktree isolation
+**Researched:** 2026-01-19
+**Confidence:** HIGH (verified against GSD source, git documentation, and community patterns)
 
 ## Executive Summary
 
-Claude Code uses a well-defined hierarchical configuration system with clear precedence rules. The architecture supports three distinct scopes: **user** (`~/.claude/`), **project** (`.claude/`), and **managed** (system-level). Portable configurations like GSD work by installing commands and agents into the user-level directories, making them available across all projects.
+Git worktrees provide filesystem-level isolation for parallel agent execution. Each executor agent operates in a dedicated worktree on its own branch, preventing the file conflicts that occur when multiple agents edit the same working directory simultaneously. The integration with GSD requires modifications at specific orchestrator points: worktree creation during execute-phase setup, coordination during wave execution, and squash-merge cleanup at plan/phase completion.
 
-## Configuration Hierarchy
+## Current GSD Flow
 
-### Load Order (Lowest to Highest Precedence)
-
-```
-1. Defaults (built-in)
-       |
-2. User Settings (~/.claude/settings.json)
-       |
-3. Shared Project Settings (.claude/settings.json)
-       |
-4. Local Project Settings (.claude/settings.local.json)
-       |
-5. Command Line Arguments (--flag)
-       |
-6. Managed Settings (system-level, IT-deployed)
-```
-
-**Key principle:** Higher-precedence settings override lower-precedence settings for scalar values. Arrays are MERGED across scopes.
-
-### Settings File Locations
-
-| Scope   | Location                                                                          | Shared   | Git        | Purpose                                 |
-| ------- | --------------------------------------------------------------------------------- | -------- | ---------- | --------------------------------------- |
-| Managed | `/etc/claude-code/` (Linux) or `/Library/Application Support/ClaudeCode/` (macOS) | Yes (IT) | N/A        | Org-wide policies, cannot be overridden |
-| User    | `~/.claude/settings.json`                                                         | No       | No         | Personal defaults for all projects      |
-| Project | `.claude/settings.json`                                                           | Yes      | Committed  | Team-shared settings                    |
-| Local   | `.claude/settings.local.json`                                                     | No       | Gitignored | Personal project-specific overrides     |
-
-### CLAUDE.md Memory Files
-
-CLAUDE.md files provide context and instructions to Claude. They load in this order:
+### Execute-Phase Architecture (Today)
 
 ```
-1. ~/.claude/CLAUDE.md           # User-level (all projects)
-       |
-2. CLAUDE.md (project root)      # Project-level (team shared)
-       |
-3. .claude/CLAUDE.md             # Alternative project location
-       |
-4. .claude/CLAUDE.local.md       # Local project (gitignored)
-       |
-5. Parent directory CLAUDE.md    # Inherited from parent dirs (monorepo)
-       |
-6. Subdirectory CLAUDE.md        # On-demand when accessing files
+/gsd:execute-phase {phase}
+    |
+    +-- 1. Validate phase exists
+    |
+    +-- 2. Discover plans (find *-PLAN.md, check for *-SUMMARY.md)
+    |
+    +-- 3. Group by wave (read frontmatter wave: N)
+    |
+    +-- 4. Execute waves
+    |       |
+    |       +-- For each wave:
+    |           +-- Spawn gsd-executor for each plan (parallel Task calls)
+    |           +-- Task blocks until completion
+    |           +-- Verify SUMMARYs created
+    |           +-- Proceed to next wave
+    |
+    +-- 5. Commit orchestrator corrections
+    |
+    +-- 6. Spawn gsd-verifier
+    |
+    +-- 7-10. Update roadmap, state, requirements
+    |
+    +-- 11. Offer next steps
 ```
 
-**Parent directory loading:** Claude searches upward from CWD toward root, loading every CLAUDE.md it finds. This enables monorepo patterns.
+### Current Commit Pattern
 
-**Subdirectory loading:** CLAUDE.md files in subdirectories load on-demand when Claude accesses files in those directories.
-
-## Configuration Component Locations
-
-### Complete Directory Structure
-
+Each gsd-executor creates per-task atomic commits directly on the current branch:
 ```
-~/.claude/                           # User-level configuration
-├── CLAUDE.md                        # Global instructions (all projects)
-├── settings.json                    # Global settings
-├── agents/                          # User subagents (available everywhere)
-│   ├── code-reviewer.md
-│   └── debugger.md
-├── commands/                        # User slash commands (available everywhere)
-│   ├── gsd/                         # Namespaced portable commands (GSD)
-│   │   ├── new-project.md
-│   │   └── execute-phase.md
-│   └── init-project.md
-├── hooks/                           # Global hooks scripts
-│   └── auto-commit.sh
-├── output-styles/                   # Output style definitions
-├── get-shit-done/                   # Portable config data (GSD example)
-│   ├── VERSION
-│   ├── templates/
-│   ├── references/
-│   └── workflows/
-└── plugins/                         # Installed plugins
-    └── marketplaces/
-
-.claude/                             # Project-level configuration
-├── CLAUDE.md                        # Project instructions (team shared)
-├── CLAUDE.local.md                  # Local project instructions (gitignored)
-├── settings.json                    # Project settings (committed)
-├── settings.local.json              # Local settings (gitignored)
-├── agents/                          # Project subagents
-├── commands/                        # Project slash commands
-├── hooks/                           # Project hook scripts
-└── skills/                          # Project skills
+feat(01-01): implement auth middleware
+feat(01-01): add user session types
+docs(01-01): complete authentication plan
 ```
 
-## Merge Behavior
+This works for single-agent execution but creates conflicts when Wave 1 spawns multiple executors simultaneously.
 
-### Arrays (MERGED)
+### The Problem with Parallel Execution Today
 
-Arrays in settings files are combined across scopes:
+When Wave 1 contains plans 01-01 and 01-02 executing in parallel:
 
-```json
-// User settings (~/.claude/settings.json)
-{
-  "permissions": {
-    "allow": ["Bash(npm:*)", "Read(.env.example)"]
-  }
+1. Both executors start from same HEAD commit
+2. Both modify files, create commits
+3. One executor pushes successfully
+4. Second executor fails: "Updates were rejected because the tip of your current branch is behind"
+
+Current mitigation: Plans in the same wave must not touch overlapping files. This is fragile and limits parallelization.
+
+## Proposed Integration Points
+
+### Modified Execute-Phase Flow
+
+```
+/gsd:execute-phase {phase}
+    |
+    +-- 1-3. (unchanged) Validate, discover, group
+    |
+    +-- 4. Execute waves (MODIFIED)
+    |       |
+    |       +-- For each wave:
+    |           |
+    |           +-- 4a. CREATE WORKTREES
+    |           |       For each plan in wave:
+    |           |         git worktree add .trees/{phase}-{plan} -b agent/{phase}-{plan}
+    |           |
+    |           +-- 4b. SPAWN EXECUTORS WITH WORKTREE PATH
+    |           |       Task(..., working_dir=".trees/{phase}-{plan}")
+    |           |
+    |           +-- 4c. WAIT FOR COMPLETION
+    |           |
+    |           +-- 4d. MERGE WORKTREE BRANCHES (squash)
+    |           |       For each completed plan:
+    |           |         git checkout master
+    |           |         git merge --squash agent/{phase}-{plan}
+    |           |         git commit -m "{type}({phase}-{plan}): {one-liner from SUMMARY}"
+    |           |
+    |           +-- 4e. CLEANUP WORKTREES
+    |           |       git worktree remove .trees/{phase}-{plan}
+    |           |       git branch -D agent/{phase}-{plan}
+    |           |
+    |           +-- Proceed to next wave
+    |
+    +-- 5-11. (unchanged) Verify, update state, offer next
+```
+
+### Integration Points Summary
+
+| Point | Location | Action |
+|-------|----------|--------|
+| Worktree setup | execute-phase step 4a (new) | Create `.trees/{phase}-{plan}/` with dedicated branch |
+| Executor spawn | execute-phase step 4b (modified) | Pass worktree path to Task tool |
+| Executor work | gsd-executor (modified) | All git operations use worktree path |
+| Squash merge | execute-phase step 4d (new) | Merge with --squash to master |
+| Cleanup | execute-phase step 4e (new) | Remove worktrees and temp branches |
+
+## Agent Coordination
+
+### Isolation Model
+
+```
+master branch
+    |
+    +-- agent/01-01 (worktree: .trees/01-01/)
+    |       |
+    |       +-- commit: feat(01-01): task 1
+    |       +-- commit: feat(01-01): task 2
+    |       +-- commit: docs(01-01): complete plan
+    |
+    +-- agent/01-02 (worktree: .trees/01-02/)
+    |       |
+    |       +-- commit: feat(01-02): task 1
+    |       +-- commit: test(01-02): task 2
+    |       +-- commit: docs(01-02): complete plan
+    |
+    (after wave completes)
+    |
+    +-- squash merge: feat(01-01): JWT auth with refresh rotation
+    +-- squash merge: feat(01-02): User profile CRUD endpoints
+```
+
+### Why This Works
+
+1. **Filesystem isolation**: Each worktree has its own directory (`.trees/01-01/`, `.trees/01-02/`)
+2. **Git isolation**: Each worktree is on a dedicated branch (`agent/01-01`, `agent/01-02`)
+3. **No cross-contamination**: Agents cannot see or modify each other's uncommitted changes
+4. **Shared .git**: All worktrees share the same `.git` directory (disk efficient)
+5. **Sequential merge**: Orchestrator merges worktrees one at a time (no race condition)
+
+### Coordination Flow
+
+```
+Wave 1 Start:
+  Orchestrator: Creates worktrees for plans 01-01, 01-02, 01-03
+  Orchestrator: Spawns 3 executors in parallel
+
+  [Executors work independently - no coordination needed]
+
+  Executor-01: Commits to agent/01-01
+  Executor-02: Commits to agent/01-02
+  Executor-03: Commits to agent/01-03
+
+Wave 1 Complete:
+  Orchestrator: Checkout master
+  Orchestrator: Squash merge agent/01-01 -> master
+  Orchestrator: Squash merge agent/01-02 -> master
+  Orchestrator: Squash merge agent/01-03 -> master
+  Orchestrator: Remove worktrees
+
+Wave 2 Start:
+  [Repeat with fresh worktrees based on new master]
+```
+
+### Handling Merge Conflicts
+
+If squash merge encounters conflicts:
+
+1. **Stop and report**: Don't auto-resolve (could corrupt code)
+2. **Present to user**: Show conflicting files, both versions
+3. **User resolves**: Manual merge resolution
+4. **Continue**: Once resolved, proceed to next plan merge
+
+```markdown
+## Merge Conflict Detected
+
+**Plan:** 01-02 (User profile CRUD)
+**Conflicting with:** Previous merge from 01-01
+
+### Conflicts
+
+| File | Status |
+|------|--------|
+| src/types/user.ts | Both modified |
+| src/utils/validation.ts | Both modified |
+
+### Resolution Options
+
+1. Keep 01-01 version
+2. Keep 01-02 version
+3. Manual merge (open in editor)
+
+Which approach?
+```
+
+## Branch/Merge Strategy
+
+### Branch Naming Convention
+
+```
+master                      # Production-ready code
+  |
+  +-- agent/{phase}-{plan}  # Temporary executor branches
+      |
+      Examples:
+      +-- agent/01-01
+      +-- agent/01-02
+      +-- agent/02-01
+```
+
+### Why `agent/` Prefix
+
+1. **Clear namespace**: Distinguishes from feature branches
+2. **Easy cleanup**: `git branch --list 'agent/*'` finds all
+3. **Signals temporary**: These branches are deleted after merge
+4. **Avoids collision**: Won't conflict with user branches
+
+### Squash Merge Benefits
+
+**Before (current atomic commits):**
+```
+abc1234 feat(01-01): implement auth middleware
+def5678 feat(01-01): add session types
+ghi9012 fix(01-01): correct token expiration
+jkl3456 test(01-01): add auth tests
+mno7890 docs(01-01): complete authentication plan
+```
+
+**After (squash merge):**
+```
+pqr2468 feat(01-01): JWT auth with refresh rotation using jose library
+```
+
+**Benefits:**
+- Clean master history (one commit per plan)
+- Easy to revert entire plan
+- Commit message from SUMMARY.md one-liner (substantive)
+- Git bisect still effective (plan-level granularity)
+- Detailed history preserved in SUMMARY.md
+
+### Commit Message for Squash
+
+```bash
+git merge --squash agent/01-01
+git commit -m "$(cat <<'EOF'
+feat(01-01): JWT auth with refresh rotation using jose library
+
+Phase: 01-auth
+Plan: 01-01-authentication
+Tasks: 5/5 complete
+
+Key deliverables:
+- Auth middleware with token validation
+- Session management with refresh rotation
+- Type definitions for User and Session
+- Integration tests for auth flow
+
+SUMMARY: .planning/phases/01-auth/01-01-SUMMARY.md
+EOF
+)"
+```
+
+### The .trees/ Directory
+
+```
+project-root/
+  +-- .trees/           # All worktrees (gitignored)
+  |     +-- 01-01/      # Worktree for plan 01-01
+  |     +-- 01-02/      # Worktree for plan 01-02
+  |     +-- 02-01/      # Worktree for plan 02-01
+  |
+  +-- .gitignore        # Contains: .trees/
+  +-- .planning/
+  +-- src/
+  +-- ...
+```
+
+**Why .trees/**:
+- Contained within project (no sibling directories)
+- Gitignored (worktrees are temporary)
+- Short path (reduces typing)
+- Matches community convention
+
+## Implementation Approach
+
+### Phase 1: Core Worktree Management
+
+**Deliverables:**
+1. Worktree creation helper
+2. Worktree cleanup helper
+3. .gitignore update for `.trees/`
+
+**Implementation:**
+
+```bash
+# Create worktree for plan execution
+create_worktree() {
+  local plan_id=$1  # e.g., "01-01"
+  local base_branch=${2:-master}
+
+  # Create worktree with dedicated branch
+  git worktree add ".trees/${plan_id}" -b "agent/${plan_id}" "${base_branch}"
+
+  echo ".trees/${plan_id}"
 }
 
-// Project settings (.claude/settings.json)
-{
-  "permissions": {
-    "allow": ["Bash(git:*)", "Edit(src/**)"]
-  }
+# Cleanup after plan completion
+remove_worktree() {
+  local plan_id=$1
+
+  # Remove worktree
+  git worktree remove ".trees/${plan_id}" --force
+
+  # Delete temporary branch
+  git branch -D "agent/${plan_id}"
 }
 
-// Result (merged)
-{
-  "permissions": {
-    "allow": ["Bash(npm:*)", "Read(.env.example)", "Bash(git:*)", "Edit(src/**)"]
-  }
+# Squash merge completed plan
+squash_merge_plan() {
+  local plan_id=$1
+  local commit_msg=$2
+
+  # Ensure on master
+  git checkout master
+
+  # Squash merge
+  git merge --squash "agent/${plan_id}"
+
+  # Commit with message
+  git commit -m "${commit_msg}"
 }
 ```
 
-### Scalars (REPLACED)
+### Phase 2: Execute-Phase Modifications
 
-Non-array settings use highest-precedence value:
+**Modifications to `/gsd:execute-phase`:**
 
-```json
-// User settings
-{ "model": "claude-sonnet-4-5-20250929" }
+1. Add worktree setup before wave execution
+2. Modify Task spawn to include working directory
+3. Add squash merge step after wave completion
+4. Add cleanup step after merge
 
-// Project settings
-{ "model": "claude-opus-4-5-20251101" }
+**Key code changes in execute-phase.md:**
 
-// Result: Project wins
-{ "model": "claude-opus-4-5-20251101" }
+```markdown
+<step name="execute_waves">
+...
+For each wave:
+
+1. **Create worktrees for all plans in wave:**
+   ```bash
+   for plan in $WAVE_PLANS; do
+     git worktree add ".trees/${plan}" -b "agent/${plan}" master
+   done
+   ```
+
+2. **Spawn executors with worktree paths:**
+   ```
+   Task(
+     prompt="Execute plan at {plan_path}...",
+     subagent_type="gsd-executor",
+     working_dir=".trees/{plan_id}"
+   )
+   ```
+
+3. **Wait for completion** (unchanged)
+
+4. **Squash merge each completed plan:**
+   ```bash
+   git checkout master
+   for plan in $COMPLETED_PLANS; do
+     summary_oneliner=$(head -1 ".trees/${plan}/.planning/phases/.../SUMMARY.md" | grep "^#" | sed 's/^# //')
+     git merge --squash "agent/${plan}"
+     git commit -m "feat(${plan}): ${summary_oneliner}"
+   done
+   ```
+
+5. **Cleanup worktrees:**
+   ```bash
+   for plan in $WAVE_PLANS; do
+     git worktree remove ".trees/${plan}" --force
+     git branch -D "agent/${plan}"
+   done
+   ```
+</step>
 ```
 
-## Portable Config Pattern (GSD Example)
+### Phase 3: Executor Modifications
 
-GSD demonstrates the portable configuration pattern:
+**Modifications to `gsd-executor.md`:**
 
-### Installation Structure
+1. Accept working directory from orchestrator
+2. All git commands operate relative to worktree
+3. No change to commit protocol (still atomic per-task)
+4. SUMMARY.md created in worktree's .planning/ directory
 
-```
-~/.claude/
-├── agents/                    # Agents are installed here
-│   ├── gsd-planner.md
-│   ├── gsd-executor.md
-│   └── gsd-verifier.md
-├── commands/
-│   └── gsd/                   # Commands namespaced in subdirectory
-│       ├── new-project.md
-│       ├── execute-phase.md
-│       └── help.md
-├── hooks/
-│   └── gsd-check-update.js    # Hooks for GSD functionality
-└── get-shit-done/             # Supporting data files
-    ├── VERSION
-    ├── templates/
-    ├── references/
-    └── workflows/
-```
+**Key insight:** The executor doesn't need to know it's in a worktree. It operates normally; the orchestrator handles isolation.
 
-### Key Patterns
+### Phase 4: Claude Awareness
 
-1. **Commands in subdirectory:** `/gsd:new-project` vs `/new-project`
-   - Prevents naming collisions
-   - Clear namespace identification
+**Problem:** Claude retries empty commits when nothing changed.
 
-2. **Agents at user level:** Available in all projects
-   - Agents named `gsd-*.md` for namespace clarity
-   - No directory namespacing for agents (flat structure)
+**Solution:** Add pre-commit check to executor:
 
-3. **Supporting data separate:** `~/.claude/get-shit-done/`
-   - Templates, references, workflows stored here
-   - Not in commands/agents directories
-   - Accessed by commands via known paths
+```bash
+# Before attempting commit
+if [ -z "$(git status --porcelain)" ]; then
+  echo "No changes to commit - skipping"
+  return 0
+fi
 
-4. **Hooks for integration:**
-   - SessionStart hook checks for updates
-   - PostToolUse hooks for auto-commit
-
-## Component Precedence
-
-### Slash Commands
-
-```
-Priority (highest to lowest):
-1. --commands CLI flag (session only)
-2. .claude/commands/ (project)
-3. ~/.claude/commands/ (user)
-4. Plugin commands (namespaced)
+# Proceed with commit
+git add ...
+git commit ...
 ```
 
-**When same name exists:** Project command takes precedence; user command silently ignored.
+**Add to gsd-executor deviation rules:**
 
-**Subdirectory behavior:** Commands in subdirectories create namespaced commands. `/frontend/test.md` creates `/test` shown as "(project:frontend)".
+```markdown
+**RULE 0: Never commit nothing**
 
-### Subagents
+Before any commit attempt:
+1. Run `git status --porcelain`
+2. If output is empty, skip commit (not an error)
+3. Log: "No changes to commit for task X"
+4. Continue to next task
 
-```
-Priority (highest to lowest):
-1. --agents CLI flag (session only)
-2. .claude/agents/ (project)
-3. ~/.claude/agents/ (user)
-4. Plugin agents
-```
-
-**When same name exists:** Highest priority location wins.
-
-### Hooks
-
-```
-Hooks from settings.json are merged:
-1. Managed hooks (if allowManagedHooksOnly is set)
-2. User hooks (~/.claude/settings.json)
-3. Project hooks (.claude/settings.json)
-4. Local hooks (.claude/settings.local.json)
+This prevents the "nothing to commit" error loop.
 ```
 
-## Recommended Architecture for Dotfiles
+## Architectural Decisions
 
-### Three-Layer Design
-
-```
-Layer 1: User Config (~/.claude/)
-├── CLAUDE.md                 # Global instructions via Ansible template
-├── settings.json             # Managed by Ansible, contains hooks
-├── agents/                   # User agents (copied by Ansible)
-├── commands/                 # User commands (copied by Ansible)
-├── hooks/                    # Hook scripts (copied by Ansible)
-└── output-styles/            # Output styles (copied by Ansible)
-
-Layer 2: Portable Configs (~/.claude/<name>/)
-└── get-shit-done/            # Example: GSD data
-    └── (managed by npm package, not Ansible)
-
-Layer 3: Repo Config (.claude/)
-├── CLAUDE.md                 # Project-specific instructions (committed)
-├── settings.json             # Project settings (committed)
-├── settings.local.json       # Personal overrides (gitignored)
-├── commands/                 # Project commands (committed)
-├── agents/                   # Project agents (committed)
-└── hooks/                    # Project hook scripts (committed)
-```
-
-### Ansible Responsibilities
-
-**Ansible should manage:**
-
-- `~/.claude/CLAUDE.md` (templated based on host groups)
-- `~/.claude/settings.json` (user-level settings)
-- `~/.claude/agents/` (user agents)
-- `~/.claude/commands/` (user commands, excluding portable)
-- `~/.claude/hooks/` (hook scripts)
-- `~/.claude/output-styles/` (output styles)
-
-**Ansible should NOT manage:**
-
-- Portable configs (they have their own installers)
-- Project-level configs (repo-specific)
-- `settings.local.json` (personal overrides)
-- `CLAUDE.local.md` (personal overrides)
-
-### Portable Config Guidelines
-
-For portable configurations like GSD:
-
-1. **Use dedicated installer:** npm package, script, etc.
-2. **Commands in subdirectory:** `~/.claude/commands/<name>/`
-3. **Agents with prefix:** `~/.claude/agents/<name>-*.md`
-4. **Data in dedicated directory:** `~/.claude/<name>/`
-5. **Avoid name collisions:** Namespace everything
-6. **Version tracking:** Store version in data directory
+| Decision | Rationale | Alternatives Considered |
+|----------|-----------|------------------------|
+| Worktrees over clones | Shared .git saves disk, instant creation | Full clones (slow, wasteful) |
+| Squash merge over rebase | Clean history, easy revert, preserves detail in SUMMARY | Rebase (loses merge point), regular merge (cluttered history) |
+| .trees/ over ../project-01/ | Contained in project, easy gitignore | Sibling directories (scattered, harder to manage) |
+| Per-wave cleanup over end-of-phase | Disk space, reduces stale worktrees | Keep all until phase end (uses more disk, risks stale state) |
+| agent/ branch prefix | Clear namespace, easy to identify | No prefix (collision risk), temp/ (less descriptive) |
 
 ## Anti-Patterns to Avoid
 
-### 1. Mixing Scopes
+### 1. Shared Working Directory
+**Bad:** Multiple executors write to same directory
+**Consequence:** File corruption, merge conflicts, lost work
+**Avoided by:** Worktree isolation
 
-**Bad:** Putting personal settings in project `.claude/settings.json`
-**Good:** Use `.claude/settings.local.json` for personal overrides
+### 2. Long-Lived Agent Branches
+**Bad:** Keep agent branches after merge
+**Consequence:** Branch proliferation, confusion about state
+**Avoided by:** Immediate cleanup after squash merge
 
-### 2. Hardcoding Paths
+### 3. Rebasing Agent Branches
+**Bad:** Rebase agent branch onto master mid-execution
+**Consequence:** Can confuse executor, lose checkpoint state
+**Avoided by:** Each wave starts fresh from current master
 
-**Bad:** `~/.claude/hooks/my-hook.sh` hardcoded in settings
-**Good:** Use `$CLAUDE_PROJECT_DIR` or `$HOME` variables
+### 4. Auto-Resolving Merge Conflicts
+**Bad:** Automatically pick one side in conflicts
+**Consequence:** Silent code loss, bugs
+**Avoided by:** Stop and ask user on any conflict
 
-### 3. Committing Secrets
+### 5. Worktrees Outside Project
+**Bad:** Create worktrees in parent directory (../project-01-01/)
+**Consequence:** Scattered directories, hard to cleanup
+**Avoided by:** .trees/ directory inside project
 
-**Bad:** API keys in `.claude/settings.json`
-**Good:** Use environment variables or `.local` files
+## Scalability Considerations
 
-### 4. Flat Command Namespace
-
-**Bad:** All portable commands in `~/.claude/commands/` root
-**Good:** Group in subdirectories: `~/.claude/commands/gsd/`
-
-### 5. Ignoring Precedence
-
-**Bad:** Assuming user settings always apply
-**Good:** Document that project settings can override
+| Concern | At 3 parallel agents | At 10 parallel agents | Mitigation |
+|---------|---------------------|----------------------|------------|
+| Disk space | ~50MB overhead | ~150MB overhead | Per-wave cleanup |
+| Memory | Minimal | Minimal | Worktrees share .git |
+| Merge time | ~1 second per plan | ~3 seconds per plan | Sequential, fast |
+| Conflict risk | Low (careful planning) | Higher | Better wave assignment |
 
 ## Sources
 
-- [Claude Code Settings Documentation](https://code.claude.com/docs/en/settings) (Official, HIGH confidence)
-- [Claude Code Subagents Documentation](https://code.claude.com/docs/en/sub-agents) (Official, HIGH confidence)
-- [Claude Code Plugins Documentation](https://code.claude.com/docs/en/plugins.md) (Official, HIGH confidence)
-- [Claude Code Slash Commands Documentation](https://code.claude.com/docs/en/slash-commands) (Official, HIGH confidence)
-- [Claude Blog: Using CLAUDE.md Files](https://claude.com/blog/using-claude-md-files) (Official, HIGH confidence)
-- [Settings Hierarchy Guide](https://deepwiki.com/zebbern/claude-code-guide/4.1-settings-hierarchy) (Community, MEDIUM confidence)
+- [Nick Mitchinson: Git Worktrees for Multi-Feature Development](https://www.nrmitchi.com/2025/10/using-git-worktrees-for-multi-feature-development-with-ai-agents/) - Practical workflow patterns (HIGH confidence)
+- [Nx Blog: Git Worktrees and AI Agents](https://nx.dev/blog/git-worktrees-ai-agents) - Isolation benefits (HIGH confidence)
+- [GSD execute-phase.md](~/.claude/commands/gsd/execute-phase.md) - Current orchestrator flow (HIGH confidence, direct source)
+- [GSD gsd-executor.md](~/.claude/agents/gsd-executor.md) - Current executor behavior (HIGH confidence, direct source)
+- [Building a Multi-Agent Development Workflow](https://itsgg.com/blog/2026/01/08/building-a-multi-agent-development-workflow/) - Advisory locks + worktrees pattern (MEDIUM confidence)
+- [ccswarm](https://github.com/nwiizo/ccswarm) - Multi-agent orchestration reference (MEDIUM confidence)
+- [GitHub Docs: Squash and Merge](https://docs.github.com/articles/about-pull-request-merges) - Squash merge mechanics (HIGH confidence)
+- [Git Worktree Documentation](https://git-scm.com/docs/git-worktree) - Official git reference (HIGH confidence)

@@ -1,395 +1,247 @@
-# Feature Landscape: Claude Code Configuration
+# Features Research: Multi-agent Worktree Workflow
 
-**Domain:** Claude Code configuration for dotfiles management
-**Researched:** 2026-01-18
-**Overall Confidence:** HIGH (based on official documentation at code.claude.com)
+**Domain:** Git worktree-based multi-agent isolation for Claude Code
+**Researched:** 2026-01-19
+**Overall Confidence:** HIGH (based on official Claude Code docs + extensive community patterns)
+
+## User Journey
+
+### Current State (The Problem)
+
+Multiple Claude Code agents working in the same directory create git conflicts:
+1. Agent A makes changes, commits
+2. Agent B makes changes, commits
+3. Agent A reverts its work (fixing a bug) - accidentally undoes Agent B's work
+4. Git history becomes a tangled mess of interleaved commits
+5. Squash merging is impossible because commits aren't grouped by feature
+
+### Target State (The Solution)
+
+Each Claude agent operates in an isolated worktree:
+1. User initiates GSD phase execution
+2. GSD creates worktree with feature branch (`git worktree add ../project-feature-x -b feature/phase-01-x`)
+3. Agent works in complete isolation - all commits on its own branch
+4. When phase completes, GSD squash-merges the feature branch to master
+5. Clean history: one squashed commit per phase, traceable to the work done
+
+### Workflow Sequence
+
+```
+User: /gsd:execute-phase phase-01-auth
+
+GSD Orchestrator:
+  1. Check if worktree needed (yes for execution phases)
+  2. Create branch: feature/phase-01-auth
+  3. Create worktree: ../_dotfiles-phase-01-auth/
+  4. Change working directory to worktree
+  5. Execute phase plan
+  6. On completion: squash-merge to master
+  7. Clean up worktree
+  8. Return user to main directory
+
+Result: Clean commit on master like:
+  "feat(phase-01): implement auth system [squashed from 47 commits]"
+```
+
+---
 
 ## Table Stakes
 
-Features users expect from a dotfiles-managed Claude Code configuration.
+Must-have features for this to be usable. Missing = workflow broken.
 
-| Feature                       | Why Expected                            | Complexity | Notes                                |
-| ----------------------------- | --------------------------------------- | ---------- | ------------------------------------ |
-| Global CLAUDE.md              | Defines AI behavior across all projects | Low        | Template with Jinja2 for host groups |
-| User settings.json            | Permission rules, environment vars      | Low        | Static JSON deployed via Ansible     |
-| Project .claude/ structure    | Standard project config location        | Low        | Already exists in this repo          |
-| Git-aware permissions         | Allow git commands, protect secrets     | Low        | Permission rules in settings.json    |
-| Shell tool permissions        | Allow common CLI tools                  | Low        | Bash patterns in allow list          |
-| Gitignore settings.local.json | Personal overrides not committed        | Low        | Claude Code handles automatically    |
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| **Automatic worktree creation** | Core isolation mechanism | Medium | `git worktree add` with branch naming convention |
+| **Automatic worktree cleanup** | Prevent directory sprawl | Low | `git worktree remove` + `git worktree prune` |
+| **Squash merge on completion** | Clean history goal | Low | `git merge --squash` + commit with summary |
+| **Branch per phase** | Isolate phase work | Low | Naming: `feature/phase-{id}` |
+| **Directory naming convention** | Predictable locations | Low | Sibling dirs: `../{project}-{phase}/` |
+| **Graceful failure handling** | Recovery from crashes | Medium | Detect orphaned worktrees, offer cleanup |
+| **Conflict detection before merge** | Prevent bad squashes | Medium | Check for conflicts, pause if found |
+| **Works without node_modules** | Dotfiles is Ansible, no deps | Low | No npm install step needed |
+
+### Critical Path Features
+
+1. **Worktree creation** - Without this, no isolation
+2. **Branch naming** - Without this, can't track what's what
+3. **Squash merge** - Without this, history stays messy
+4. **Cleanup** - Without this, directories accumulate
+
+---
 
 ## Differentiators
 
-Features that enhance the configuration beyond basics.
+Nice-to-have workflow improvements. Enhance the experience but not blocking.
 
-| Feature               | Value Proposition               | Complexity | Notes                               |
-| --------------------- | ------------------------------- | ---------- | ----------------------------------- |
-| Custom slash commands | Codify common workflows         | Low        | Markdown files in .claude/commands/ |
-| Custom subagents      | Specialized AI assistants       | Medium     | Requires prompt engineering         |
-| Pre/Post hooks        | Automated linting, formatting   | Medium     | Shell scripts with JSON stdin       |
-| Conditional rules     | File-type-specific instructions | Low        | YAML frontmatter with paths         |
-| MCP servers           | External tool integrations      | Medium     | Depends on which servers needed     |
-| Context injection     | Dynamic session context         | Medium     | SessionStart hooks                  |
-| Host-specific config  | Different configs per machine   | Medium     | Ansible templating with group_names |
-| Agent Skills          | Modular, reusable capabilities  | Medium     | SKILL.md with frontmatter           |
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| **Pre-merge conflict preview** | See conflicts before they happen | Medium | `git diff main...feature` analysis |
+| **Commit message aggregation** | Generate squash message from individual commits | Medium | Parse `git log` for commit messages |
+| **Session renaming in worktrees** | Claude Code `/rename` auto-set | Low | Name session after phase |
+| **Worktree status dashboard** | See all active worktrees | Low | `git worktree list` with phase mapping |
+| **Auto-stash main changes** | Don't lose uncommitted work | Low | `git stash` before worktree switch |
+| **Parallel phase execution** | Multiple phases at once | High | Multiple worktrees simultaneously |
+| **Hook-based branch isolation** | GitButler-style auto-branching | High | Lifecycle hooks for per-session branches |
+| **Worktree health checks** | Detect stale or broken worktrees | Low | Part of GSD startup |
+| **Phase-specific CLAUDE.md** | Customize behavior per phase | Low | Copy/symlink base config |
+
+### High-Value Differentiators (Recommend for v1.1)
+
+1. **Commit message aggregation** - Makes squash messages meaningful
+2. **Worktree status dashboard** - Visibility into parallel work
+3. **Auto-stash main changes** - Prevents accidental data loss
+
+---
 
 ## Anti-Features
 
-Features to explicitly NOT build. Common mistakes in this domain.
+Things to deliberately NOT build. Either dangerous, complex, or wrong approach.
 
-| Anti-Feature             | Why Avoid                      | What to Do Instead                    |
-| ------------------------ | ------------------------------ | ------------------------------------- |
-| Overly permissive rules  | Security risk, defeats purpose | Specific tool patterns with wildcards |
-| Hardcoded absolute paths | Breaks across machines         | Use $CLAUDE_PROJECT_DIR, $HOME        |
-| Complex hook chains      | Hard to debug, fragile         | Simple, focused scripts               |
-| Duplicated instructions  | Context bloat, conflicts       | Import syntax in CLAUDE.md            |
-| Secrets in settings      | Security vulnerability         | Environment vars, apiKeyHelper        |
-| bypassPermissions mode   | Removes safety guardrails      | Use specific allow rules instead      |
-| Managed settings locally | Requires admin, overkill       | Use user/project settings             |
-| MCP in settings.json     | Wrong file, won't work         | Use .mcp.json instead                 |
+| Anti-Feature | Why Avoid | What to Do Instead |
+|--------------|-----------|-------------------|
+| **Automatic rebase** | Risk of history rewriting, data loss | Use squash merge only (forward-only) |
+| **Force push to remote** | Destructive, affects other users | Only push with `--force-with-lease` if at all |
+| **Auto-delete branches on remote** | Can't recover if merge fails | Manual cleanup after verification |
+| **Shared worktrees between agents** | Defeats isolation purpose | One worktree per agent, always |
+| **npm install in worktrees** | Not needed for this project, adds complexity | Skip for Ansible-based project |
+| **Complex merge strategies** | Hard to debug, unpredictable | Simple squash merge only |
+| **Interactive rebase** | Not automatable, requires user input | Use `--squash` flag instead |
+| **Worktrees inside project dir** | Git confusion, nested repos | Sibling directories only |
+| **Global worktree manager** | Scope creep, over-engineering | GSD-specific, project-local |
+| **Auto-resolve conflicts** | AI conflict resolution is error-prone | Stop and notify user |
 
----
+### Most Important Anti-Features
 
-## Configuration Hierarchy Overview
-
-Claude Code uses a multi-tier configuration system with clear precedence rules. Configuration flows from most general (enterprise) to most specific (local project), with higher specificity taking precedence.
-
-| Priority    | Level               | Location                      | Shared          | Purpose                    |
-| ----------- | ------------------- | ----------------------------- | --------------- | -------------------------- |
-| 1 (highest) | Managed/Enterprise  | System directories            | Org-wide        | IT policies, compliance    |
-| 2           | Project Local       | `.claude/settings.local.json` | No (gitignored) | Personal project overrides |
-| 3           | Project (committed) | `.claude/settings.json`       | Team via git    | Shared team config         |
-| 4           | User                | `~/.claude/settings.json`     | No              | Personal preferences       |
-
-**For dotfiles three-layer goal:**
-
-- **User layer:** `~/.claude/` (deployed via Ansible)
-- **Portable layer:** Symlinked directories or imported files
-- **Repo-specific layer:** `.claude/` in each repository
+1. **Never auto-resolve conflicts** - Always stop and ask the user
+2. **Never force push** - Protect shared history
+3. **Never put worktrees inside project** - Causes git confusion
 
 ---
 
-## Feature Categories
+## GSD Integration Points
 
-### 1. Memory Files (CLAUDE.md)
+How this integrates with existing GSD workflow.
 
-Instructions and context that Claude loads at startup. These are markdown files that Claude treats as suggestions
+### Phase Execution Changes
 
-| Feature                    | User Level             | Project Level                          | Notes                                            |
-| -------------------------- | ---------------------- | -------------------------------------- | ------------------------------------------------ |
-| `CLAUDE.md`                | `~/.claude/CLAUDE.md`  | `./CLAUDE.md` or `./.claude/CLAUDE.md` | Project overrides user                           |
-| `CLAUDE.local.md`          | N/A                    | `./CLAUDE.local.md`                    | Auto-gitignored, personal project prefs          |
-| Rules directory            | `~/.claude/rules/*.md` | `.claude/rules/*.md`                   | Modular instructions                             |
-| Path-scoped rules          | Both                   | Both                                   | Use `paths:` frontmatter for conditional loading |
-| Parent directory recursion | N/A                    | Yes                                    | Walks up from cwd to find CLAUDE.md files        |
-| Subdirectory discovery     | N/A                    | Yes                                    | Loads on-demand when accessing files in subtree  |
-| Imports (`@path/to/file`)  | Both                   | Both                                   | Max 5 hops depth, relative/absolute paths        |
+```
+Current GSD execute-phase:
+  1. Read phase plan
+  2. Execute tasks
+  3. Commit as you go (in main directory)
 
-**Loading order (first loaded = lower priority):**
-
-1. Enterprise policy (system directories)
-2. User-level (`~/.claude/CLAUDE.md`)
-3. Parent directory CLAUDE.md files (walking up from cwd)
-4. Project-level (`./CLAUDE.md` or `.claude/CLAUDE.md`)
-5. Rules directory (`.claude/rules/*.md`)
-6. Project local (`./CLAUDE.local.md`)
-7. Subdirectory CLAUDE.md (on-demand when accessing those files)
-
----
-
-### 2. Settings Files (settings.json)
-
-JSON configuration for permissions, environment, hooks, and behavior settings.
-
-| File                    | Location     | Shared          | Priority                          |
-| ----------------------- | ------------ | --------------- | --------------------------------- |
-| `managed-settings.json` | System dirs  | Org-wide        | 1 (highest, cannot be overridden) |
-| `settings.local.json`   | `.claude/`   | No (gitignored) | 2                                 |
-| `settings.json`         | `.claude/`   | Yes (git)       | 3                                 |
-| `settings.json`         | `~/.claude/` | No              | 4                                 |
-
-**System directories for managed settings:**
-
-- macOS: `/Library/Application Support/ClaudeCode/`
-- Linux: `/etc/claude-code/`
-- Windows: `C:\Program Files\ClaudeCode\`
-
-#### Core Settings
-
-| Setting             | User | Project | Description                          |
-| ------------------- | ---- | ------- | ------------------------------------ |
-| `model`             | Yes  | Yes     | Override default model               |
-| `language`          | Yes  | Yes     | Claude's response language           |
-| `env`               | Yes  | Yes     | Environment variables for sessions   |
-| `cleanupPeriodDays` | Yes  | Yes     | Session cleanup period (default: 30) |
-| `outputStyle`       | Yes  | Yes     | Adjust output verbosity              |
-
-#### Permission Settings
-
-| Setting                                    | User         | Project | Description                   |
-| ------------------------------------------ | ------------ | ------- | ----------------------------- |
-| `permissions.allow`                        | Yes          | Yes     | Allowed tool patterns         |
-| `permissions.ask`                          | Yes          | Yes     | Tools requiring confirmation  |
-| `permissions.deny`                         | Yes          | Yes     | Blocked tool patterns         |
-| `permissions.additionalDirectories`        | Yes          | Yes     | Extra working directories     |
-| `permissions.defaultMode`                  | Yes          | Yes     | Startup permission mode       |
-| `permissions.disableBypassPermissionsMode` | Managed only | No      | Disable dangerous bypass flag |
-
-**Permission rule syntax:**
-
-```json
-{
-  "permissions": {
-    "allow": [
-      "Bash(npm run:*)",
-      "Read(./.env)",
-      "WebFetch(domain:example.com)"
-    ],
-    "deny": ["Bash(curl:*)", "Read(./.env.*)"]
-  }
-}
+New GSD execute-phase with worktrees:
+  1. Read phase plan
+  2. [NEW] Create worktree for phase
+  3. [NEW] cd to worktree
+  4. Execute tasks
+  5. Commit as you go (in worktree, on feature branch)
+  6. [NEW] On completion: squash-merge to master
+  7. [NEW] Clean up worktree
+  8. [NEW] Return to main directory
 ```
 
-#### Sandbox Settings
+### GSD Commands Affected
 
-| Setting                            | User | Project | Description                      |
-| ---------------------------------- | ---- | ------- | -------------------------------- |
-| `sandbox.enabled`                  | Yes  | Yes     | Enable bash sandboxing           |
-| `sandbox.autoAllowBashIfSandboxed` | Yes  | Yes     | Auto-approve bash when sandboxed |
-| `sandbox.excludedCommands`         | Yes  | Yes     | Commands run outside sandbox     |
-| `sandbox.network.*`                | Yes  | Yes     | Network proxy settings           |
+| Command | Change Needed |
+|---------|---------------|
+| `/gsd:execute-phase` | Add worktree creation/cleanup/merge |
+| `/gsd:status` | Show active worktrees |
+| `/gsd:cleanup` | Clean orphaned worktrees |
 
----
+### GSD Files Potentially Affected
 
-### 3. Hooks
-
-Shell commands that run at specific lifecycle events.
-
-| Event               | Matcher | Purpose                                          |
-| ------------------- | ------- | ------------------------------------------------ |
-| `PreToolUse`        | Yes     | Before tool execution, can modify input or block |
-| `PostToolUse`       | Yes     | After tool success, can add context              |
-| `PermissionRequest` | Yes     | When permission dialog shown                     |
-| `UserPromptSubmit`  | No      | When user submits prompt                         |
-| `SessionStart`      | Yes     | On session start/resume                          |
-| `SessionEnd`        | No      | On session end                                   |
-| `Stop`              | No      | When Claude finishes responding                  |
-| `SubagentStop`      | No      | When subagent finishes                           |
-| `PreCompact`        | Yes     | Before context compaction                        |
-| `Notification`      | Yes     | On notifications                                 |
-
-#### Hook Environment Variables
-
-| Variable             | Availability      | Description                       |
-| -------------------- | ----------------- | --------------------------------- |
-| `CLAUDE_PROJECT_DIR` | All hooks         | Project root path                 |
-| `CLAUDE_CODE_REMOTE` | All hooks         | "true" for web environment        |
-| `CLAUDE_ENV_FILE`    | SessionStart only | File path for persisting env vars |
-
-#### Hook Exit Codes
-
-| Exit Code | Behavior                               |
-| --------- | -------------------------------------- |
-| 0         | Success, parse stdout for JSON control |
-| 2         | Blocking error, stderr shown to user   |
-| Other     | Non-blocking error, logged             |
-
----
-
-### 4. Custom Slash Commands
-
-Markdown files that define reusable prompts invoked with `/command-name`.
-
-| Location              | Scope            | Priority |
-| --------------------- | ---------------- | -------- |
-| `.claude/commands/`   | Project (shared) | Higher   |
-| `~/.claude/commands/` | User (personal)  | Lower    |
-
-**Project commands override user commands with the same name.**
-
-#### Command Frontmatter Options
-
-| Option          | Description                  |
-| --------------- | ---------------------------- |
-| `description`   | Brief command description    |
-| `argument-hint` | Expected arguments display   |
-| `allowed-tools` | Tools the command can use    |
-| `model`         | Specific model to use        |
-| `context`       | `fork` for sub-agent context |
-| `agent`         | Agent type when using fork   |
-| `hooks`         | Define execution hooks       |
-
-#### Argument Handling
-
-| Placeholder      | Description                     |
-| ---------------- | ------------------------------- |
-| `$ARGUMENTS`     | All passed arguments            |
-| `$1`, `$2`, etc. | Individual positional arguments |
-
----
-
-### 5. Custom Subagents
-
-Specialized AI assistants with isolated context and custom tool access.
-
-| Location            | Scope           | Priority    |
-| ------------------- | --------------- | ----------- |
-| `--agents` CLI flag | Current session | 1 (highest) |
-| `.claude/agents/`   | Project         | 2           |
-| `~/.claude/agents/` | User            | 3           |
-| Plugin `agents/`    | Plugin scope    | 4 (lowest)  |
-
-#### Subagent Frontmatter Options
-
-| Field             | Required | Description                             |
-| ----------------- | -------- | --------------------------------------- |
-| `name`            | Yes      | Unique identifier                       |
-| `description`     | Yes      | When to delegate to this agent          |
-| `tools`           | No       | Allowed tools (inherits all if omitted) |
-| `disallowedTools` | No       | Tools to deny                           |
-| `model`           | No       | `sonnet`, `opus`, `haiku`, or `inherit` |
-| `permissionMode`  | No       | Permission handling mode                |
-| `skills`          | No       | Skills to load at startup               |
-| `hooks`           | No       | Lifecycle hooks scoped to this agent    |
-
----
-
-### 6. MCP Server Configuration
-
-External tool servers that extend Claude's capabilities.
-
-| File               | Location         | Scope                    |
-| ------------------ | ---------------- | ------------------------ |
-| `.claude.json`     | `~/.claude.json` | User (all projects)      |
-| `.mcp.json`        | Project root     | Project (shared via git) |
-| `managed-mcp.json` | System dirs      | Managed (org-wide)       |
-
-**IMPORTANT:** MCP servers are NOT configured in `settings.json`. They use separate files.
-
-#### MCP Configuration Structure
-
-```json
-{
-  "mcpServers": {
-    "server-name": {
-      "type": "stdio|http|sse",
-      "command": "/path/to/executable",
-      "args": ["--flag", "value"],
-      "env": {
-        "API_KEY": "value"
-      }
-    }
-  }
-}
-```
+| File | Change |
+|------|--------|
+| `execute-phase.md` | Add worktree orchestration logic |
+| `STATE.md` | Track active worktrees per project |
+| New: `WORKTREES.md` | Document worktree conventions |
 
 ---
 
 ## Feature Dependencies
 
 ```
-User settings.json
-    └── Project settings.json (overrides user)
-        └── settings.local.json (overrides both)
+Worktree Creation
+    └── Branch Naming Convention
+        └── Directory Naming Convention
 
-User CLAUDE.md
-    └── Project CLAUDE.md (combines with user)
-        └── .claude/rules/*.md (combines with both)
-            └── CLAUDE.local.md (combines with all)
+Squash Merge
+    └── Conflict Detection
+        └── Graceful Failure Handling
 
-Hooks require:
-    └── Executable scripts with proper permissions
-    └── JSON stdin parsing capability
-    └── Error handling for exit codes
-
-Subagents require:
-    └── Well-crafted system prompts
-    └── Appropriate tool restrictions
-    └── Clear delegation triggers (description field)
+Cleanup
+    └── Worktree Health Checks
+        └── Orphan Detection
 ```
+
+### Implementation Order
+
+Based on dependencies:
+
+1. **Directory and branch naming conventions** (no code, just decisions)
+2. **Worktree creation** (basic `git worktree add`)
+3. **Worktree cleanup** (basic `git worktree remove`)
+4. **Conflict detection** (check before merge)
+5. **Squash merge** (the payoff)
+6. **GSD integration** (wire it all together)
 
 ---
 
 ## MVP Recommendation
 
-For MVP, prioritize:
+For v1.1, prioritize:
 
-1. **User-level CLAUDE.md** - Template with host group conditions
-2. **User-level settings.json** - Common permission rules
-3. **Enhance existing project .claude/** - Add missing pieces
+1. **Automatic worktree creation** - Core feature
+2. **Branch naming convention** - `feature/phase-{id}`
+3. **Directory naming** - `../{project}-{phase}/`
+4. **Squash merge on completion** - The whole point
+5. **Automatic cleanup** - Prevent sprawl
+6. **Basic conflict detection** - Stop if conflicts exist
 
-Defer to post-MVP:
+Defer to post-v1.1:
 
-- **Portable configs**: Complex, may not be needed
-- **MCP servers**: Project-specific, not dotfiles concern
-- **Complex hooks**: Start simple, add as needed
-- **Skills directory**: Start with commands/agents first
-
----
-
-## Three-Layer Strategy for Dotfiles
-
-### Layer 1: User Config (`~/.claude/`)
-
-Deployed via Ansible to all machines:
-
-```
-~/.claude/
-├── CLAUDE.md              # User-wide instructions
-├── settings.json          # User permissions, model prefs
-├── commands/              # Personal slash commands
-├── agents/                # Personal subagents
-└── rules/                 # Personal rules
-```
-
-### Layer 2: Portable Config (Symlinked or Imported)
-
-Shareable configurations (like GSD) that can be added to any repo:
-
-**Option A: Symlinks**
-
-```bash
-ln -s ~/portable-configs/gsd-agents .claude/agents/gsd
-ln -s ~/portable-configs/gsd-commands .claude/commands/gsd
-```
-
-**Option B: Imports in CLAUDE.md**
-
-```markdown
-# Project Instructions
-
-@~/portable-configs/gsd/instructions.md
-```
-
-### Layer 3: Repo-Specific Config (`.claude/`)
-
-Checked into each repository:
-
-```
-.claude/
-├── settings.json          # Project hooks, permissions
-├── settings.local.json    # Personal project overrides (gitignored)
-├── commands/              # Project-specific commands
-├── agents/                # Project-specific subagents
-└── rules/                 # Project-specific rules
-```
-
----
-
-## Key Limitations
-
-1. **MCP servers use separate files** - Cannot be configured in `settings.json`
-2. **Skills don't inherit to subagents** - Must explicitly list in `skills:` field
-3. **Rules `paths:` field uses globs** - Not regex patterns
-4. **Hook timeout default is 60 seconds** - Configurable per hook
-5. **Import depth limited to 5 hops** - Prevent circular dependencies
+- **Parallel phase execution** - Complex, not urgent
+- **Hook-based auto-branching** - GitButler integration is separate
+- **Worktree health dashboard** - Nice but not critical
+- **Commit message aggregation** - Can manually write squash messages
 
 ---
 
 ## Sources
 
-- [Claude Code Settings](https://code.claude.com/docs/en/settings) - Official settings reference
-- [Claude Code Memory](https://code.claude.com/docs/en/memory) - CLAUDE.md and rules documentation
-- [Claude Code Hooks](https://code.claude.com/docs/en/hooks) - Hooks reference
-- [Claude Code Slash Commands](https://code.claude.com/docs/en/slash-commands) - Commands documentation
-- [Claude Code Sub-agents](https://code.claude.com/docs/en/sub-agents) - Custom subagents reference
-- [Claude Code MCP](https://code.claude.com/docs/en/mcp) - MCP server configuration
+### Official Documentation (HIGH confidence)
+
+- [Claude Code Hooks Guide](https://code.claude.com/docs/en/hooks-guide) - Lifecycle events and configuration
+- [Claude Code Common Workflows](https://code.claude.com/docs/en/common-workflows) - Git worktree patterns
+- [Claude Code Best Practices](https://www.anthropic.com/engineering/claude-code-best-practices) - Anthropic's recommendations
+
+### Community Patterns (MEDIUM confidence, verified with official docs)
+
+- [Nick Mitchinson: Git Worktrees for Multi-Feature Development with AI Agents](https://www.nrmitchi.com/2025/10/using-git-worktrees-for-multi-feature-development-with-ai-agents/)
+- [Agent Interviews: Parallel AI Coding with Git Worktrees](https://docs.agentinterviews.com/blog/parallel-ai-coding-with-gitworktrees/)
+- [Nx Blog: How Git Worktrees Changed My AI Agent Workflow](https://nx.dev/blog/git-worktrees-ai-agents)
+- [GitButler: Claude Code Hooks for Branch Management](https://blog.gitbutler.com/automate-your-ai-workflows-with-claude-code-hooks/)
+- [Simon Willison: Embracing the Parallel Coding Agent Lifestyle](https://simonwillison.net/2025/Oct/5/parallel-coding-agents/)
+
+### Git Documentation (HIGH confidence)
+
+- [Git Worktree Documentation](https://git-scm.com/docs/git-worktree) - Official git reference
+- [DataCamp: Git Worktree Tutorial](https://www.datacamp.com/tutorial/git-worktree-tutorial) - Commands and patterns
+
+### Known Limitations Research (MEDIUM confidence)
+
+- [Lobsters Discussion: Git Worktree Issues](https://lobste.rs/s/ikbbnt/how_i_use_git_worktrees) - node_modules and dependency gotchas
+- [GitHub Issue #16293](https://github.com/anthropics/claude-code/issues/16293) - Built-in auto-commit safety settings request
+
+---
+
+## Confidence Assessment
+
+| Area | Confidence | Reason |
+|------|------------|--------|
+| Git worktree mechanics | HIGH | Official git documentation, well-established feature |
+| Claude Code hooks | HIGH | Official documentation verified via WebFetch |
+| Community patterns | MEDIUM | Multiple sources agree, but not official Anthropic guidance |
+| GSD integration points | MEDIUM | Based on understanding of GSD, not yet validated |
+| Feature priorities | MEDIUM | Based on stated project goals, may need adjustment |

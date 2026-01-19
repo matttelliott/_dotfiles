@@ -1,199 +1,172 @@
 # Project Research Summary
 
-**Project:** Dotfiles Claude Code Configuration
-**Domain:** Developer tools configuration and automation
-**Researched:** 2026-01-18
+**Project:** Claude Code Configuration v1.1
+**Domain:** Git worktree multi-agent isolation
+**Researched:** 2026-01-19
 **Confidence:** HIGH
 
 ## Executive Summary
 
-Claude Code uses a well-documented hierarchical configuration system with three primary scopes: user (`~/.claude/`), project (`.claude/`), and managed (system-level). For a dotfiles-managed deployment, Ansible should own the user-level configuration while respecting that project-level configs are repo-specific and portable configs (like GSD) have their own installers. The configuration stack is entirely YAML, JSON, and Markdown with no external runtime dependencies.
+Git worktrees are the right tool for multi-agent isolation in Claude Code workflows. Built into Git since v2.5 (current is v2.52), worktrees provide true filesystem isolation while sharing Git history with zero additional dependencies. The core pattern is straightforward: create a dedicated worktree with feature branch for each executing phase, let agents commit freely within their isolated workspace, then squash-merge to master for clean history. This solves the fundamental problem of parallel agents creating interleaved commits and file conflicts when working in the same directory.
 
-The recommended approach is to implement a three-layer architecture: (1) Ansible-templated user config deployed to all machines via host groups, (2) portable configs installed independently to `~/.claude/<name>/`, and (3) repo-specific configs committed to each project. Settings files merge arrays across scopes but replace scalars, meaning user-level permission rules combine with project rules while model preferences are overridden. Memory files (CLAUDE.md) combine additively with later files having higher precedence.
+The recommended implementation integrates worktree lifecycle management directly into the GSD execute-phase command. When a phase begins, the orchestrator creates `.trees/{phase-id}/` with a dedicated `agent/{phase-id}` branch. The executor agent works in complete isolation, making atomic commits as it progresses. Upon completion, the orchestrator squash-merges the feature branch to master with a substantive commit message derived from the phase summary, then cleans up the worktree and temporary branch. This preserves detailed work history in SUMMARY.md files while maintaining a clean, bisectable master branch.
 
-Key risks center on hook implementation (exit code 2 required for blocking, not exit code 1), git automation (Claude bypasses pre-commit hooks with --no-verify), and multi-agent conflicts (parallel sessions corrupt shared files). All risks have well-documented mitigations: test hooks thoroughly, deny direct git commit access, and use git worktrees for parallel work.
+The key risks are merge conflicts when parallel agents modify shared files, orphaned worktrees from incomplete cleanups, and the cognitive overhead of managing multiple parallel contexts. These are mitigated by clear file ownership rules in agent CLAUDE.md files, automated cleanup in the GSD workflow, and limiting parallelization to 2-3 agents maximum. The dotfiles project is particularly well-suited for this approach since it has no npm/node dependencies requiring per-worktree installation.
 
 ## Key Findings
 
 ### Recommended Stack
 
-Claude Code configuration uses native formats with no build step required.
+Native git worktree commands with thin shell wrappers provide the ideal balance of simplicity and capability. Heavy tooling like workmux is unnecessary for this use case. The stack is entirely built-in to Git with no external dependencies.
 
 **Core technologies:**
-- **JSON**: `settings.json` for permissions, hooks, environment vars, and behavior
-- **Markdown**: `CLAUDE.md` for memory/instructions, commands in `.claude/commands/`, agents in `.claude/agents/`
-- **Shell scripts**: Hook executables that receive JSON via stdin
-- **Ansible**: Template-based deployment with Jinja2 conditionals for host groups
+- **Git worktree (built-in):** Filesystem isolation with shared .git directory - mature, well-documented, zero setup
+- **Squash merge:** Clean history with one commit per phase - standard git workflow
+- **Shell wrapper functions:** `gsd-worktree-add`, `gsd-worktree-merge`, `gsd-worktree-list` - simple, integrates with existing zsh setup
 
-**Critical version requirements:** None. Configuration format is stable across Claude Code versions.
+**Not recommended:**
+- workmux (Rust CLI) - overkill for this project, adds tmux dependency
+- Custom tooling - native git commands are sufficient
+- Bare repository pattern - adds complexity without benefit for single-machine workflows
 
 ### Expected Features
 
 **Must have (table stakes):**
-- Global `CLAUDE.md` with host-group-aware templating
-- User `settings.json` with common permission rules (git, npm, shell tools)
-- Existing project `.claude/` structure maintained
-- Gitignored `settings.local.json` for personal overrides
+- Automatic worktree creation on phase start (`git worktree add .trees/{phase} -b agent/{phase}`)
+- Automatic worktree cleanup on phase completion (`git worktree remove` + `git branch -D`)
+- Squash merge with meaningful commit messages (derived from SUMMARY.md)
+- Branch per phase (naming convention: `agent/{phase-id}`)
+- Graceful failure handling (detect orphaned worktrees, offer cleanup)
+- Conflict detection before merge (stop and notify user, never auto-resolve)
 
 **Should have (competitive):**
-- Custom slash commands for common workflows
-- Custom subagents for specialized tasks
-- Pre/Post hooks for automated linting and formatting
-- Conditional rules via YAML frontmatter with path patterns
-- Host-specific config via Ansible group_names
+- Commit message aggregation (generate squash message from individual commits)
+- Worktree status dashboard (`git worktree list` with phase mapping)
+- Auto-stash main changes before worktree creation
+- Pre-merge conflict preview (`git diff main...agent/{phase}`)
 
 **Defer (v2+):**
-- MCP server integration (project-specific, not dotfiles concern)
-- Complex hook chains (start simple, add as needed)
-- Portable config management (GSD has its own installer)
-- Skills directory (commands/agents suffice initially)
+- Parallel phase execution (multiple worktrees simultaneously)
+- Hook-based branch isolation (GitButler-style auto-branching)
+- Integration with external tools (tmux, workmux)
+- Cross-repository worktree management
 
 ### Architecture Approach
 
-The architecture follows Claude Code's native hierarchy: user config provides defaults, project config overrides for team sharing, and local config handles personal preferences. Arrays merge (permissions accumulate), scalars replace (model preference wins).
+The architecture centers on modifying GSD execute-phase to manage worktree lifecycle. The orchestrator creates worktrees before spawning executors, passes worktree paths to Task calls, waits for completion, then handles sequential squash-merge and cleanup. This pattern maintains executor simplicity - the executor doesn't need to know it's in a worktree; it operates normally while the orchestrator handles isolation.
 
 **Major components:**
-1. **User layer (`~/.claude/`)** — Ansible-deployed global defaults: CLAUDE.md template, settings.json, user commands/agents
-2. **Project layer (`.claude/`)** — Repo-committed team config: project-specific rules, hooks, commands
-3. **Local layer (`settings.local.json`, `CLAUDE.local.md`)** — Personal overrides, auto-gitignored
+1. **Worktree Creation (execute-phase step 4a):** Create `.trees/{phase-id}/` with dedicated branch before spawning executors
+2. **Executor Spawn (execute-phase step 4b):** Pass `working_dir=".trees/{phase-id}"` to Task tool
+3. **Squash Merge (execute-phase step 4d):** Sequential merge of completed worktrees to master with substantive commit messages
+4. **Cleanup (execute-phase step 4e):** Remove worktrees and temporary branches, run `git worktree prune`
 
-**Key patterns:**
-- Commands in subdirectories create namespaces: `~/.claude/commands/gsd/` becomes `/gsd:command`
-- Agents use flat naming with prefixes: `gsd-planner.md`, `gsd-executor.md`
-- Hooks configured in settings.json, scripts stored in `~/.claude/hooks/`
-- Supporting data for portables in `~/.claude/<name>/`
+**Directory structure:**
+```
+project-root/
+  +-- .trees/           # All worktrees (gitignored)
+  |     +-- 01-01/      # Worktree for plan 01-01
+  |     +-- 01-02/      # Worktree for plan 01-02
+  +-- .planning/        # GSD planning files
+  +-- tools/            # Dotfiles tools
+```
 
 ### Critical Pitfalls
 
-1. **Hook exit code 2 required for blocking** — Exit code 1 does NOT block operations; use exit 2 or return `{"decision": "block"}` JSON with exit 0
-2. **Claude bypasses pre-commit hooks** — Uses `--no-verify` to force commits; deny direct git commit and use controlled flow
-3. **Multi-agent file conflicts** — Parallel sessions overwrite each other; use git worktrees for isolation
-4. **Permission bypass bug** — Git commands may ignore "ask" rules; use "deny" for critical operations during affected versions
-5. **Bloated CLAUDE.md** — Over 100-150 lines dilutes instructions; keep minimal, use subdirectory CLAUDE.md for context-specific rules
+1. **Same file modified by multiple agents (M1):** Without explicit coordination, agents independently modify shared files (configs, types, utils). Prevent by defining file ownership in each agent's CLAUDE.md and designating shared files as "propose changes, don't commit."
+
+2. **Orphaned worktree metadata (W5):** Using `rm -rf` instead of `git worktree remove` leaves stale metadata. Always use proper git commands; include `git worktree prune` in cleanup workflow.
+
+3. **Squash merge loses granular history (C1):** Large squashed commits make `git bisect` ineffective. Mitigate by keeping phases small enough for meaningful squash commits and preserving detail in SUMMARY.md and squash commit messages.
+
+4. **Branch already checked out error (W1):** Git prevents checking out the same branch in multiple worktrees. Always create NEW branches with worktrees (`git worktree add -b agent/{phase}`), never reuse existing branches.
+
+5. **Phase completion without proper merge (GSD2):** Forgetting the merge step leaves changes stranded in worktrees. Enforce completion checklist in GSD workflow: merge to main, delete worktree, delete branch, update state.
 
 ## Implications for Roadmap
 
 Based on research, suggested phase structure:
 
-### Phase 1: User Layer Foundation
+### Phase 1: Worktree Foundation
 
-**Rationale:** User-level config must exist before project configs can reference or override it. This establishes the base layer that all other configs build upon.
+**Rationale:** Core worktree management must exist before GSD integration can use it.
+**Delivers:** Shell wrapper functions, directory conventions, .gitignore setup
+**Addresses:** Automatic worktree creation, cleanup, branch naming convention
+**Avoids:** W1 (branch checkout error), W5 (orphaned metadata) by building checks into helpers
 
-**Delivers:**
-- Ansible playbook for `~/.claude/` directory structure
-- Templated `CLAUDE.md` with host-group conditionals
-- Base `settings.json` with common permission rules
-- Directory scaffolding for commands/, agents/, hooks/
+### Phase 2: GSD Execute-Phase Integration
 
-**Addresses:** Global CLAUDE.md, user settings.json, git-aware permissions, shell tool permissions
+**Rationale:** GSD is the orchestration layer; worktree lifecycle belongs in execute-phase, not executors.
+**Delivers:** Modified execute-phase with worktree creation, executor spawn with working_dir, squash merge, cleanup
+**Uses:** Shell wrappers from Phase 1
+**Implements:** Orchestrator integration architecture from ARCHITECTURE.md
+**Avoids:** GSD1 (execution without worktree), GSD2 (completion without merge)
 
-**Avoids:** Hardcoded paths (use $HOME variables), secrets in settings (use environment vars)
+### Phase 3: Squash Merge and History
 
-### Phase 2: Permission and Hook System
+**Rationale:** Squash merge is the payoff but requires the integration layer to be in place first.
+**Delivers:** Commit message generation from SUMMARY.md, conflict detection, proper cleanup sequence
+**Addresses:** Clean history goal, meaningful commit messages
+**Avoids:** C1 (loses history), C2 (reusing squashed branches)
 
-**Rationale:** Permissions and hooks provide the safety layer that prevents the critical pitfalls. Must be in place before automating any git operations.
+### Phase 4: Claude Empty Commit Awareness
 
-**Delivers:**
-- Permission rules for git, npm, common CLIs
-- Pre/Post hook scripts with proper exit codes
-- Hook validation testing approach
-- Attribution configuration for commit messages
-
-**Uses:** settings.json hooks configuration, shell scripts
-
-**Implements:** Hook architecture from ARCHITECTURE.md
-
-**Avoids:** Exit code 1 confusion (test with exit 2), hook template variable bugs (use stdin JSON parsing)
-
-### Phase 3: Custom Commands and Agents
-
-**Rationale:** Commands and agents build on the permission/hook foundation. They provide workflow automation that respects the safety guardrails.
-
-**Delivers:**
-- User-level slash commands for common workflows
-- User-level subagents for specialized tasks
-- Command namespace conventions
-- Agent naming conventions
-
-**Addresses:** Custom slash commands, custom subagents differentiators
-
-**Avoids:** Flat command namespace (use subdirectories), poor commit messages (explicit format in commit command)
-
-### Phase 4: Host-Specific Configuration
-
-**Rationale:** Once the base config is stable, add host-group variations for different machine types (macs, debian, arch, with_gui_tools, etc.).
-
-**Delivers:**
-- Jinja2 conditionals in CLAUDE.md template
-- Host-group-specific permission rules
-- Machine-type-aware defaults
-
-**Uses:** Ansible group_names, existing inventory structure
-
-### Phase 5: Project Config Enhancement
-
-**Rationale:** Finally, enhance the existing `.claude/` in this dotfiles repo as the reference implementation.
-
-**Delivers:**
-- Enhanced project settings.json with hooks
-- Project-specific commands for dotfiles workflows
-- Documentation for other repos to follow pattern
-
-**Addresses:** Project .claude/ structure, existing project enhancement
+**Rationale:** Separate concern that can be addressed after core workflow works.
+**Delivers:** Pre-commit check in executor to skip empty commits, updated deviation rules
+**Addresses:** Stops Claude from retrying "nothing to commit" errors
+**Avoids:** CL4 (commit retry loops)
 
 ### Phase Ordering Rationale
 
-- **Phases 1-2 first:** Must establish user config and safety layer before any automation
-- **Phase 2 before 3:** Hooks enforce safety that commands rely on
-- **Phase 3 before 4:** Base commands work before adding host variations
-- **Phase 4 before 5:** User config complete before using as reference for project config
+- **Foundation before integration:** Worktree helpers (Phase 1) must exist before GSD can call them (Phase 2)
+- **Integration before payoff:** Squash merge (Phase 3) requires the worktree lifecycle to be wired into GSD
+- **Core before polish:** Empty commit handling (Phase 4) is an improvement to existing behavior, not blocking
+- **Risk mitigation front-loaded:** Phases 1-2 address the most critical pitfalls (W1, W5, GSD1, GSD2)
 
 ### Research Flags
 
-**Phases likely needing deeper research during planning:**
-- **Phase 2 (Hooks):** Test exit code behavior extensively; known bugs in PostToolUse blocking
-- **Phase 3 (Commands/Agents):** Subagent prompt engineering requires iteration
+Phases likely needing deeper research during planning:
+- **Phase 2:** GSD execute-phase internals need careful review to understand exact modification points
+- **Phase 3:** Commit message generation from SUMMARY.md may need iteration on format
 
-**Phases with standard patterns (skip research-phase):**
-- **Phase 1 (Foundation):** Well-documented file locations and formats
-- **Phase 4 (Host-Specific):** Standard Ansible templating, no Claude-specific complexity
-- **Phase 5 (Project Config):** Same patterns as Phase 1-3, applied to project scope
+Phases with standard patterns (skip research-phase):
+- **Phase 1:** Git worktree commands are well-documented; shell wrapper is straightforward
+- **Phase 4:** Simple conditional check before commit; well-understood pattern
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | Official documentation, JSON schema available |
-| Features | HIGH | Official docs, community consensus on best practices |
-| Architecture | HIGH | Official hierarchy documented, verified precedence rules |
-| Pitfalls | HIGH | GitHub issues confirm bugs, community experiences validate |
+| Stack | HIGH | Official git documentation, no external dependencies |
+| Features | HIGH | Community consensus + official Claude Code docs |
+| Architecture | HIGH | Direct review of GSD source + established worktree patterns |
+| Pitfalls | HIGH | Multiple independent sources with consistent findings |
 
 **Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **Hook exit code bugs:** Known issues (#4809, #2814) may affect behavior; test thoroughly and monitor for fixes
-- **Permission bypass bug (#13009):** Verify if resolved before relying on "ask" for critical operations
-- **Portable config interaction:** GSD and Ansible-managed configs must not conflict; namespace carefully
+- **Task tool working_dir parameter:** Architecture assumes Task can accept working directory. Verify during Phase 2 planning.
+- **Executor path handling:** May need to use absolute paths in executors when spawned in worktree context.
+- **SUMMARY.md one-liner extraction:** Need to define exact format for extracting commit message from SUMMARY.md.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- [Claude Code Settings](https://code.claude.com/docs/en/settings) — permissions, hooks, hierarchy
-- [Claude Code Memory](https://code.claude.com/docs/en/memory) — CLAUDE.md loading order
-- [Claude Code Hooks Reference](https://code.claude.com/docs/en/hooks) — exit codes, stdin format
-- [Claude Code Slash Commands](https://code.claude.com/docs/en/slash-commands) — command format
-- [Claude Code Sub-agents](https://code.claude.com/docs/en/sub-agents) — agent configuration
-- [JSON Schema](https://json.schemastore.org/claude-code-settings.json) — settings.json structure
+- [Git Worktree Documentation](https://git-scm.com/docs/git-worktree) - Authoritative command reference
+- [Claude Code Common Workflows](https://code.claude.com/docs/en/common-workflows) - Official Anthropic worktree guidance
+- [Claude Code Hooks Guide](https://code.claude.com/docs/en/hooks-guide) - Lifecycle events and configuration
 
 ### Secondary (MEDIUM confidence)
-- GitHub Issues #2814, #4809, #4834, #13009 — known bugs and workarounds
-- [Anthropic Engineering Blog](https://www.anthropic.com/engineering/claude-code-best-practices) — best practices
-- [GitButler Blog](https://blog.gitbutler.com/parallel-claude-code) — multi-agent isolation
+- [incident.io: Shipping faster with Claude Code and Git Worktrees](https://incident.io/blog/shipping-faster-with-claude-code-and-git-worktrees) - Production team workflow
+- [Nick Mitchinson: Git Worktrees for Multi-Feature Development](https://www.nrmitchi.com/2025/10/using-git-worktrees-for-multi-feature-development-with-ai-agents/) - Practical patterns
+- [Simon Willison: Parallel Coding Agent Lifestyle](https://simonwillison.net/2025/Oct/5/parallel-coding-agents/) - Multi-agent coordination
+- [DNSimple: Two Years of Squash Merge](https://blog.dnsimple.com/2019/01/two-years-of-squash-merge/) - Squash merge tradeoffs
 
 ### Tertiary (LOW confidence)
-- Community guides (eesel.ai, alexop.dev) — CLAUDE.md best practices, needs validation against official docs
+- [GitHub Issue #16293](https://github.com/anthropics/claude-code/issues/16293) - Autocommit feature request (confirms no built-in feature)
+- [GitHub Issue #4963](https://github.com/anthropics/claude-code/issues/4963) - Worktree orchestration request
 
 ---
-*Research completed: 2026-01-18*
+*Research completed: 2026-01-19*
 *Ready for roadmap: yes*

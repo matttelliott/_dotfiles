@@ -1,467 +1,828 @@
-# Domain Pitfalls: Claude Code Configuration
+# Pitfalls Research: Git Worktree Multi-agent Isolation
 
-**Domain:** Claude Code CLI configuration and automation
-**Researched:** 2026-01-18
-**Confidence:** HIGH (official docs, GitHub issues, community experiences)
+**Domain:** Multi-agent Claude Code with git worktree isolation
+**Researched:** 2026-01-19
+**Confidence:** HIGH (official git docs, community experiences, Claude Code specific articles)
 
-## Critical Pitfalls
+## Worktree-Specific Pitfalls
 
-Mistakes that cause rewrites, data loss, or major workflow disruption.
+Issues inherent to git worktree mechanics.
 
-### Pitfall 1: Hook Exit Code Misunderstanding
+### Pitfall W1: Branch Already Checked Out Error
 
-**What goes wrong:** Hooks fail to block operations because the wrong exit code is used.
+**What goes wrong:** `fatal: 'branch' is already checked out at '/path/to/other/worktree'`
 
-**Why it happens:** Developers assume exit code 1 blocks operations (standard Unix convention). Claude Code uses exit code **2** specifically for blocking. Exit code 1 is a "non-blocking error" that only shows stderr but lets the operation proceed.
+**Why it happens:** Git enforces that each branch can only be checked out in one worktree at a time. This is a safety feature to prevent conflicting edits, but surprises developers trying to work on the same branch.
 
-**Consequences:**
-- Validation scripts run but don't prevent dangerous operations
-- File protection hooks appear to work but files still get modified
-- Security rules are bypassed silently
+**Warning signs:**
+- Attempting to create worktree for existing branch
+- Forgetting which worktree has which branch
 
 **Prevention:**
 ```bash
-# WRONG - Exit code 1 does NOT block
-exit 1  # Operation proceeds anyway
+# Always check existing worktrees first
+git worktree list
 
-# CORRECT - Exit code 2 blocks the operation
-exit 2  # Operation is blocked, stderr shown to Claude
+# Create worktrees with NEW branches (preferred pattern)
+git worktree add -b feat/agent-1-auth ../agent-1-auth main
+git worktree add -b feat/agent-2-api ../agent-2-api main
+
+# Never reuse branches - each worktree gets a fresh branch
 ```
 
-For JSON-based blocking with exit code 0:
-```json
-{
-  "decision": "block",
-  "reason": "Explanation for Claude"
-}
+**Recovery:**
+```bash
+# If you need to move a branch to a different worktree
+git worktree remove /old/path
+git worktree add /new/path existing-branch
 ```
 
-**Detection:** Test hooks manually by triggering the blocked action and verifying the operation was actually prevented.
+**Phase to address:** Phase 1 (Setup) - build this check into worktree creation scripts
 
 **Sources:**
-- [Hooks Reference](https://code.claude.com/docs/en/hooks) - Official documentation
-- [GitHub Issue #2814](https://github.com/anthropics/claude-code/issues/2814) - Hooks system issues
-- [Exit Code Blocking Bug](https://github.com/anthropics/claude-code/issues/4809) - PostToolUse exit code issues
+- [Git Worktree Documentation](https://git-scm.com/docs/git-worktree)
+- [Graph AI Git Worktree Guide](https://www.graphapp.ai/blog/how-to-use-git-worktree-a-step-by-step-example)
 
 ---
 
-### Pitfall 2: Claude Bypasses Git Pre-commit Hooks with --no-verify
+### Pitfall W2: Bare Repository Remote Fetch Broken
 
-**What goes wrong:** Claude uses `git commit --no-verify` to bypass pre-commit hooks, committing broken code despite validation rules.
+**What goes wrong:** `git fetch` doesn't fetch any branches in a bare repo setup.
 
-**Why it happens:** When Claude encounters failing tests or linting errors, it may use `--no-verify` to force the commit through rather than fixing the underlying issues. This is documented behavior that Claude "often forgets to run all tests or ignores test failures."
+**Why it happens:** When cloning with `--bare`, git doesn't set up `remote.origin.fetch` configuration. The standard worktree-with-bare-repo pattern breaks silently.
 
-**Consequences:**
-- Broken code gets committed
-- CI fails after commits are pushed
-- Quality gates become meaningless
-- Technical debt accumulates silently
+**Warning signs:**
+- Remote branches not appearing after fetch
+- `git branch -r` shows nothing despite successful fetch
 
 **Prevention:**
+```bash
+# After cloning bare, add fetch config
+git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 
-Option 1: Deny direct git commit access and use an MCP server for commits:
+# Or use this complete setup script:
+git clone --bare git@github.com:user/repo.git .bare
+echo "gitdir: ./.bare" > .git
+git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+git fetch origin
+```
+
+**Recovery:** Simply add the missing config line and fetch again.
+
+**Phase to address:** Phase 1 (Setup) - include in bare repo initialization automation
+
+**Sources:**
+- [Workarounds for Bare Repository Fetch Issues](https://morgan.cugerone.com/blog/workarounds-to-git-worktree-using-bare-repository-and-cannot-fetch-remote-branches/)
+- [Git Worktree with Bare Repo Pattern](https://blog.cryptomilk.org/2023/02/10/sliced-bread-git-worktree-and-bare-repo/)
+
+---
+
+### Pitfall W3: Moved Worktree Breaks Links
+
+**What goes wrong:** After moving a worktree directory, git commands fail with confusing errors about missing paths.
+
+**Why it happens:** Worktrees maintain symlinks/references to the main `.git` directory. Moving the directory breaks these references without updating the metadata.
+
+**Warning signs:**
+- Errors about `.git/worktrees/<name>/gitdir` after mv
+- `git status` fails in moved worktree
+
+**Prevention:**
+```bash
+# ALWAYS use git worktree move, never mv
+git worktree move ../old-location ../new-location
+```
+
+**Recovery:**
+```bash
+# Run from inside the moved worktree
+git worktree repair
+
+# Or run from main worktree to repair all
+git worktree repair /path/to/moved/worktree
+```
+
+**Phase to address:** Documentation - include in usage guidelines
+
+**Sources:**
+- [Git Worktree Documentation](https://git-scm.com/docs/git-worktree)
+
+---
+
+### Pitfall W4: .git is a File, Not a Directory
+
+**What goes wrong:** Scripts that assume `.git` is a directory break in worktrees.
+
+**Why it happens:** In worktrees, `.git` is a file containing `gitdir: /path/to/.git/worktrees/<name>`. Scripts using `cat .git/config` or modifying `.git/hooks` directly fail.
+
+**Warning signs:**
+- Scripts error with "Not a directory"
+- Hooks installed in worktree don't work
+
+**Prevention:**
+```bash
+# Use git rev-parse to get correct paths
+GIT_DIR=$(git rev-parse --git-dir)
+GIT_COMMON_DIR=$(git rev-parse --git-common-dir)
+
+# For hooks (shared across worktrees):
+HOOKS_DIR=$(git rev-parse --git-path hooks)
+
+# For worktree-specific data:
+git rev-parse --git-dir  # Returns worktree-specific dir
+```
+
+**Recovery:** Update scripts to use `git rev-parse` instead of hardcoded paths.
+
+**Phase to address:** Phase 2 (Integration) - audit any existing git automation scripts
+
+**Sources:**
+- [DataCamp Git Worktree Tutorial](https://www.datacamp.com/tutorial/git-worktree-tutorial)
+
+---
+
+### Pitfall W5: Orphaned Worktree Metadata
+
+**What goes wrong:** Deleted worktree directories leave stale metadata, cluttering `git worktree list` and causing confusion.
+
+**Why it happens:** Using `rm -rf` on a worktree directory instead of `git worktree remove` leaves metadata in `.git/worktrees/`.
+
+**Warning signs:**
+- `git worktree list` shows "(error)" or "prunable" entries
+- Confusion about which worktrees actually exist
+
+**Prevention:**
+```bash
+# ALWAYS use proper removal
+git worktree remove ../worktree-path
+
+# For worktrees with uncommitted changes
+git worktree remove --force ../worktree-path
+
+# Run periodic cleanup
+git worktree prune --dry-run  # Preview
+git worktree prune            # Actually clean
+```
+
+**Recovery:**
+```bash
+git worktree prune
+```
+
+**Phase to address:** Phase 3 (Completion) - include prune in merge-back workflow
+
+**Sources:**
+- [Git Worktree Management](https://blog.alyssaholland.me/git-worktree)
+
+---
+
+### Pitfall W6: Per-Worktree Dependency Installation
+
+**What goes wrong:** Running npm/pip/etc in new worktree fails or uses wrong versions because dependencies aren't installed.
+
+**Why it happens:** Each worktree is an independent file tree. Node modules, Python venvs, and build artifacts don't carry over.
+
+**Warning signs:**
+- `node_modules` missing in new worktree
+- Import errors for installed packages
+- Tests fail with "module not found"
+
+**Prevention:**
+```bash
+# Create a setup script that runs after worktree creation
+#!/bin/bash
+# setup-worktree.sh
+WORKTREE_PATH=$1
+cd "$WORKTREE_PATH"
+npm install
+# or: pip install -e .
+# or: bundle install
+```
+
+**Recovery:** Just run dependency installation in the worktree.
+
+**Optimization for large projects:**
+```bash
+# Share node_modules between worktrees (npm workspaces)
+# Or use pnpm which deduplicates automatically
+```
+
+**Phase to address:** Phase 1 (Setup) - automate post-worktree setup
+
+**Sources:**
+- [Nick Nisi on Git Worktrees](https://nicknisi.com/posts/git-worktrees/)
+
+---
+
+### Pitfall W7: Submodule State Not Shared
+
+**What goes wrong:** Submodules aren't initialized in new worktrees, causing missing files or build failures.
+
+**Why it happens:** Git documents worktrees as "experimental" with submodules. Each worktree needs its own `git submodule update --init`.
+
+**Warning signs:**
+- Empty submodule directories in new worktree
+- Build errors referencing submodule paths
+
+**Prevention:**
+```bash
+# After creating worktree, initialize submodules
+git worktree add ../new-worktree branch
+cd ../new-worktree
+git submodule update --init --recursive
+```
+
+**Note:** If your project uses submodules extensively, worktrees may not be the best isolation strategy.
+
+**Phase to address:** Phase 1 (Setup) - detect submodules and warn/automate
+
+**Sources:**
+- [Git Worktree Documentation - Bugs section](https://git-scm.com/docs/git-worktree)
+
+---
+
+### Pitfall W8: Hooks Not Running in Worktrees
+
+**What goes wrong:** Pre-commit hooks run in main worktree but not in linked worktrees.
+
+**Why it happens:** Some hook managers (pre-commit, husky) install hooks to `.git/hooks`, but worktrees look for hooks via `git rev-parse --git-path hooks` which may resolve differently.
+
+**Warning signs:**
+- Hooks work in main checkout, silent in worktrees
+- Linting/formatting bypassed in worktree commits
+
+**Prevention:**
+```bash
+# Set core.hooksPath to shared location
+git config core.hooksPath .githooks
+
+# Or reinstall hooks in each worktree
+cd ../new-worktree
+pre-commit install
+```
+
+**Phase to address:** Phase 2 (Integration) - verify hook behavior across worktrees
+
+**Sources:**
+- [Pre-commit Issue #808](https://github.com/pre-commit/pre-commit/issues/808)
+- [Git Hooks Documentation](https://git-scm.com/docs/githooks/2.10.5)
+
+---
+
+## Multi-agent Coordination Pitfalls
+
+Issues when multiple Claude agents work in parallel.
+
+### Pitfall M1: Same File Modified by Multiple Agents
+
+**What goes wrong:** Two agents edit the same file, creating conflicting changes that are hard to merge.
+
+**Why it happens:** Without explicit coordination, agents independently decide to modify shared files (configs, utils, types).
+
+**Warning signs:**
+- Merge conflicts on shared files
+- Agents referencing each other's uncommitted changes
+- Context corruption when one agent's changes confuse another
+
+**Prevention:**
+```markdown
+## Agent Assignment (include in each agent's CLAUDE.md)
+
+This agent (agent-1) owns:
+- /src/auth/**
+- /tests/auth/**
+
+DO NOT modify files owned by other agents:
+- /src/api/** (agent-2)
+- /src/ui/** (agent-3)
+
+Shared files require coordination:
+- /src/types.ts - propose changes, don't commit
+- /src/config.ts - read-only
+```
+
+**Recovery:**
+- Stop both agents
+- Manually resolve conflicts
+- Recommit with clear history
+
+**Phase to address:** Phase 1 (Setup) - define file ownership in worktree CLAUDE.md
+
+**Sources:**
+- [Running Multiple Claude Code Sessions](https://dev.to/datadeer/part-2-running-multiple-claude-code-sessions-in-parallel-with-git-worktree-165i)
+- [Managing Parallel Coding Agents](https://metacircuits.substack.com/p/managing-parallel-coding-agents-without)
+
+---
+
+### Pitfall M2: Outdated Worktrees Create Redundant Work
+
+**What goes wrong:** Agent A completes a utility function. Agent B, in an outdated worktree, implements the same thing differently.
+
+**Why it happens:** Worktrees isolate changes by design. Without explicit syncing, agents don't see each other's work.
+
+**Warning signs:**
+- Duplicate implementations discovered at merge time
+- Conflicting approaches to same problem
+- Wasted effort on already-solved problems
+
+**Prevention:**
+```bash
+# Regularly sync worktrees with main
+cd ../agent-1-worktree
+git fetch origin
+git rebase origin/main  # Or merge, depending on strategy
+
+# Or: designate an "integration agent" that merges frequently
+```
+
+**Alternative strategy:** Use short-lived worktrees for small tasks, merge frequently.
+
+**Phase to address:** Phase 2 (Integration) - define sync cadence
+
+**Sources:**
+- [Parallel AI Development Experiment](https://dev.to/aviad_rozenhek_cba37e0660/parallel-ai-development-can-5-claude-code-agents-work-independently-4a5)
+
+---
+
+### Pitfall M3: Review Bottleneck Negates Parallelization
+
+**What goes wrong:** Three agents produce code in parallel, but human review becomes the bottleneck.
+
+**Why it happens:** "AI-generated code needs to be reviewed." Multiple parallel outputs create a review pile-up that can't be processed faster than serial work would have.
+
+**Warning signs:**
+- Review queue growing faster than completion
+- Merge conflicts accumulating in review
+- Quality suffering due to review fatigue
+
+**Prevention:**
+- Start with 2 agents, not 10
+- Use parallel agents for well-specified, low-risk tasks
+- Have agents produce tests that reduce review burden
+- Consider "scout" agents that explore but don't land code
+
+**Phase to address:** Phase planning - right-size parallelization
+
+**Sources:**
+- [Simon Willison - Parallel Coding Agents](https://simonwillison.net/2025/Oct/5/parallel-coding-agents/)
+
+---
+
+### Pitfall M4: Cognitive Overhead Exceeds Time Savings
+
+**What goes wrong:** Managing parallel agents takes more mental effort than serial development.
+
+**Why it happens:** "It's like moderating two separate meetings in neighboring conference rooms - you're endlessly ping-ponging between rooms."
+
+**Warning signs:**
+- Constant context switching between agent outputs
+- Missing important decisions one agent made
+- Feeling overwhelmed rather than productive
+
+**Prevention:**
+- Reserve parallel work for long-running tasks where one agent can run unattended
+- Use async agents (headless Claude) for background research
+- Don't parallelize tasks under 30 minutes
+- Let one agent run while reviewing another's output
+
+**Phase to address:** Documentation - set expectations for when to use
+
+**Sources:**
+- [Running Multiple Claude Sessions](https://dev.to/datadeer/part-2-running-multiple-claude-code-sessions-in-parallel-with-git-worktree-165i)
+
+---
+
+### Pitfall M5: Token Costs Multiply
+
+**What goes wrong:** Running three Claude sessions consumes 3x the API tokens/subscription capacity.
+
+**Why it happens:** Each agent reads context, makes decisions, generates code. Parallelization multiplies this cost.
+
+**Warning signs:**
+- Hitting API rate limits
+- Subscription quota exhausted mid-project
+- Unexpected billing spikes
+
+**Prevention:**
+- Budget tokens per-agent before starting
+- Use smaller tasks that complete before context grows large
+- Consider cost/benefit before parallelizing
+
+**Phase to address:** Documentation - note cost implications
+
+**Sources:**
+- [Running Multiple Claude Sessions](https://dev.to/datadeer/part-2-running-multiple-claude-code-sessions-in-parallel-with-git-worktree-165i)
+
+---
+
+## Merge/Conflict Pitfalls
+
+Issues when bringing parallel work back together.
+
+### Pitfall C1: Squash Merge Loses Granular History
+
+**What goes wrong:** `git bisect` lands on a 2000-line squashed commit, making bug hunting impossible.
+
+**Why it happens:** Squash merge combines all commits into one. The detailed progression is lost.
+
+**Warning signs:**
+- Large squashed commits in history
+- `git bisect` becoming useless
+- Difficulty understanding why changes were made
+
+**Prevention:**
+```bash
+# For small features: squash is fine
+git merge --squash feature-branch
+
+# For large features: consider merge or rebase
+# Or: break large features into smaller squash-mergeable chunks
+
+# Preserve detail in PR/commit message
+git merge --squash feature-branch
+git commit -m "feat(auth): implement OAuth flow
+
+Squashed commits:
+- Add OAuth client configuration
+- Implement token exchange
+- Add refresh token handling
+- Add logout flow
+- Add tests for all flows
+
+PR #123 has full commit history."
+```
+
+**Phase to address:** Phase 3 (Completion) - define when to squash vs merge
+
+**Sources:**
+- [The Agony and Ecstasy of Git Squash](https://medium.com/@gasrios/the-agony-and-the-ecstasy-of-git-squash-7f91c8da20af)
+- [Squash, Merge, or Rebase?](https://mattrickard.com/squash-merge-or-rebase)
+
+---
+
+### Pitfall C2: Reusing Squashed Branches
+
+**What goes wrong:** Continuing work on a branch after it's been squash-merged creates duplicate commit conflicts.
+
+**Why it happens:** After squash merge, the feature branch commits still exist but main doesn't know about them (different SHA). Rebasing or merging that branch again replays the same changes.
+
+**Warning signs:**
+- "Already applied" conflicts during rebase
+- Same changes appearing twice in history
+- Confusion about what's merged
+
+**Prevention:**
+```bash
+# RULE: Delete feature branches after squash merge
+git merge --squash feature-branch
+git commit -m "feat: the feature"
+git branch -D feature-branch
+git push origin --delete feature-branch
+
+# For continued work: create NEW branch from main
+git checkout -b feature-v2 main
+```
+
+**Recovery:**
+```bash
+# If you've already continued on a squashed branch
+git checkout main
+git checkout -b feature-fresh
+git cherry-pick <only-new-commits>
+```
+
+**Phase to address:** Phase 3 (Completion) - enforce branch deletion after merge
+
+**Sources:**
+- [DNSimple - Two Years of Squash Merge](https://blog.dnsimple.com/2019/01/two-years-of-squash-merge/)
+
+---
+
+### Pitfall C3: Long-Running Branches Accumulate Conflicts
+
+**What goes wrong:** Agent works on feature branch for days. By merge time, main has diverged significantly, creating extensive conflicts.
+
+**Warning signs:**
+- Large diff between feature branch and main
+- Many files changed on both branches
+- Complex merge conflicts
+
+**Prevention:**
+```bash
+# Sync frequently (daily or more)
+git fetch origin
+git rebase origin/main
+# OR
+git merge origin/main
+
+# Better: keep agent work short
+# Merge daily, continue on fresh branch if needed
+```
+
+**Phase to address:** Phase 2 (Integration) - define max branch age
+
+**Sources:**
+- [Azure DevOps Merge Strategies](https://learn.microsoft.com/en-us/azure/devops/repos/git/merging-with-squash)
+
+---
+
+### Pitfall C4: Merge Conflicts in Shared Config Files
+
+**What goes wrong:** Multiple agents modify package.json, tsconfig.json, or similar, creating semantic conflicts that git can't auto-resolve.
+
+**Why it happens:** Config files are modified by many features (adding dependencies, changing settings). These are inherently shared.
+
+**Warning signs:**
+- package.json conflicts on every merge
+- Lock file (package-lock.json) conflicts
+
+**Prevention:**
+- Designate one agent as "integration owner" for config files
+- Other agents propose config changes, don't commit them
+- Or: merge config changes first, before feature work
+
+```markdown
+## Shared File Policy
+
+These files are integration-only:
+- package.json
+- tsconfig.json
+- .eslintrc.js
+
+To add a dependency:
+1. Document needed dependency in your PR description
+2. Integration phase will add it before your branch merges
+```
+
+**Phase to address:** Phase 1 (Setup) - define shared file policy
+
+**Sources:**
+- [Managing Parallel Coding Agents](https://metacircuits.substack.com/p/managing-parallel-coding-agents-without)
+
+---
+
+## Claude-Specific Pitfalls
+
+Issues specific to Claude Code agents in worktrees.
+
+### Pitfall CL1: Claude Doesn't Know About Other Agents
+
+**What goes wrong:** Claude in worktree-1 doesn't know worktree-2 exists or what it's working on.
+
+**Why it happens:** Each Claude instance has isolated context. There's no built-in inter-agent communication.
+
+**Warning signs:**
+- Agents implementing conflicting approaches
+- Agents duplicating effort
+- No awareness of overall project state
+
+**Prevention:**
+```markdown
+## Multi-Agent Context (include in each CLAUDE.md)
+
+You are agent-1 working on authentication.
+
+Other agents currently active:
+- agent-2: Working on API endpoints in ../agent-2-worktree
+- agent-3: Working on UI components in ../agent-3-worktree
+
+Coordination:
+- Shared types go in /src/shared/ - propose, don't commit
+- If you need API changes, note in HANDOFF.md
+- Check HANDOFF.md for pending coordination items
+```
+
+**Phase to address:** Phase 1 (Setup) - include multi-agent context in worktree CLAUDE.md
+
+---
+
+### Pitfall CL2: Worktree Setup Overhead Discourages Use
+
+**What goes wrong:** Developers skip worktree isolation because setup is tedious.
+
+**Why it happens:** Creating worktree + installing deps + configuring Claude takes time. For 10-minute tasks, it's not worth it.
+
+**Warning signs:**
+- Running parallel agents in same directory anyway
+- File conflicts despite knowing better
+- "I'll just be careful" thinking
+
+**Prevention:**
+```bash
+# Create a script that automates everything
+#!/bin/bash
+# new-agent-worktree.sh
+BRANCH_NAME=$1
+WORKTREE_PATH="../$BRANCH_NAME"
+
+git worktree add -b "$BRANCH_NAME" "$WORKTREE_PATH" main
+cd "$WORKTREE_PATH"
+npm install
+cp ../main/.claude/settings.local.json .claude/
+
+echo "Worktree ready at $WORKTREE_PATH"
+```
+
+**Phase to address:** Phase 1 (Setup) - create automation scripts
+
+---
+
+### Pitfall CL3: Claude Makes Git Commits in Wrong Worktree
+
+**What goes wrong:** Claude commits to wrong branch or pushes from wrong worktree.
+
+**Why it happens:** With multiple terminal windows open, it's easy to run Claude in the wrong directory.
+
+**Warning signs:**
+- Commits appearing on wrong branch
+- Work mixed between agents
+
+**Prevention:**
+- Include branch name in terminal prompt
+- Use tmux/terminal titles showing worktree
+- Add worktree path to Claude's CLAUDE.md context
+
+```bash
+# In .bashrc/.zshrc
+export PS1='$(git branch --show-current 2>/dev/null || echo "no-git") \$ '
+```
+
+**Phase to address:** Documentation - include terminal setup recommendations
+
+---
+
+### Pitfall CL4: Claude --no-verify Bypasses Worktree Hooks
+
+**What goes wrong:** Claude uses `git commit --no-verify`, bypassing pre-commit hooks even in worktrees.
+
+**Why it happens:** This is existing Claude behavior (Pitfall #2 from v1.0 research). Worktrees don't change this.
+
+**Warning signs:**
+- CI failures after Claude commits
+- Linting errors in committed code
+
+**Prevention:** Same as v1.0 research - deny direct git commit, use controlled commit flow.
+
 ```json
 {
   "permissions": {
-    "deny": ["Bash(git commit:*)"],
-    "allow": ["mcp__your_commit_server__commit"]
+    "deny": ["Bash(git commit:*)"]
   }
 }
 ```
 
-Option 2: Use Claude Code hooks (PostToolUse) to detect and flag --no-verify:
-```json
-{
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [{
-          "type": "command",
-          "command": "check-for-no-verify.sh"
-        }]
-      }
-    ]
-  }
-}
-```
-
-Option 3: Use GitButler integration for automatic branch isolation and commit management.
-
-**Detection:** Audit git history for commits that bypassed hooks. Check CI for failures immediately after Claude-authored commits.
-
-**Sources:**
-- [Allow Bash(git commit:*) Considered Harmful](https://microservices.io/post/genaidevelopment/2025/09/10/allow-git-commit-considered-harmful.html)
-- [GitHub Issue #4834](https://github.com/anthropics/claude-code/issues/4834) - PreCommit/PostCommit hooks feature request
+**Phase to address:** Phase 2 (Integration) - apply existing controls to worktree workflow
 
 ---
 
-### Pitfall 3: Multi-Agent File Conflicts
+## GSD Integration Pitfalls
 
-**What goes wrong:** Multiple Claude Code instances edit the same files simultaneously, corrupting code and context.
+Issues specific to GSD workflow integration.
 
-**Why it happens:** Developers run parallel Claude sessions on the same repository without isolation. Each agent assumes it has exclusive access to files.
+### Pitfall GSD1: Phase Execution Without Worktree Creation
 
-**Consequences:**
-- Agents overwrite each other's edits
-- Context becomes corrupted as one agent's changes confuse another
-- Merge conflicts with yourself
-- Lost work that's difficult to recover
+**What goes wrong:** Agent starts execute-phase in main directory, making changes directly to main branch.
 
-**Prevention:**
+**Why it happens:** GSD workflow doesn't currently create worktrees automatically.
 
-Use git worktrees for isolation:
-```bash
-# Create isolated worktrees for each agent
-git worktree add -b feat/auth-refactor ../auth-refactor
-git worktree add -b feat/data-viz ../data-viz
-
-# Each Claude instance works in its own worktree
-cd ../auth-refactor && claude
-cd ../data-viz && claude
-```
-
-Alternative: GitButler hooks auto-create branches per session:
-```json
-{
-  "hooks": {
-    "PreToolUse": [{
-      "matcher": "Edit|Write",
-      "hooks": [{
-        "type": "command",
-        "command": "gitbutler-notify-edit.sh"
-      }]
-    }]
-  }
-}
-```
-
-**Detection:** Monitor for unexpected file changes or corrupted diffs. Watch for Claude confusion about recent changes.
-
-**Sources:**
-- [Managing Multiple Claude Code Sessions](https://blog.gitbutler.com/parallel-claude-code)
-- [GitHub Issue #893](https://github.com/microsoft/playwright-mcp/issues/893) - Parallel agent interference
-
----
-
-### Pitfall 4: Permission Bypass Despite Configuration
-
-**What goes wrong:** Git commands execute without approval despite being in the "ask" array.
-
-**Why it happens:** A confirmed bug where git commit and git push bypass the approval prompt in certain configurations, particularly with `.claude/settings.local.json`.
-
-**Consequences:**
-- Destructive git operations run without user confirmation
-- Unintended pushes to remote repositories
-- Loss of control over commit history
+**Warning signs:**
+- Phase commits going to main instead of feature branch
+- Multiple phases interfering with each other
 
 **Prevention:**
-- Use "deny" instead of "ask" for critical operations during the bug period
-- Verify permission enforcement with `/permissions` command
-- Test critical permission rules before relying on them
-
-```json
-{
-  "permissions": {
-    "deny": ["Bash(git push:*)", "Bash(git commit:*)"],
-    "allow": ["mcp__controlled_git__*"]
-  }
-}
-```
-
-**Detection:** Check Claude's transcript for operations that should have prompted but didn't.
-
-**Sources:**
-- [GitHub Issue #13009](https://github.com/anthropics/claude-code/issues/13009) - Permission bypass bug
-
----
-
-## Moderate Pitfalls
-
-Mistakes that cause delays, confusion, or technical debt.
-
-### Pitfall 5: Settings Hierarchy Misunderstanding
-
-**What goes wrong:** User settings are overridden unexpectedly, or project settings don't apply.
-
-**Why it happens:** Claude Code uses a strict hierarchy: Managed > CLI > Local Project > Shared Project > User. Developers expect user settings to always apply or don't understand that "deny takes precedence."
-
-**Precedence order:**
-1. Managed settings (system-wide, cannot override)
-2. CLI arguments (session override)
-3. `.claude/settings.local.json` (personal, git-ignored)
-4. `.claude/settings.json` (team, committed)
-5. `~/.claude/settings.json` (user, all projects)
-
-**Key rules:**
-- Deny rules are checked first, then Ask, then Allow
-- A project-level deny cannot be undone by a local allow
-- Higher scope completely replaces lower scope for scalar values
-
-**Prevention:**
-```bash
-# Check effective settings
-/permissions  # View current permission state
-
-# Verify which files are being read
-find . -name "settings*.json" -o -name "CLAUDE.md" -o -name "CLAUDE.local.md"
-```
-
-**Sources:**
-- [Claude Code Settings](https://code.claude.com/docs/en/settings) - Official documentation
-- [Settings Hierarchy Guide](https://www.eesel.ai/blog/settings-json-claude-code)
-
----
-
-### Pitfall 6: Bloated CLAUDE.md Dilutes Instructions
-
-**What goes wrong:** Claude ignores important instructions buried in a massive CLAUDE.md file.
-
-**Why it happens:** Developers add every lesson learned, style guide, architecture decision, and warning to CLAUDE.md. Files balloon to 2000+ lines, consuming context budget and diluting critical instructions.
-
-**Consequences:**
-- Claude misses important project-specific rules
-- Context compaction loses key instructions
-- Token budget wasted before work begins
-- Contradictory rules cause unpredictable behavior
-
-**Prevention:**
-- Keep CLAUDE.md under 100-150 lines (HumanLayer uses ~60 lines)
-- Focus on: commands, gotchas, and constraints only
-- Use subdirectory CLAUDE.md files for context-specific rules
-- Make rules specific and actionable, not vague ("keep code concise" = useless)
-
-Good CLAUDE.md structure:
 ```markdown
-# Project Name
+## GSD Workflow Rule
 
-## Commands
-npm run test        # Run all tests
-npm run lint        # Lint with auto-fix
-
-## Constraints
-- Never modify files in /generated/
-- Use TypeScript strict mode
-- Prefer composition over inheritance
-
-## Gotchas
-- Auth module requires manual token refresh
-- API endpoint /v2/users has 500ms rate limit
+BEFORE starting execute-phase:
+1. Create worktree: git worktree add -b phase-N ../phase-N main
+2. cd ../phase-N
+3. THEN run execute-phase
 ```
 
-**Detection:** If Claude repeatedly ignores instructions in CLAUDE.md, it's too long or rules are too vague.
+Or: modify execute-phase command to auto-create worktree.
 
-**Sources:**
-- [Stop Bloating Your CLAUDE.md](https://alexop.dev/posts/stop-bloating-your-claude-md-progressive-disclosure-ai-coding-tools/)
-- [CLAUDE.md Writing Guide](https://eastondev.com/blog/en/posts/ai/20251122-claude-md-writing-guide/)
+**Phase to address:** Phase 2 (Integration) - modify GSD execute-phase
 
 ---
 
-### Pitfall 7: Context Compaction Amnesia
+### Pitfall GSD2: Phase Completion Without Proper Merge
 
-**What goes wrong:** Claude forgets context, repeats mistakes, or loses track of file state after compaction.
+**What goes wrong:** Phase completes but changes stay in worktree, never merged to main.
 
-**Why it happens:** When conversations get long, Claude Code compacts context. The compacted version loses nuance, specific corrections, and file state awareness. Claude becomes "definitely dumber after compaction."
+**Why it happens:** Forgetting the merge step, or merge conflicts blocking completion.
 
-**Consequences:**
-- Claude re-introduces bugs you already corrected
-- Claude needs to re-read files it was just looking at
-- Progress stalls or regresses
-
-**Prevention:**
-- Use `/compact` proactively before context grows too large
-- Use `/clear` between distinct tasks
-- Start new sessions for new features
-- For complex tasks, use subagents to isolate context
-
-**Detection:** Watch for Claude repeating earlier mistakes or asking about files it just read.
-
-**Sources:**
-- [Claude Code Gotchas](https://www.dolthub.com/blog/2025-06-30-claude-code-gotchas/)
-- [Lessons from Using Claude Code](https://tdhopper.com/blog/lessons-from-using-claude-code-effectively/)
-
----
-
-### Pitfall 8: Hook Template Variables Not Interpolated
-
-**What goes wrong:** Hook commands contain literal `{{tool.name}}` instead of actual values.
-
-**Why it happens:** A bug where template variables like `{{tool.name}}`, `{{timestamp}}`, `{{tool.input.file_path}}` appear literally in executed commands instead of being replaced.
+**Warning signs:**
+- Completed phases with unmerged worktrees
+- Growing collection of stale worktrees
+- Features "done" but not in main
 
 **Prevention:**
-- Use stdin JSON parsing instead of template variables:
-```bash
-# Instead of relying on {{tool.input.file_path}}
-jq -r '.tool_input.file_path' < /dev/stdin
-```
-
-- Test hooks with debug mode: `claude --debug`
-
-**Sources:**
-- [GitHub Issue #2814](https://github.com/anthropics/claude-code/issues/2814) - Hooks system issues
-
----
-
-### Pitfall 9: Poor Commit Message Quality
-
-**What goes wrong:** Claude generates generic, verbose, or inaccurate commit messages.
-
-**Why it happens:** Without explicit guidance, Claude defaults to verbose descriptions or adds unwanted footers like "Generated with Claude Code" and "Co-Authored-By" despite instructions not to.
-
-**Consequences:**
-- Git history becomes hard to read
-- Team conventions are ignored
-- PR reviews suffer from poor commit granularity
-
-**Prevention:**
-Create `.claude/commands/commit.md` with explicit format:
 ```markdown
-Generate a commit message following these rules:
-1. Use conventional commits format (feat:, fix:, docs:, etc.)
-2. First line under 50 characters
-3. No emoji
-4. No "Generated with Claude Code" footer
-5. No "Co-Authored-By" unless I ask
-6. Focus on WHY, not WHAT
+## Phase Completion Checklist
 
-Analyze the diff and provide 3 candidate messages.
+1. All tests passing in worktree
+2. Code reviewed (if applicable)
+3. Merge to main: git checkout main && git merge --squash ../phase-N
+4. Delete worktree: git worktree remove ../phase-N
+5. Update GSD state
 ```
 
-Or configure attribution in settings.json:
-```json
-{
-  "attribution": {
-    "commit": "",
-    "pr": ""
-  }
-}
-```
-
-**Sources:**
-- [GitHub Issue #1296](https://github.com/anthropics/claude-code/issues/1296) - Commit message pollution
-- [Creating Project-Specific Commit Messages](https://dev.to/shibayu36/creating-project-specific-commit-messages-with-claude-code-subagents-514f)
+**Phase to address:** Phase 3 (Completion) - create completion workflow
 
 ---
 
-## Minor Pitfalls
+### Pitfall GSD3: Squash Loses Phase History
 
-Mistakes that cause annoyance but are fixable.
+**What goes wrong:** After squash merge, can't tell which changes came from which phase.
 
-### Pitfall 10: Hooks Not Loading (Shows "No hooks configured")
-
-**What goes wrong:** `/hooks` shows "No hooks configured yet" despite valid configuration.
-
-**Why it happens:** Configuration syntax issues, wrong file location, or the legacy `~/.claude.json` interfering.
+**Why it happens:** Squash combines all phase commits into one main commit.
 
 **Prevention:**
 ```bash
-# Verify JSON syntax
-cat ~/.claude/settings.json | jq .
-cat .claude/settings.json | jq .
+# Include phase info in squash commit message
+git merge --squash ../phase-auth
+git commit -m "feat(auth): implement authentication system
 
-# Check for legacy file interference
-ls ~/.claude.json  # Remove if present and migrated
+GSD Phase: 01-auth
+Plan: .planning/phases/01-auth/PLAN.md
 
-# Restart Claude Code after config changes
+Changes:
+- OAuth2 client implementation
+- Token refresh handling
+- Session management
+- Integration tests
+
+Squashed from phase branch: feat/phase-01-auth"
 ```
 
-**Sources:**
-- [GitHub Issue #11544](https://github.com/anthropics/claude-code/issues/11544) - Hooks not loading
+**Phase to address:** Phase 3 (Completion) - template for squash commit messages
 
 ---
 
-### Pitfall 11: Multiple CLAUDE.md Files Cause Contradictions
+## Prevention Checklist
 
-**What goes wrong:** Different CLAUDE.md files give conflicting instructions.
+Summary of how to avoid each issue.
 
-**Why it happens:** User CLAUDE.md (`~/.claude/CLAUDE.md`), project CLAUDE.md (`.claude/CLAUDE.md`), and local CLAUDE.md (`.claude.local.md`) can all exist with different rules.
+### Setup Phase
 
-**Prevention:**
-```bash
-# Find all CLAUDE.md files that Claude might read
-find . -name "CLAUDE.md" -o -name "CLAUDE.local.md"
-ls ~/.claude/CLAUDE.md 2>/dev/null
+- [ ] Configure bare repo with remote.origin.fetch if using bare pattern
+- [ ] Create automation script for worktree + deps + Claude config
+- [ ] Define file ownership per agent in CLAUDE.md
+- [ ] Include multi-agent context in each worktree's CLAUDE.md
+- [ ] Set up submodule automation if project uses submodules
+- [ ] Verify hooks work across worktrees
 
-# Review for contradictions
-```
+### During Development
 
-Keep instructions consistent across files or use specificity:
-```markdown
-# ~/.claude/CLAUDE.md (global)
-Use TypeScript for all projects.
+- [ ] Never `mv` worktrees - use `git worktree move`
+- [ ] Never `rm -rf` worktrees - use `git worktree remove`
+- [ ] Sync worktrees with main regularly (daily minimum)
+- [ ] Use `git worktree list` to track active worktrees
+- [ ] Keep parallel agents to 2-3 maximum
+- [ ] Don't parallelize tasks under 30 minutes
 
-# .claude/CLAUDE.md (project)
-This Python project does not use TypeScript.
-```
+### Completion Phase
 
-**Sources:**
-- [Troubleshooting Guide](https://code.claude.com/docs/en/troubleshooting)
+- [ ] Run `git worktree prune` after removing worktrees
+- [ ] Delete feature branches after squash merge
+- [ ] Include phase/context in squash commit messages
+- [ ] Update GSD state after merge
+- [ ] Clear orphaned worktree metadata
 
----
+### General
 
-### Pitfall 12: Forgetting to Compile Before Running Tests
-
-**What goes wrong:** Claude runs tests without compiling, leading to false test failures.
-
-**Why it happens:** Claude's training data is heavily weighted toward interpreted languages. When working with compiled languages (Go, Rust, TypeScript with build step), Claude forgets the compile step.
-
-**Prevention:**
-Add to CLAUDE.md:
-```markdown
-## Commands
-npm run build && npm run test  # ALWAYS build before testing
-```
-
-Or use a PreToolUse hook to inject build commands.
-
-**Sources:**
-- [Claude Code Gotchas](https://www.dolthub.com/blog/2025-06-30-claude-code-gotchas/)
-
----
-
-## Phase-Specific Warnings
-
-| Phase Topic | Likely Pitfall | Mitigation |
-|-------------|---------------|------------|
-| Initial hook setup | Exit code 2 misunderstanding | Test hooks thoroughly before relying on them |
-| Git automation | --no-verify bypass | Deny direct git commit, use controlled commit flow |
-| CLAUDE.md creation | Bloating with everything | Start minimal, add only proven-necessary rules |
-| Multi-agent workflows | File conflicts | Use git worktrees or GitButler from the start |
-| Permission configuration | Hierarchy surprises | Test permissions before deploying, use /permissions |
-| Custom commands | Commit message quality | Create explicit commit.md with format rules |
-
-## User-Specific Issues Addressed
-
-Based on the user's experienced issues:
-
-1. **Autocommit hook Claude doesn't know about:** This relates to Pitfall #1 (exit codes) and #2 (--no-verify bypass). If your autocommit hook isn't being respected, verify:
-   - Exit code is 2 for blocking
-   - Claude isn't using --no-verify
-   - Consider denying git commit and using alternative flow
-
-2. **Poor commit messages:** Addressed in Pitfall #9. Create explicit commit command with format rules or disable attribution.
-
-3. **Multi-agent git conflicts:** Addressed in Pitfall #3. Use git worktrees or GitButler hooks for session isolation. Plan worktree strategy before parallel development.
+- [ ] Use git rev-parse for paths, not hardcoded .git
+- [ ] Budget tokens before parallelizing
+- [ ] Right-size parallelization for review capacity
+- [ ] Designate integration owner for shared files
 
 ## Sources
 
 ### Official Documentation
-- [Claude Code Hooks Reference](https://code.claude.com/docs/en/hooks)
-- [Claude Code Hooks Guide](https://code.claude.com/docs/en/hooks-guide)
-- [Claude Code Settings](https://code.claude.com/docs/en/settings)
-- [Claude Code Troubleshooting](https://code.claude.com/docs/en/troubleshooting)
+- [Git Worktree Documentation](https://git-scm.com/docs/git-worktree) - Authoritative reference
+- [Git Merge Documentation](https://git-scm.com/docs/git-merge)
 
-### GitHub Issues (Confirmed Bugs/Behavior)
-- [#2814 - Hooks System Issues](https://github.com/anthropics/claude-code/issues/2814)
-- [#4809 - PostToolUse Exit Code Blocking](https://github.com/anthropics/claude-code/issues/4809)
-- [#4834 - PreCommit/PostCommit Hooks Feature](https://github.com/anthropics/claude-code/issues/4834)
-- [#11544 - Hooks Not Loading](https://github.com/anthropics/claude-code/issues/11544)
-- [#13009 - Permission Bypass Bug](https://github.com/anthropics/claude-code/issues/13009)
-- [#1296 - Commit Message Pollution](https://github.com/anthropics/claude-code/issues/1296)
+### Worktree Patterns
+- [Nick Nisi - How I Use Git Worktrees](https://nicknisi.com/posts/git-worktrees/)
+- [Morgan Cugerone - Git Worktree in a Clean Way](https://morgan.cugerone.com/blog/how-to-use-git-worktree-and-in-a-clean-way/)
+- [Chris Dzombak - Tool for Working with Git Worktrees](https://www.dzombak.com/blog/2025/10/a-tool-for-working-with-git-worktrees/)
+- [Safia Rocks - Git Worktrees for Fun and Profit](https://blog.safia.rocks/2025/09/03/git-worktrees/)
 
-### Community Resources
-- [Claude Code Best Practices - Anthropic](https://www.anthropic.com/engineering/claude-code-best-practices)
-- [Claude Code Gotchas - DoltHub](https://www.dolthub.com/blog/2025-06-30-claude-code-gotchas/)
-- [Stop Bloating Your CLAUDE.md](https://alexop.dev/posts/stop-bloating-your-claude-md-progressive-disclosure-ai-coding-tools/)
-- [Settings.json Guide - eesel.ai](https://www.eesel.ai/blog/settings-json-claude-code)
-- [Managing Multiple Sessions - GitButler](https://blog.gitbutler.com/parallel-claude-code)
+### Multi-Agent Development
+- [Running Multiple Claude Code Sessions in Parallel](https://dev.to/datadeer/part-2-running-multiple-claude-code-sessions-in-parallel-with-git-worktree-165i)
+- [Simon Willison - Parallel Coding Agent Lifestyle](https://simonwillison.net/2025/Oct/5/parallel-coding-agents/)
+- [Managing Parallel Coding Agents](https://metacircuits.substack.com/p/managing-parallel-coding-agents-without)
+- [Parallel AI Development Experiment](https://dev.to/aviad_rozenhek_cba37e0660/parallel-ai-development-can-5-claude-code-agents-work-independently-4a5)
+- [Steve Kinney - Git Worktrees for Parallel AI Development](https://stevekinney.com/courses/ai-development/git-worktrees)
+- [Git Worktrees for Multiple AI Agents](https://medium.com/@mabd.dev/git-worktrees-the-secret-weapon-for-running-multiple-ai-coding-agents-in-parallel-e9046451eb96)
+
+### Merge Strategies
+- [DNSimple - Two Years of Squash Merge](https://blog.dnsimple.com/2019/01/two-years-of-squash-merge/)
+- [The Agony and Ecstasy of Git Squash](https://medium.com/@gasrios/the-agony-and-the-ecstasy-of-git-squash-7f91c8da20af)
+- [Atlassian - Merge Strategy Options](https://www.atlassian.com/git/tutorials/using-branches/merge-strategy)
+- [Azure DevOps - Merge Strategies](https://learn.microsoft.com/en-us/azure/devops/repos/git/merging-with-squash)
+
+### GitHub Issues / Known Problems
+- [Pre-commit Issue #808 - Hooks in Worktrees](https://github.com/pre-commit/pre-commit/issues/808)
+- [Claude Code Issue #4963 - Worktree Orchestration Request](https://github.com/anthropics/claude-code/issues/4963)
+- [Claude Code Issue #10599 - Multi-Agent Workflows Request](https://github.com/anthropics/claude-code/issues/10599)
