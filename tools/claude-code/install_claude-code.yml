@@ -29,6 +29,11 @@
         path: ~/.claude
         state: directory
 
+    - name: Install global CLAUDE.md
+      template:
+        src: CLAUDE.md.j2
+        dest: ~/.claude/CLAUDE.md
+
     - name: Create Claude hooks directory
       file:
         path: ~/.claude/hooks
