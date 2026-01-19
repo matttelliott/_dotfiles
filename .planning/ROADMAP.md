@@ -41,7 +41,9 @@
   3. User can remove a worktree with `gsd-worktree-remove {name}` (cleans metadata)
   4. User can squash merge with `gsd-worktree-merge {name}` (checks for conflicts first)
   5. Worktree directories follow sibling pattern: `../{repo}-{name}/`
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 03-01-PLAN.md — Create gsd-worktree shell functions and Ansible deployment
 
 ### Phase 4: Parallel Features
 
@@ -76,10 +78,10 @@
 |-------|-----------|----------------|--------|-----------|
 | 1. Cleanup | v1.0 | 2/2 | Complete | 2026-01-19 |
 | 2. Structure | v1.0 | 1/1 | Complete | 2026-01-19 |
-| 3. Worktree Foundation | v1.1 | 0/TBD | Not started | - |
+| 3. Worktree Foundation | v1.1 | 0/1 | Planned | - |
 | 4. Parallel Features | v1.1 | 0/TBD | Not started | - |
 | 5. Merge Workflow | v1.1 | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-01-19*
-*Last updated: 2026-01-19 after scope refinement*
+*Last updated: 2026-01-19 after Phase 3 planning*
