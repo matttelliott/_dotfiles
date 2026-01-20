@@ -47,7 +47,9 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+1 pending todo — /gsd:check-todos to review
+
+- Sort tmux sessions alphabetically (config)
 
 ### Blockers/Concerns
 
