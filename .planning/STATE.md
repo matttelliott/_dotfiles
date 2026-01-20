@@ -47,9 +47,10 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-1 pending todo — /gsd:check-todos to review
+2 pending todos — /gsd:check-todos to review
 
 - Sort tmux sessions alphabetically (config)
+- Fix themes and add default themes for each machine (config)
 
 ### Blockers/Concerns
 

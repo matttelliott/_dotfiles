@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "updated": 1737417600000,
+  "files": {
+    "/home/matt/_dotfiles/infrastructure/index.ts": {
+      "exports": ["dropletIp", "dropletId"],
+      "imports": ["@pulumi/pulumi", "@pulumi/digitalocean"],
+      "indexed": 1737417600000
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "updated": 1737417600000,
+  "naming": {
+    "exports": {
+      "dominant": "camelCase",
+      "count": 2,
+      "percentage": 100
+    }
+  },
+  "directories": {
+    "infrastructure": { "purpose": "Infrastructure as Code", "files": 1 }
+  },
+  "suffixes": {}
+}
