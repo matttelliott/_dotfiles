@@ -54,6 +54,6 @@
         name: wol
         enabled: true
         state: started
-        daemon_reload: yes
+        daemon_reload: true
       become: true
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
