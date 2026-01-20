@@ -1,5 +1,6 @@
 ---
-- import_playbook: ../node/install_node.yml
+- name: Install Node.js (dependency)
+  import_playbook: ../node/install_node.yml
 
 - name: Install Claude Code
   hosts: with_ai_tools:&with_login_tools
