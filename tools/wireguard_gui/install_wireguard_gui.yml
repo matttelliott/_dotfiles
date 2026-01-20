@@ -5,25 +5,25 @@
 
   tasks:
     - name: Install WireGuard app via mas (Mac App Store) (macOS)
-      shell: /opt/homebrew/bin/mas install 1451685025
+      ansible.builtin.shell: /opt/homebrew/bin/mas install 1451685025
       args:
         creates: /Applications/WireGuard.app
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install WireGuard tools via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name:
           - wireguard
           - wireguard-tools
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install WireGuard tools via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name:
           - wireguard-tools
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"

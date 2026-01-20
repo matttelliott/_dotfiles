@@ -5,21 +5,21 @@
 
   tasks:
     - name: Install ripgrep via Homebrew
-      shell: /opt/homebrew/bin/brew install ripgrep
+      ansible.builtin.shell: /opt/homebrew/bin/brew install ripgrep
       args:
         creates: /opt/homebrew/bin/rg
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install ripgrep via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: ripgrep
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install ripgrep via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: ripgrep
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"

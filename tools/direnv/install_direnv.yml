@@ -3,32 +3,32 @@
   gather_facts: true
   tasks:
     - name: Install direnv via Homebrew
-      shell: /opt/homebrew/bin/brew install direnv
+      ansible.builtin.shell: /opt/homebrew/bin/brew install direnv
       args:
         creates: /opt/homebrew/bin/direnv
       when: ansible_facts['os_family'] == "Darwin"
     - name: Install direnv via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: direnv
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
     - name: Install direnv via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: direnv
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
     - name: Create zsh config directory
-      file:
+      ansible.builtin.file:
         path: ~/.config/zsh
         state: directory
     - name: Install direnv shell hook
-      copy:
+      ansible.builtin.copy:
         src: direnv.zsh
         dest: ~/.config/zsh/direnv.zsh
     - name: Source direnv hook in zshrc
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: ~/.zshrc
         line: source ~/.config/zsh/direnv.zsh
-        create: yes
+        create: true

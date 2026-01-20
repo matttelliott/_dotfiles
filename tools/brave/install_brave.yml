@@ -5,34 +5,34 @@
 
   tasks:
     - name: Install Brave via Homebrew Cask (macOS)
-      shell: /opt/homebrew/bin/brew install --cask brave-browser
+      ansible.builtin.shell: /opt/homebrew/bin/brew install --cask brave-browser
       args:
         creates: /Applications/Brave Browser.app
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Check if Brave is installed (Debian)
-      stat:
+      ansible.builtin.stat:
         path: /usr/bin/brave-browser
       register: brave_check
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Add Brave apt repository (Debian)
-      shell: |
+      ansible.builtin.shell: |
         curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
         echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" | tee /etc/apt/sources.list.d/brave-browser-release.list > /dev/null
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian" and not brave_check.stat.exists
 
     - name: Install Brave via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: brave-browser
         state: present
-        update_cache: yes
-      become: yes
+        update_cache: true
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Brave via yay (Arch)
-      shell: yay -S --noconfirm brave-bin
+      ansible.builtin.shell: yay -S --noconfirm brave-bin
       args:
         creates: /usr/bin/brave
       when: ansible_facts['os_family'] == "Archlinux"

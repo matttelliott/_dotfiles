@@ -7,7 +7,7 @@
 
   tasks:
     - name: Install/update Claude Code via npm (macOS)
-      shell: |
+      ansible.builtin.shell: |
         export NVM_DIR="$HOME/.nvm"
         . /opt/homebrew/opt/nvm/nvm.sh
         npm install -g @anthropic-ai/claude-code@latest
@@ -16,7 +16,7 @@
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install/update Claude Code via npm (Linux)
-      shell: |
+      ansible.builtin.shell: |
         export NVM_DIR="$HOME/.nvm"
         . ~/.nvm/nvm.sh
         npm install -g @anthropic-ai/claude-code@latest
@@ -25,12 +25,12 @@
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
 
     - name: Create Claude config directory
-      file:
+      ansible.builtin.file:
         path: ~/.claude
         state: directory
 
     - name: Create Claude config scaffold directories
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       loop:
@@ -39,7 +39,7 @@
         - ~/.claude/hooks
 
     - name: Add/update Sequential Thinking MCP server (user level)
-      shell: |
+      ansible.builtin.shell: |
         export NVM_DIR="$HOME/.nvm"
         {% if ansible_facts['os_family'] == "Darwin" %}
         . /opt/homebrew/opt/nvm/nvm.sh
@@ -52,7 +52,7 @@
       failed_when: false
 
     - name: Add/update Playwright MCP server (user level)
-      shell: |
+      ansible.builtin.shell: |
         export NVM_DIR="$HOME/.nvm"
         {% if ansible_facts['os_family'] == "Darwin" %}
         . /opt/homebrew/opt/nvm/nvm.sh
@@ -66,7 +66,7 @@
 
     # https://github.com/glittercowboy/get-shit-done
     - name: Install/update Get Shit Done (GSD) commands (user level)
-      shell: |
+      ansible.builtin.shell: |
         export NVM_DIR="$HOME/.nvm"
         {% if ansible_facts['os_family'] == "Darwin" %}
         . /opt/homebrew/opt/nvm/nvm.sh

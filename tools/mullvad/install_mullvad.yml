@@ -5,47 +5,47 @@
 
   tasks:
     - name: Install Mullvad Browser via Homebrew Cask (macOS)
-      shell: /opt/homebrew/bin/brew install --cask mullvad-browser
+      ansible.builtin.shell: /opt/homebrew/bin/brew install --cask mullvad-browser
       args:
         creates: /Applications/Mullvad Browser.app
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Check if Mullvad Browser is installed (Debian)
-      stat:
+      ansible.builtin.stat:
         path: /opt/mullvad-browser
       register: mullvad_check
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Download Mullvad Browser (Debian)
-      get_url:
+      ansible.builtin.get_url:
         url: https://mullvad.net/en/download/browser/linux-x86_64/latest
         dest: /tmp/mullvad-browser.tar.xz
       when: ansible_facts['os_family'] == "Debian" and not mullvad_check.stat.exists
 
     - name: Extract Mullvad Browser (Debian)
-      unarchive:
+      ansible.builtin.unarchive:
         src: /tmp/mullvad-browser.tar.xz
         dest: /opt
-        remote_src: yes
-      become: yes
+        remote_src: true
+      become: true
       when: ansible_facts['os_family'] == "Debian" and not mullvad_check.stat.exists
 
     - name: Create symlink for Mullvad Browser (Debian)
-      file:
+      ansible.builtin.file:
         src: /opt/mullvad-browser/Browser/start-mullvad-browser
         dest: /usr/local/bin/mullvad-browser
         state: link
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Clean up Mullvad Browser archive (Debian)
-      file:
+      ansible.builtin.file:
         path: /tmp/mullvad-browser.tar.xz
         state: absent
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Mullvad Browser via yay (Arch)
-      shell: yay -S --noconfirm mullvad-browser-bin
+      ansible.builtin.shell: yay -S --noconfirm mullvad-browser-bin
       args:
         creates: /usr/bin/mullvad-browser
       when: ansible_facts['os_family'] == "Archlinux"

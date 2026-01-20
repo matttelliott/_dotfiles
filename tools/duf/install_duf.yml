@@ -3,19 +3,19 @@
   gather_facts: true
   tasks:
     - name: Install duf via Homebrew
-      shell: /opt/homebrew/bin/brew install duf
+      ansible.builtin.shell: /opt/homebrew/bin/brew install duf
       args:
         creates: /opt/homebrew/bin/duf
       when: ansible_facts['os_family'] == "Darwin"
     - name: Install duf via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: duf
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
     - name: Install duf via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: duf
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"

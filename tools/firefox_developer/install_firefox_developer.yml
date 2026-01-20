@@ -5,52 +5,52 @@
 
   tasks:
     - name: Install Firefox Developer Edition via Homebrew Cask (macOS)
-      shell: /opt/homebrew/bin/brew install --cask firefox@developer-edition
+      ansible.builtin.shell: /opt/homebrew/bin/brew install --cask firefox@developer-edition
       args:
         creates: /Applications/Firefox Developer Edition.app
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Check if Firefox Developer Edition is installed (Debian)
-      stat:
+      ansible.builtin.stat:
         path: /opt/firefox-developer
       register: firefox_dev_check
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Download Firefox Developer Edition (Debian)
-      get_url:
+      ansible.builtin.get_url:
         url: https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US
         dest: /tmp/firefox-developer.tar.bz2
       when: ansible_facts['os_family'] == "Debian" and not firefox_dev_check.stat.exists
 
     - name: Extract Firefox Developer Edition (Debian)
-      unarchive:
+      ansible.builtin.unarchive:
         src: /tmp/firefox-developer.tar.bz2
         dest: /opt
-        remote_src: yes
-      become: yes
+        remote_src: true
+      become: true
       when: ansible_facts['os_family'] == "Debian" and not firefox_dev_check.stat.exists
 
     - name: Rename Firefox Developer Edition directory (Debian)
-      command: mv /opt/firefox /opt/firefox-developer
-      become: yes
+      ansible.builtin.command: mv /opt/firefox /opt/firefox-developer
+      become: true
       when: ansible_facts['os_family'] == "Debian" and not firefox_dev_check.stat.exists
 
     - name: Create symlink for Firefox Developer Edition (Debian)
-      file:
+      ansible.builtin.file:
         src: /opt/firefox-developer/firefox
         dest: /usr/local/bin/firefox-developer
         state: link
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Clean up Firefox Developer Edition archive (Debian)
-      file:
+      ansible.builtin.file:
         path: /tmp/firefox-developer.tar.bz2
         state: absent
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Firefox Developer Edition via yay (Arch)
-      shell: yay -S --noconfirm firefox-developer-edition
+      ansible.builtin.shell: yay -S --noconfirm firefox-developer-edition
       args:
         creates: /usr/bin/firefox-developer-edition
       when: ansible_facts['os_family'] == "Archlinux"

@@ -5,21 +5,21 @@
 
   tasks:
     - name: Install wget via Homebrew
-      shell: /opt/homebrew/bin/brew install wget
+      ansible.builtin.shell: /opt/homebrew/bin/brew install wget
       args:
         creates: /opt/homebrew/bin/wget
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install wget via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: wget
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install wget via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: wget
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"

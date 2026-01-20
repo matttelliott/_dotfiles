@@ -38,7 +38,7 @@
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: "{{ item.value.right }}"
-        replace: "{{ target.right }}"
+        ansible.builtin.replace: "{{ target.right }}"
       loop: "{{ styles | dict2items }}"
       when: item.key != style and item.key != 'none'
 
@@ -46,7 +46,7 @@
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: "{{ item.value.left }}"
-        replace: "{{ target.left }}"
+        ansible.builtin.replace: "{{ target.left }}"
       loop: "{{ styles | dict2items }}"
       when: item.key != style and item.key != 'none'
 
@@ -55,70 +55,70 @@
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: '(status-left.*?)\] #\[fg='
-        replace: '\1]{{ target.right }}#[fg='
+        ansible.builtin.replace: '\1]{{ target.right }}#[fg='
       when: style != 'none'
 
     - name: Restore right separator from none in tmux (status-left, pass 2)
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: '(status-left.*?)\] #\[fg='
-        replace: '\1]{{ target.right }}#[fg='
+        ansible.builtin.replace: '\1]{{ target.right }}#[fg='
       when: style != 'none'
 
     - name: Restore right separator from none in tmux (window-status, pass 1)
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: '(window-status.*?)\] #\[fg='
-        replace: '\1]{{ target.right }}#[fg='
+        ansible.builtin.replace: '\1]{{ target.right }}#[fg='
       when: style != 'none'
 
     - name: Restore right separator from none in tmux (window-status, pass 2)
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: '(window-status.*?)\] #\[fg='
-        replace: '\1]{{ target.right }}#[fg='
+        ansible.builtin.replace: '\1]{{ target.right }}#[fg='
       when: style != 'none'
 
     - name: Restore left separator from none in tmux (status-right, pass 1)
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: '(status-right.*?)\] #\[fg='
-        replace: '\1]{{ target.left }}#[fg='
+        ansible.builtin.replace: '\1]{{ target.left }}#[fg='
       when: style != 'none'
 
     - name: Restore left separator from none in tmux (status-right, pass 2)
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: '(status-right.*?)\] #\[fg='
-        replace: '\1]{{ target.left }}#[fg='
+        ansible.builtin.replace: '\1]{{ target.left }}#[fg='
       when: style != 'none'
 
     - name: Restore trailing right separator in tmux (status-left)
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: '(status-left.*?)\]  "'
-        replace: '\1]{{ target.right }} "'
+        ansible.builtin.replace: '\1]{{ target.right }} "'
       when: style != 'none'
 
     - name: Restore trailing right separator in tmux (window-status, two spaces)
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: '(window-status-current.*?)\]  "'
-        replace: '\1]{{ target.right }} "'
+        ansible.builtin.replace: '\1]{{ target.right }} "'
       when: style != 'none'
 
     - name: Restore trailing right separator in tmux (window-status, one space)
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: '(window-status-current.*?)\] "'
-        replace: '\1]{{ target.right }}"'
+        ansible.builtin.replace: '\1]{{ target.right }}"'
       when: style != 'none'
 
     - name: Restore trailing left separator in tmux (status-right)
       ansible.builtin.replace:
         path: ~/.tmux.conf
         regexp: '(status-right.*?)\]  "'
-        replace: '\1]{{ target.left }} "'
+        ansible.builtin.replace: '\1]{{ target.left }} "'
       when: style != 'none'
 
     - name: Reload tmux config
@@ -132,7 +132,7 @@
       ansible.builtin.replace:
         path: ~/.config/starship.toml
         regexp: "{{ item.value.right }}"
-        replace: "{{ target.right }}"
+        ansible.builtin.replace: "{{ target.right }}"
       loop: "{{ styles | dict2items }}"
       when: item.key != style and item.key != 'none'
 
@@ -140,7 +140,7 @@
       ansible.builtin.replace:
         path: ~/.config/starship.toml
         regexp: "{{ item.value.left }}"
-        replace: "{{ target.left }}"
+        ansible.builtin.replace: "{{ target.left }}"
       loop: "{{ styles | dict2items }}"
       when: item.key != style and item.key != 'none'
 
@@ -148,7 +148,7 @@
       ansible.builtin.replace:
         path: ~/.config/starship.toml
         regexp: '\[ \]\(fg:'
-        replace: "[{{ target.right }}](fg:"
+        ansible.builtin.replace: "[{{ target.right }}](fg:"
       when: style != 'none'
 
     # ===================
@@ -158,7 +158,7 @@
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: "nr2char\\({{ item.value.right_code }}\\)"
-        replace: "nr2char({{ target.right_code }})"
+        ansible.builtin.replace: "nr2char({{ target.right_code }})"
       loop: "{{ styles | dict2items }}"
       when: item.key != style and item.key != 'none' and target.right_code != 'none'
 
@@ -166,7 +166,7 @@
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: "nr2char\\({{ item.value.left_code }}\\)"
-        replace: "nr2char({{ target.left_code }})"
+        ansible.builtin.replace: "nr2char({{ target.left_code }})"
       loop: "{{ styles | dict2items }}"
       when: item.key != style and item.key != 'none' and target.left_code != 'none'
 
@@ -175,7 +175,7 @@
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: "vim\\.fn\\.nr2char\\({{ item.value.right_code }}\\)"
-        replace: "' '"
+        ansible.builtin.replace: "' '"
       loop: "{{ styles | dict2items }}"
       when: style == 'none' and item.key != 'none'
 
@@ -183,7 +183,7 @@
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: "vim\\.fn\\.nr2char\\({{ item.value.left_code }}\\)"
-        replace: "' '"
+        ansible.builtin.replace: "' '"
       loop: "{{ styles | dict2items }}"
       when: style == 'none' and item.key != 'none'
 
@@ -192,13 +192,13 @@
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: "(local arrow_right = )' '"
-        replace: "\\1vim.fn.nr2char({{ target.right_code }})"
+        ansible.builtin.replace: "\\1vim.fn.nr2char({{ target.right_code }})"
       when: style != 'none'
 
     - name: Restore neovim left arrow from none
       ansible.builtin.replace:
         path: ~/.config/nvim/init.lua
         regexp: "(local arrow_left = )' '"
-        replace: "\\1vim.fn.nr2char({{ target.left_code }})"
+        ansible.builtin.replace: "\\1vim.fn.nr2char({{ target.left_code }})"
       when: style != 'none'
 

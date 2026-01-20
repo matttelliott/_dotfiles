@@ -5,20 +5,20 @@
 
   tasks:
     - name: Install sd via Homebrew
-      shell: /opt/homebrew/bin/brew install sd
+      ansible.builtin.shell: /opt/homebrew/bin/brew install sd
       args:
         creates: /opt/homebrew/bin/sd
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install sd via cargo (Debian)
-      shell: ~/.cargo/bin/cargo install sd
+      ansible.builtin.shell: ~/.cargo/bin/cargo install sd
       args:
         creates: ~/.cargo/bin/sd
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install sd via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: sd
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"

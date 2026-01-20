@@ -5,46 +5,46 @@
 
   tasks:
     - name: Install Starship via Homebrew
-      shell: /opt/homebrew/bin/brew install starship
+      ansible.builtin.shell: /opt/homebrew/bin/brew install starship
       args:
         creates: /opt/homebrew/bin/starship
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Check if Starship is installed (Debian)
-      stat:
+      ansible.builtin.stat:
         path: /usr/local/bin/starship
       register: starship_check
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Starship via curl (Debian)
-      shell: curl -sS https://starship.rs/install.sh | sh -s -- -y
-      become: yes
+      ansible.builtin.shell: curl -sS https://starship.rs/install.sh | sh -s -- -y
+      become: true
       when: ansible_facts['os_family'] == "Debian" and not starship_check.stat.exists
 
     - name: Install Starship via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: starship
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Create zsh config directory
-      file:
+      ansible.builtin.file:
         path: ~/.config/zsh
         state: directory
 
     - name: Install starship zsh config
-      copy:
+      ansible.builtin.copy:
         src: starship.zsh
         dest: ~/.config/zsh/starship.zsh
 
     - name: Source starship in zshrc
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: ~/.zshrc
         line: 'source ~/.config/zsh/starship.zsh'
-        create: yes
+        create: true
 
     - name: Install starship config
-      copy:
+      ansible.builtin.copy:
         src: starship.toml
         dest: ~/.config/starship.toml

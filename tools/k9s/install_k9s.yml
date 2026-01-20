@@ -3,43 +3,43 @@
   gather_facts: true
   tasks:
     - name: Install k9s via Homebrew
-      shell: /opt/homebrew/bin/brew install k9s
+      ansible.builtin.shell: /opt/homebrew/bin/brew install k9s
       args:
         creates: /opt/homebrew/bin/k9s
       when: ansible_facts['os_family'] == "Darwin"
     - name: Check if k9s is installed (Debian)
-      stat:
+      ansible.builtin.stat:
         path: /usr/local/bin/k9s
       register: k9s_check
       when: ansible_facts['os_family'] == "Debian"
     - name: Download and install k9s (Debian)
-      shell: |
+      ansible.builtin.shell: |
         curl -Lo /tmp/k9s.tar.gz "https://github.com/derailed/k9s/releases/latest/download/k9s_Linux_amd64.tar.gz"
         tar xf /tmp/k9s.tar.gz -C /tmp k9s
         install /tmp/k9s /usr/local/bin
         rm -f /tmp/k9s /tmp/k9s.tar.gz
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian" and not k9s_check.stat.exists
     - name: Install k9s via yay (Arch)
-      shell: yay -S --noconfirm k9s
+      ansible.builtin.shell: yay -S --noconfirm k9s
       args:
         creates: /usr/bin/k9s
       when: ansible_facts['os_family'] == "Archlinux"
     # macOS uses ~/Library/Application Support/k9s/
     - name: Create k9s skins directory (macOS)
-      file:
+      ansible.builtin.file:
         path: ~/Library/Application Support/k9s/skins
         state: directory
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install k9s skin (macOS)
-      copy:
+      ansible.builtin.copy:
         src: skin.yml
         dest: ~/Library/Application Support/k9s/skins/tokyonight.yml
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Create k9s config (macOS)
-      copy:
+      ansible.builtin.copy:
         dest: ~/Library/Application Support/k9s/config.yaml
         content: |
           k9s:
@@ -49,19 +49,19 @@
 
     # Linux uses ~/.config/k9s/
     - name: Create k9s skins directory (Linux)
-      file:
+      ansible.builtin.file:
         path: ~/.config/k9s/skins
         state: directory
       when: ansible_facts['os_family'] != "Darwin"
 
     - name: Install k9s skin (Linux)
-      copy:
+      ansible.builtin.copy:
         src: skin.yml
         dest: ~/.config/k9s/skins/tokyonight.yml
       when: ansible_facts['os_family'] != "Darwin"
 
     - name: Create k9s config (Linux)
-      copy:
+      ansible.builtin.copy:
         dest: ~/.config/k9s/config.yml
         content: |
           k9s:

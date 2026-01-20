@@ -3,18 +3,18 @@
   gather_facts: true
   tasks:
     - name: Install dust via Homebrew
-      shell: /opt/homebrew/bin/brew install dust
+      ansible.builtin.shell: /opt/homebrew/bin/brew install dust
       args:
         creates: /opt/homebrew/bin/dust
       when: ansible_facts['os_family'] == "Darwin"
     - name: Install dust via cargo (Debian)
-      shell: ~/.cargo/bin/cargo install du-dust
+      ansible.builtin.shell: ~/.cargo/bin/cargo install du-dust
       args:
         creates: ~/.cargo/bin/dust
       when: ansible_facts['os_family'] == "Debian"
     - name: Install dust via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: dust
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"

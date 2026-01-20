@@ -5,6 +5,6 @@
 
   tasks:
     - name: Install mas via Homebrew
-      shell: /opt/homebrew/bin/brew install mas
+      ansible.builtin.shell: /opt/homebrew/bin/brew install mas
       args:
         creates: /opt/homebrew/bin/mas

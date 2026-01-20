@@ -5,15 +5,15 @@
 
   tasks:
     - name: Install build-essential via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: build-essential
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install base-devel via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: base-devel
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"

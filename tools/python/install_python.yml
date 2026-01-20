@@ -5,21 +5,21 @@
 
   tasks:
     - name: Install uv via Homebrew
-      shell: /opt/homebrew/bin/brew install uv
+      ansible.builtin.shell: /opt/homebrew/bin/brew install uv
       args:
         creates: /opt/homebrew/bin/uv
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install uv via official installer (Linux)
-      shell: curl -LsSf https://astral.sh/uv/install.sh | sh
+      ansible.builtin.shell: curl -LsSf https://astral.sh/uv/install.sh | sh
       args:
         creates: ~/.local/bin/uv
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
 
     - name: Install Python dev tools (macOS)
-      shell: /opt/homebrew/bin/uv tool install ruff && /opt/homebrew/bin/uv tool install black && /opt/homebrew/bin/uv tool install isort
+      ansible.builtin.shell: /opt/homebrew/bin/uv tool install ruff && /opt/homebrew/bin/uv tool install black && /opt/homebrew/bin/uv tool install isort
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install Python dev tools (Linux)
-      shell: ~/.local/bin/uv tool install ruff && ~/.local/bin/uv tool install black && ~/.local/bin/uv tool install isort
+      ansible.builtin.shell: ~/.local/bin/uv tool install ruff && ~/.local/bin/uv tool install black && ~/.local/bin/uv tool install isort
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]

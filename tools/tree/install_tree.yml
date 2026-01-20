@@ -5,21 +5,21 @@
 
   tasks:
     - name: Install tree via Homebrew
-      shell: /opt/homebrew/bin/brew install tree
+      ansible.builtin.shell: /opt/homebrew/bin/brew install tree
       args:
         creates: /opt/homebrew/bin/tree
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install tree via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: tree
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install tree via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: tree
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"

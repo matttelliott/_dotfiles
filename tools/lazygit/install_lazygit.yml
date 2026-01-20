@@ -5,47 +5,47 @@
     lazygit_version: "0.44.1"
   tasks:
     - name: Install lazygit via Homebrew
-      shell: /opt/homebrew/bin/brew install lazygit
+      ansible.builtin.shell: /opt/homebrew/bin/brew install lazygit
       args:
         creates: /opt/homebrew/bin/lazygit
       when: ansible_facts['os_family'] == "Darwin"
     - name: Check if lazygit is installed (Debian)
-      stat:
+      ansible.builtin.stat:
         path: /usr/local/bin/lazygit
       register: lazygit_check
       when: ansible_facts['os_family'] == "Debian"
     - name: Download and install lazygit (Debian)
-      shell: |
+      ansible.builtin.shell: |
         curl -Lo /tmp/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v{{ lazygit_version }}/lazygit_{{ lazygit_version }}_Linux_x86_64.tar.gz"
         tar xf /tmp/lazygit.tar.gz -C /tmp lazygit
         install /tmp/lazygit /usr/local/bin
         rm -f /tmp/lazygit /tmp/lazygit.tar.gz
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian" and not lazygit_check.stat.exists
     - name: Install lazygit via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: lazygit
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
     - name: Create zsh config directory
-      file:
+      ansible.builtin.file:
         path: ~/.config/zsh
         state: directory
     - name: Install lazygit aliases
-      copy:
+      ansible.builtin.copy:
         src: lazygit.zsh
         dest: ~/.config/zsh/lazygit.zsh
     - name: Source lazygit aliases in zshrc
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: ~/.zshrc
         line: 'source ~/.config/zsh/lazygit.zsh'
-        create: yes
+        create: true
     - name: Create lazygit config directory
-      file:
+      ansible.builtin.file:
         path: ~/.config/lazygit
         state: directory
     - name: Install lazygit config
-      copy:
+      ansible.builtin.copy:
         src: config.yml
         dest: ~/.config/lazygit/config.yml

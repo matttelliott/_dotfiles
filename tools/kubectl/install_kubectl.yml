@@ -5,21 +5,21 @@
 
   tasks:
     - name: Install kubectl via Homebrew (macOS)
-      shell: /opt/homebrew/bin/brew install kubectl
+      ansible.builtin.shell: /opt/homebrew/bin/brew install kubectl
       args:
         creates: /opt/homebrew/bin/kubectl
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install kubectl via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: kubectl
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install kubectl via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: kubectl
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"

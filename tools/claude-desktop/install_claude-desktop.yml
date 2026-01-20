@@ -5,7 +5,7 @@
 
   tasks:
     - name: Install Claude Desktop via Homebrew (macOS)
-      shell: /opt/homebrew/bin/brew install --cask claude
+      ansible.builtin.shell: /opt/homebrew/bin/brew install --cask claude
       args:
         creates: /Applications/Claude.app
       when: ansible_facts['os_family'] == "Darwin"

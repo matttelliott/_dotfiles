@@ -1,46 +1,59 @@
-- import_playbook: tools/sudoers/install_sudoers.yml
+- name: Install sudoers
+  import_playbook: tools/sudoers/install_sudoers.yml
 - name: Prevent sleep during setup (macOS)
   hosts: macs
   gather_facts: false
   tasks:
     - name: Disable sleep
-      command: pmset -a disablesleep 1
-      become: yes
+      ansible.builtin.command: pmset -a disablesleep 1
+      become: true
 - name: Update Homebrew (macOS)
   hosts: macs
   gather_facts: false
   tasks:
     - name: Update Homebrew
-      shell: /opt/homebrew/bin/brew update
+      ansible.builtin.shell: /opt/homebrew/bin/brew update
       changed_when: false
 - name: Update apt cache (Debian)
   hosts: debian
   gather_facts: false
   tasks:
     - name: Update apt cache
-      apt:
-        update_cache: yes
-      become: yes
+      ansible.builtin.apt:
+        update_cache: true
+      become: true
 - name: Update pacman cache (Arch)
   hosts: arch
   gather_facts: false
   tasks:
     - name: Update pacman cache
-      pacman:
-        update_cache: yes
-      become: yes
-- import_playbook: tools/macos/install_macos.yml
-- import_playbook: tools/debian/install_debian.yml
-- import_playbook: tools/arch/install_arch.yml
-- import_playbook: tools/yay/install_yay.yml
-- import_playbook: tools/build-essential/install_build-essential.yml
-- import_playbook: tools/curl/install_curl.yml
-- import_playbook: tools/unzip/install_unzip.yml
-- import_playbook: tools/zsh/install_zsh.yml
-- import_playbook: tools/1password_cli/install_1password_cli.yml
-- import_playbook: tools/ssh/install_ssh.yml
-- import_playbook: tools/git/install_git.yml
-- import_playbook: tools/keyboard/install_keyboard.yml
+      community.general.pacman:
+        update_cache: true
+      become: true
+- name: Configure macOS
+  import_playbook: tools/macos/install_macos.yml
+- name: Configure Debian
+  import_playbook: tools/debian/install_debian.yml
+- name: Configure Arch
+  import_playbook: tools/arch/install_arch.yml
+- name: Install yay
+  import_playbook: tools/yay/install_yay.yml
+- name: Install build-essential
+  import_playbook: tools/build-essential/install_build-essential.yml
+- name: Install curl
+  import_playbook: tools/curl/install_curl.yml
+- name: Install unzip
+  import_playbook: tools/unzip/install_unzip.yml
+- name: Install zsh
+  import_playbook: tools/zsh/install_zsh.yml
+- name: Install 1Password CLI
+  import_playbook: tools/1password_cli/install_1password_cli.yml
+- name: Install SSH
+  import_playbook: tools/ssh/install_ssh.yml
+- name: Install git
+  import_playbook: tools/git/install_git.yml
+- name: Install keyboard
+  import_playbook: tools/keyboard/install_keyboard.yml
 - name: Clone and update dotfiles repo
   hosts: all
   gather_facts: false
@@ -49,141 +62,226 @@
     dotfiles_https_url: "https://github.com/{{ github_username }}/_dotfiles.git"
   tasks:
     - name: Check if dotfiles exists
-      stat:
+      ansible.builtin.stat:
         path: ~/_dotfiles
       register: dotfiles_dir
 
     - name: Check if SSH key exists
-      stat:
+      ansible.builtin.stat:
         path: ~/.ssh/id_rsa
       register: ssh_key_file
 
     - name: Set use_ssh fact
-      set_fact:
+      ansible.builtin.set_fact:
         use_ssh: "{{ (inventory_hostname in groups['with_login_tools']) and ssh_key_file.stat.exists }}"
 
     - name: Clone dotfiles via SSH
-      git:
+      ansible.builtin.git:
         repo: "{{ dotfiles_ssh_url }}"
         dest: ~/_dotfiles
       when: not dotfiles_dir.stat.exists and use_ssh
 
     - name: Clone dotfiles via HTTPS
-      git:
+      ansible.builtin.git:
         repo: "{{ dotfiles_https_url }}"
         dest: ~/_dotfiles
       when: not dotfiles_dir.stat.exists and not use_ssh
 
     - name: Set remote to SSH
-      command: git remote set-url origin {{ dotfiles_ssh_url }}
+      ansible.builtin.command: git remote set-url origin {{ dotfiles_ssh_url }}
       args:
         chdir: ~/_dotfiles
       when: dotfiles_dir.stat.exists and use_ssh
       changed_when: false
 
     - name: Set remote to HTTPS
-      command: git remote set-url origin {{ dotfiles_https_url }}
+      ansible.builtin.command: git remote set-url origin {{ dotfiles_https_url }}
       args:
         chdir: ~/_dotfiles
       when: dotfiles_dir.stat.exists and not use_ssh
       changed_when: false
 
     - name: Update dotfiles repo
-      command: git pull --ff-only
+      ansible.builtin.command: git pull --ff-only
       args:
         chdir: ~/_dotfiles
       register: git_pull
       changed_when: "'Already up to date' not in git_pull.stdout"
       when: dotfiles_dir.stat.exists
-- import_playbook: tools/mosh/install_mosh.yml
-- import_playbook: tools/homebrew/install_homebrew.yml
-- import_playbook: tools/mas/install_mas.yml
-- import_playbook: tools/python/install_python.yml
-- import_playbook: tools/ansible/install_ansible.yml
-- import_playbook: tools/starship/install_starship.yml
-- import_playbook: tools/node/install_node.yml
-- import_playbook: tools/rust/install_rust.yml
-- import_playbook: tools/go/install_go.yml
-- import_playbook: tools/lua/install_lua.yml
-- import_playbook: tools/tmux/install_tmux.yml
-- import_playbook: tools/neovim/install_neovim.yml
-- import_playbook: tools/nvim-ai/install_nvim-ai.yml
-- import_playbook: tools/sd/install_sd.yml
-- import_playbook: tools/fd/install_fd.yml
-- import_playbook: tools/ripgrep/install_ripgrep.yml
-- import_playbook: tools/fzf/install_fzf.yml
-- import_playbook: tools/jq/install_jq.yml
-- import_playbook: tools/htop/install_htop.yml
-- import_playbook: tools/btop/install_btop.yml
-- import_playbook: tools/procs/install_procs.yml
-- import_playbook: tools/nmap/install_nmap.yml
-- import_playbook: tools/bat/install_bat.yml
-- import_playbook: tools/eza/install_eza.yml
-- import_playbook: tools/tree/install_tree.yml
-- import_playbook: tools/dust/install_dust.yml
-- import_playbook: tools/duf/install_duf.yml
-- import_playbook: tools/tldr/install_tldr.yml
-- import_playbook: tools/direnv/install_direnv.yml
-- import_playbook: tools/wget/install_wget.yml
-- import_playbook: tools/yt-dlp/install_yt-dlp.yml
-- import_playbook: tools/ffmpeg/install_ffmpeg.yml
-- import_playbook: tools/imagemagick/install_imagemagick.yml
-- import_playbook: tools/pandoc/install_pandoc.yml
-- import_playbook: tools/asciiquarium/install_asciiquarium.yml
-- import_playbook: tools/fastfetch/install_fastfetch.yml
-- import_playbook: tools/cowsay/install_cowsay.yml
-- import_playbook: tools/fortune/install_fortune.yml
-- import_playbook: tools/lolcat/install_lolcat.yml
-- import_playbook: tools/cmatrix/install_cmatrix.yml
-- import_playbook: tools/lazygit/install_lazygit.yml
-- import_playbook: tools/lazydocker/install_lazydocker.yml
-- import_playbook: tools/docker/install_docker.yml
-- import_playbook: tools/wireguard/install_wireguard.yml
-- import_playbook: tools/wireguard_gui/install_wireguard_gui.yml
-- import_playbook: tools/nas/install_nas.yml
-- import_playbook: tools/fail2ban/install_fail2ban.yml
-- import_playbook: tools/doctl/install_doctl.yml
-- import_playbook: tools/pulumi/install_pulumi.yml
-- import_playbook: tools/awscli/install_awscli.yml
-- import_playbook: tools/gh/install_gh.yml
-- import_playbook: tools/gcloud/install_gcloud.yml
-- import_playbook: tools/kubectl/install_kubectl.yml
-- import_playbook: tools/k9s/install_k9s.yml
-- import_playbook: tools/helm/install_helm.yml
-- import_playbook: tools/kubectx/install_kubectx.yml
-- import_playbook: tools/claude-code/install_claude-code.yml
-- import_playbook: tools/claude-desktop/install_claude-desktop.yml
-- import_playbook: tools/chatgpt-desktop/install_chatgpt-desktop.yml
-- import_playbook: tools/codex/install_codex.yml
-- import_playbook: tools/1password/install_1password.yml
-- import_playbook: tools/age/install_age.yml
-- import_playbook: tools/sops/install_sops.yml
-- import_playbook: tools/rectangle/install_rectangle.yml
-- import_playbook: tools/wezterm/install_wezterm.yml
-- import_playbook: tools/dbeaver/install_dbeaver.yml
-- import_playbook: tools/obsidian/install_obsidian.yml
-- import_playbook: tools/vlc/install_vlc.yml
-- import_playbook: tools/chrome/install_chrome.yml
-- import_playbook: tools/chromium/install_chromium.yml
-- import_playbook: tools/chrome_canary/install_chrome_canary.yml
-- import_playbook: tools/firefox/install_firefox.yml
-- import_playbook: tools/firefox_developer/install_firefox_developer.yml
-- import_playbook: tools/opera/install_opera.yml
-- import_playbook: tools/vivaldi/install_vivaldi.yml
-- import_playbook: tools/brave/install_brave.yml
-- import_playbook: tools/arc/install_arc.yml
-- import_playbook: tools/edge/install_edge.yml
-- import_playbook: tools/tor/install_tor.yml
-- import_playbook: tools/librewolf/install_librewolf.yml
-- import_playbook: tools/zen/install_zen.yml
-- import_playbook: tools/orion/install_orion.yml
-- import_playbook: tools/mullvad/install_mullvad.yml
-- import_playbook: tools/gpu/install_gpu.yml
-- import_playbook: tools/steam/install_steam.yml
+- name: Install mosh
+  import_playbook: tools/mosh/install_mosh.yml
+- name: Install Homebrew
+  import_playbook: tools/homebrew/install_homebrew.yml
+- name: Install mas
+  import_playbook: tools/mas/install_mas.yml
+- name: Install Python
+  import_playbook: tools/python/install_python.yml
+- name: Install Ansible
+  import_playbook: tools/ansible/install_ansible.yml
+- name: Install Starship
+  import_playbook: tools/starship/install_starship.yml
+- name: Install Node
+  import_playbook: tools/node/install_node.yml
+- name: Install Rust
+  import_playbook: tools/rust/install_rust.yml
+- name: Install Go
+  import_playbook: tools/go/install_go.yml
+- name: Install Lua
+  import_playbook: tools/lua/install_lua.yml
+- name: Install tmux
+  import_playbook: tools/tmux/install_tmux.yml
+- name: Install Neovim
+  import_playbook: tools/neovim/install_neovim.yml
+- name: Install nvim-ai
+  import_playbook: tools/nvim-ai/install_nvim-ai.yml
+- name: Install sd
+  import_playbook: tools/sd/install_sd.yml
+- name: Install fd
+  import_playbook: tools/fd/install_fd.yml
+- name: Install ripgrep
+  import_playbook: tools/ripgrep/install_ripgrep.yml
+- name: Install fzf
+  import_playbook: tools/fzf/install_fzf.yml
+- name: Install jq
+  import_playbook: tools/jq/install_jq.yml
+- name: Install htop
+  import_playbook: tools/htop/install_htop.yml
+- name: Install btop
+  import_playbook: tools/btop/install_btop.yml
+- name: Install procs
+  import_playbook: tools/procs/install_procs.yml
+- name: Install nmap
+  import_playbook: tools/nmap/install_nmap.yml
+- name: Install bat
+  import_playbook: tools/bat/install_bat.yml
+- name: Install eza
+  import_playbook: tools/eza/install_eza.yml
+- name: Install tree
+  import_playbook: tools/tree/install_tree.yml
+- name: Install dust
+  import_playbook: tools/dust/install_dust.yml
+- name: Install duf
+  import_playbook: tools/duf/install_duf.yml
+- name: Install tldr
+  import_playbook: tools/tldr/install_tldr.yml
+- name: Install direnv
+  import_playbook: tools/direnv/install_direnv.yml
+- name: Install wget
+  import_playbook: tools/wget/install_wget.yml
+- name: Install yt-dlp
+  import_playbook: tools/yt-dlp/install_yt-dlp.yml
+- name: Install ffmpeg
+  import_playbook: tools/ffmpeg/install_ffmpeg.yml
+- name: Install ImageMagick
+  import_playbook: tools/imagemagick/install_imagemagick.yml
+- name: Install pandoc
+  import_playbook: tools/pandoc/install_pandoc.yml
+- name: Install asciiquarium
+  import_playbook: tools/asciiquarium/install_asciiquarium.yml
+- name: Install fastfetch
+  import_playbook: tools/fastfetch/install_fastfetch.yml
+- name: Install cowsay
+  import_playbook: tools/cowsay/install_cowsay.yml
+- name: Install fortune
+  import_playbook: tools/fortune/install_fortune.yml
+- name: Install lolcat
+  import_playbook: tools/lolcat/install_lolcat.yml
+- name: Install cmatrix
+  import_playbook: tools/cmatrix/install_cmatrix.yml
+- name: Install lazygit
+  import_playbook: tools/lazygit/install_lazygit.yml
+- name: Install lazydocker
+  import_playbook: tools/lazydocker/install_lazydocker.yml
+- name: Install Docker
+  import_playbook: tools/docker/install_docker.yml
+- name: Install WireGuard
+  import_playbook: tools/wireguard/install_wireguard.yml
+- name: Install WireGuard GUI
+  import_playbook: tools/wireguard_gui/install_wireguard_gui.yml
+- name: Install NAS
+  import_playbook: tools/nas/install_nas.yml
+- name: Install fail2ban
+  import_playbook: tools/fail2ban/install_fail2ban.yml
+- name: Install doctl
+  import_playbook: tools/doctl/install_doctl.yml
+- name: Install Pulumi
+  import_playbook: tools/pulumi/install_pulumi.yml
+- name: Install AWS CLI
+  import_playbook: tools/awscli/install_awscli.yml
+- name: Install gh
+  import_playbook: tools/gh/install_gh.yml
+- name: Install gcloud
+  import_playbook: tools/gcloud/install_gcloud.yml
+- name: Install kubectl
+  import_playbook: tools/kubectl/install_kubectl.yml
+- name: Install k9s
+  import_playbook: tools/k9s/install_k9s.yml
+- name: Install Helm
+  import_playbook: tools/helm/install_helm.yml
+- name: Install kubectx
+  import_playbook: tools/kubectx/install_kubectx.yml
+- name: Install Claude Code
+  import_playbook: tools/claude-code/install_claude-code.yml
+- name: Install Claude Desktop
+  import_playbook: tools/claude-desktop/install_claude-desktop.yml
+- name: Install ChatGPT Desktop
+  import_playbook: tools/chatgpt-desktop/install_chatgpt-desktop.yml
+- name: Install Codex
+  import_playbook: tools/codex/install_codex.yml
+- name: Install 1Password
+  import_playbook: tools/1password/install_1password.yml
+- name: Install age
+  import_playbook: tools/age/install_age.yml
+- name: Install SOPS
+  import_playbook: tools/sops/install_sops.yml
+- name: Install Rectangle
+  import_playbook: tools/rectangle/install_rectangle.yml
+- name: Install WezTerm
+  import_playbook: tools/wezterm/install_wezterm.yml
+- name: Install DBeaver
+  import_playbook: tools/dbeaver/install_dbeaver.yml
+- name: Install Obsidian
+  import_playbook: tools/obsidian/install_obsidian.yml
+- name: Install VLC
+  import_playbook: tools/vlc/install_vlc.yml
+- name: Install Chrome
+  import_playbook: tools/chrome/install_chrome.yml
+- name: Install Chromium
+  import_playbook: tools/chromium/install_chromium.yml
+- name: Install Chrome Canary
+  import_playbook: tools/chrome_canary/install_chrome_canary.yml
+- name: Install Firefox
+  import_playbook: tools/firefox/install_firefox.yml
+- name: Install Firefox Developer
+  import_playbook: tools/firefox_developer/install_firefox_developer.yml
+- name: Install Opera
+  import_playbook: tools/opera/install_opera.yml
+- name: Install Vivaldi
+  import_playbook: tools/vivaldi/install_vivaldi.yml
+- name: Install Brave
+  import_playbook: tools/brave/install_brave.yml
+- name: Install Arc
+  import_playbook: tools/arc/install_arc.yml
+- name: Install Edge
+  import_playbook: tools/edge/install_edge.yml
+- name: Install Tor
+  import_playbook: tools/tor/install_tor.yml
+- name: Install LibreWolf
+  import_playbook: tools/librewolf/install_librewolf.yml
+- name: Install Zen
+  import_playbook: tools/zen/install_zen.yml
+- name: Install Orion
+  import_playbook: tools/orion/install_orion.yml
+- name: Install Mullvad
+  import_playbook: tools/mullvad/install_mullvad.yml
+- name: Install GPU
+  import_playbook: tools/gpu/install_gpu.yml
+- name: Install Steam
+  import_playbook: tools/steam/install_steam.yml
 - name: Allow sleep after setup (macOS)
   hosts: macs
   gather_facts: false
   tasks:
     - name: Re-enable sleep
-      command: pmset -a disablesleep 0
-      become: yes
+      ansible.builtin.command: pmset -a disablesleep 0
+      become: true

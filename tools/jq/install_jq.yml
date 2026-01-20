@@ -5,21 +5,21 @@
 
   tasks:
     - name: Install jq via Homebrew
-      shell: /opt/homebrew/bin/brew install jq
+      ansible.builtin.shell: /opt/homebrew/bin/brew install jq
       args:
         creates: /opt/homebrew/bin/jq
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install jq via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: jq
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install jq via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: jq
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"

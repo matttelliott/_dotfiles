@@ -23,13 +23,13 @@
       apt:
         name: wakeonlan
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
     - name: Install wakeonlan (Arch)
       pacman:
         name: wakeonlan
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
     - name: Set hosts to wake
       set_fact:

@@ -5,60 +5,60 @@
 
   tasks:
     - name: Create LaunchAgents directory (macOS)
-      file:
+      ansible.builtin.file:
         path: ~/Library/LaunchAgents
         state: directory
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install Caps Lock to Ctrl remap LaunchAgent (macOS)
-      copy:
+      ansible.builtin.copy:
         src: com.local.KeyRemapping.plist
         dest: ~/Library/LaunchAgents/com.local.KeyRemapping.plist
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Load keyboard remap LaunchAgent (macOS)
-      command: launchctl load ~/Library/LaunchAgents/com.local.KeyRemapping.plist
+      ansible.builtin.command: launchctl load ~/Library/LaunchAgents/com.local.KeyRemapping.plist
       changed_when: false
       failed_when: false
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Apply keyboard remap immediately (macOS)
-      command: hidutil property --set '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x7000000E0}]}'
+      ansible.builtin.command: hidutil property --set '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x7000000E0}]}'
       changed_when: false
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Remap Caps Lock to Ctrl (Debian)
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/default/keyboard
         regexp: '^XKBOPTIONS='
         line: 'XKBOPTIONS="ctrl:nocaps"'
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Apply keyboard configuration (Debian)
-      command: dpkg-reconfigure -f noninteractive keyboard-configuration
-      become: yes
+      ansible.builtin.command: dpkg-reconfigure -f noninteractive keyboard-configuration
+      become: true
       changed_when: false
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Add keyboard remap to xprofile (Debian)
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: ~/.xprofile
         regexp: '^setxkbmap.*ctrl:nocaps'
         line: 'setxkbmap -option ctrl:nocaps'
-        create: yes
+        create: true
         mode: '0644'
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Create xorg.conf.d directory (Arch)
-      file:
+      ansible.builtin.file:
         path: /etc/X11/xorg.conf.d
         state: directory
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Remap Caps Lock to Ctrl for X11 (Arch)
-      copy:
+      ansible.builtin.copy:
         dest: /etc/X11/xorg.conf.d/00-keyboard.conf
         content: |
           Section "InputClass"
@@ -68,38 +68,38 @@
               Option "XkbOptions" "ctrl:nocaps"
           EndSection
         mode: '0644'
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Remap Caps Lock to Ctrl for Wayland (Arch)
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/environment
         regexp: '^XKB_DEFAULT_OPTIONS='
         line: 'XKB_DEFAULT_OPTIONS=ctrl:nocaps'
-        create: yes
-      become: yes
+        create: true
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Set keyboard layout in vconsole.conf (Arch)
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/vconsole.conf
         regexp: '^KEYMAP='
         line: 'KEYMAP=us'
-        create: yes
-      become: yes
+        create: true
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Add keyboard remap to xprofile (Arch)
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: ~/.xprofile
         regexp: '^setxkbmap.*ctrl:nocaps'
         line: 'setxkbmap -option ctrl:nocaps'
-        create: yes
+        create: true
         mode: '0644'
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Apply keyboard remap for current session (Arch)
-      command: setxkbmap -option ctrl:nocaps
+      ansible.builtin.command: setxkbmap -option ctrl:nocaps
       environment:
         DISPLAY: ":0"
       changed_when: false

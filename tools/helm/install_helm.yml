@@ -5,21 +5,21 @@
 
   tasks:
     - name: Install helm via Homebrew (macOS)
-      shell: /opt/homebrew/bin/brew install helm
+      ansible.builtin.shell: /opt/homebrew/bin/brew install helm
       args:
         creates: /opt/homebrew/bin/helm
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install helm via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: helm
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install helm via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: helm
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"

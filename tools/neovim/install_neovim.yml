@@ -3,54 +3,54 @@
   gather_facts: true
   tasks:
     - name: Install Neovim via Homebrew
-      shell: /opt/homebrew/bin/brew install neovim
+      ansible.builtin.shell: /opt/homebrew/bin/brew install neovim
       args:
         creates: /opt/homebrew/bin/nvim
       when: ansible_facts['os_family'] == "Darwin"
     - name: Check if Neovim is installed (Debian)
-      stat:
+      ansible.builtin.stat:
         path: /usr/local/bin/nvim
       register: nvim_check
       when: ansible_facts['os_family'] == "Debian"
     - name: Download and install Neovim from GitHub (Debian)
-      shell: |
+      ansible.builtin.shell: |
         curl -LO https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz
         tar xzf nvim-linux-x86_64.tar.gz
         cp -r nvim-linux-x86_64/* /usr/local/
         rm -rf nvim-linux-x86_64 nvim-linux-x86_64.tar.gz
       args:
         chdir: /tmp
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian" and not nvim_check.stat.exists
     - name: Install Neovim via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: neovim
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
     - name: Remove existing neovim config
-      file:
+      ansible.builtin.file:
         path: ~/.config/nvim
         state: absent
     - name: Install neovim config
-      copy:
+      ansible.builtin.copy:
         src: nvim/
         dest: ~/.config/nvim/
     - name: Create zsh config directory
-      file:
+      ansible.builtin.file:
         path: ~/.config/zsh
         state: directory
     - name: Install neovim environment
-      copy:
+      ansible.builtin.copy:
         src: neovim.zsh
         dest: ~/.config/zsh/neovim.zsh
     - name: Source neovim environment in zshrc
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: ~/.zshrc
         line: 'source ~/.config/zsh/neovim.zsh'
-        create: yes
+        create: true
     - name: Install Mason language servers
-      shell: |
+      ansible.builtin.shell: |
         nvim --headless -c "MasonInstall typescript-language-server eslint-lsp css-lsp html-lsp json-lsp tailwindcss-language-server pyright rust-analyzer bash-language-server yaml-language-server prettierd stylua shfmt shellcheck black isort ruff" -c "sleep 30" -c "qa"
       args:
         creates: ~/.local/share/nvim/mason/bin/typescript-language-server

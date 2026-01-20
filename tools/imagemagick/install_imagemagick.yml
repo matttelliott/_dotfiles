@@ -5,21 +5,21 @@
 
   tasks:
     - name: Install imagemagick via Homebrew
-      shell: /opt/homebrew/bin/brew install imagemagick
+      ansible.builtin.shell: /opt/homebrew/bin/brew install imagemagick
       args:
         creates: /opt/homebrew/bin/magick
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install imagemagick via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: imagemagick
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install imagemagick via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: imagemagick
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"

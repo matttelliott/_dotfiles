@@ -6,7 +6,7 @@
 
   tasks:
     - name: Install Orion via Homebrew Cask (macOS only)
-      shell: /opt/homebrew/bin/brew install --cask orion
+      ansible.builtin.shell: /opt/homebrew/bin/brew install --cask orion
       args:
         creates: /Applications/Orion.app
       when: ansible_facts['os_family'] == "Darwin"

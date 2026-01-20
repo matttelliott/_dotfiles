@@ -5,37 +5,37 @@
 
   tasks:
     - name: Install Google Chrome via Homebrew Cask (macOS)
-      shell: /opt/homebrew/bin/brew install --cask google-chrome
+      ansible.builtin.shell: /opt/homebrew/bin/brew install --cask google-chrome
       args:
         creates: /Applications/Google Chrome.app
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Check if Chrome is installed (Debian)
-      stat:
+      ansible.builtin.stat:
         path: /usr/bin/google-chrome
       register: chrome_check
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Download Google Chrome deb package (Debian)
-      get_url:
+      ansible.builtin.get_url:
         url: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
         dest: /tmp/google-chrome.deb
       when: ansible_facts['os_family'] == "Debian" and not chrome_check.stat.exists
 
     - name: Install Google Chrome (Debian)
-      apt:
+      ansible.builtin.apt:
         deb: /tmp/google-chrome.deb
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian" and not chrome_check.stat.exists
 
     - name: Clean up Chrome deb package (Debian)
-      file:
+      ansible.builtin.file:
         path: /tmp/google-chrome.deb
         state: absent
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Google Chrome via yay (Arch)
-      shell: yay -S --noconfirm google-chrome
+      ansible.builtin.shell: yay -S --noconfirm google-chrome
       args:
         creates: /usr/bin/google-chrome-stable
       when: ansible_facts['os_family'] == "Archlinux"

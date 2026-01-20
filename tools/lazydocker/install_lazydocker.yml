@@ -3,46 +3,46 @@
   gather_facts: true
   tasks:
     - name: Install lazydocker via Homebrew
-      shell: /opt/homebrew/bin/brew install lazydocker
+      ansible.builtin.shell: /opt/homebrew/bin/brew install lazydocker
       args:
         creates: /opt/homebrew/bin/lazydocker
       when: ansible_facts['os_family'] == "Darwin"
     - name: Check if lazydocker is installed (Debian)
-      stat:
+      ansible.builtin.stat:
         path: /usr/local/bin/lazydocker
       register: lazydocker_check
       when: ansible_facts['os_family'] == "Debian"
     - name: Download and install lazydocker (Debian)
-      shell: |
+      ansible.builtin.shell: |
         curl -Lo /tmp/lazydocker.tar.gz "https://github.com/jesseduffield/lazydocker/releases/latest/download/lazydocker_0.24.1_Linux_x86_64.tar.gz"
         tar xf /tmp/lazydocker.tar.gz -C /tmp lazydocker
         install /tmp/lazydocker /usr/local/bin
         rm -f /tmp/lazydocker /tmp/lazydocker.tar.gz
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian" and not lazydocker_check.stat.exists
     - name: Install lazydocker via yay (Arch)
-      shell: yay -S --noconfirm lazydocker
+      ansible.builtin.shell: yay -S --noconfirm lazydocker
       args:
         creates: /usr/bin/lazydocker
       when: ansible_facts['os_family'] == "Archlinux"
     - name: Create zsh config directory
-      file:
+      ansible.builtin.file:
         path: ~/.config/zsh
         state: directory
     - name: Install lazydocker aliases
-      copy:
+      ansible.builtin.copy:
         src: lazydocker.zsh
         dest: ~/.config/zsh/lazydocker.zsh
     - name: Source lazydocker aliases in zshrc
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: ~/.zshrc
         line: source ~/.config/zsh/lazydocker.zsh
-        create: yes
+        create: true
     - name: Create lazydocker config directory
-      file:
+      ansible.builtin.file:
         path: ~/.config/lazydocker
         state: directory
     - name: Install lazydocker config
-      copy:
+      ansible.builtin.copy:
         src: config.yml
         dest: ~/.config/lazydocker/config.yml

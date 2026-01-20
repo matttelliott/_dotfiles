@@ -5,21 +5,21 @@
 
   tasks:
     - name: Install htop via Homebrew (macOS)
-      shell: /opt/homebrew/bin/brew install htop
+      ansible.builtin.shell: /opt/homebrew/bin/brew install htop
       args:
         creates: /opt/homebrew/bin/htop
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install htop via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: htop
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install htop via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: htop
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"

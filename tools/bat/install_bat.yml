@@ -3,32 +3,32 @@
   gather_facts: true
   tasks:
     - name: Install bat via Homebrew
-      shell: /opt/homebrew/bin/brew install bat
+      ansible.builtin.shell: /opt/homebrew/bin/brew install bat
       args:
         creates: /opt/homebrew/bin/bat
       when: ansible_facts['os_family'] == "Darwin"
     - name: Install bat via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: bat
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
     - name: Install bat via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: bat
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
     - name: Create zsh config directory
-      file:
+      ansible.builtin.file:
         path: ~/.config/zsh
         state: directory
     - name: Install bat zsh config
-      copy:
+      ansible.builtin.copy:
         src: bat.zsh
         dest: ~/.config/zsh/bat.zsh
     - name: Source bat config in zshrc
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: ~/.zshrc
         line: 'source ~/.config/zsh/bat.zsh'
-        create: yes
+        create: true

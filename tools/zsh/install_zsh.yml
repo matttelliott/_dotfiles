@@ -3,67 +3,67 @@
   gather_facts: true
   tasks:
     - name: Verify zsh is installed (macOS)
-      raw: which zsh
+      ansible.builtin.raw: which zsh
       changed_when: false
       when: ansible_facts['os_family'] == "Darwin"
     - name: Install zsh via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: zsh
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
     - name: Install zsh via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: zsh
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
     - name: Set zsh as default shell (Linux)
-      user:
+      ansible.builtin.user:
         name: "{{ ansible_facts['user_id'] }}"
-        shell: /usr/bin/zsh
-      become: yes
+        ansible.builtin.shell: /usr/bin/zsh
+      become: true
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
     - name: Install zshrc base config
-      blockinfile:
+      ansible.builtin.blockinfile:
         path: ~/.zshrc
-        create: yes
+        create: true
         insertbefore: BOF
         marker: "# {mark} ZSH BASE"
         block: "{{ lookup('file', 'zshrc') }}"
     # zsh-autosuggestions
     - name: Install zsh-autosuggestions via Homebrew
-      shell: /opt/homebrew/bin/brew install zsh-autosuggestions
+      ansible.builtin.shell: /opt/homebrew/bin/brew install zsh-autosuggestions
       args:
         creates: /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
       when: ansible_facts['os_family'] == "Darwin"
     - name: Install zsh-autosuggestions via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: zsh-autosuggestions
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
     - name: Install zsh-autosuggestions via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: zsh-autosuggestions
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
     # zsh-syntax-highlighting
     - name: Install zsh-syntax-highlighting via Homebrew
-      shell: /opt/homebrew/bin/brew install zsh-syntax-highlighting
+      ansible.builtin.shell: /opt/homebrew/bin/brew install zsh-syntax-highlighting
       args:
         creates: /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
       when: ansible_facts['os_family'] == "Darwin"
     - name: Install zsh-syntax-highlighting via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: zsh-syntax-highlighting
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
     - name: Install zsh-syntax-highlighting via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: zsh-syntax-highlighting
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"

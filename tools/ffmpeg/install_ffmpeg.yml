@@ -5,21 +5,21 @@
 
   tasks:
     - name: Install ffmpeg via Homebrew
-      shell: /opt/homebrew/bin/brew install ffmpeg
+      ansible.builtin.shell: /opt/homebrew/bin/brew install ffmpeg
       args:
         creates: /opt/homebrew/bin/ffmpeg
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install ffmpeg via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: ffmpeg
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install ffmpeg via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: ffmpeg
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"

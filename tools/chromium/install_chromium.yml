@@ -5,21 +5,21 @@
 
   tasks:
     - name: Install Eloston Chromium via Homebrew Cask (macOS)
-      shell: /opt/homebrew/bin/brew install --cask eloston-chromium
+      ansible.builtin.shell: /opt/homebrew/bin/brew install --cask eloston-chromium
       args:
         creates: /Applications/Chromium.app
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install Chromium via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: chromium
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Chromium via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: chromium
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"

@@ -5,45 +5,45 @@
 
   tasks:
     - name: Install Ansible via Homebrew
-      shell: /opt/homebrew/bin/brew install ansible
+      ansible.builtin.shell: /opt/homebrew/bin/brew install ansible
       args:
         creates: /opt/homebrew/bin/ansible
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install ansible-lint via Homebrew
-      shell: /opt/homebrew/bin/brew install ansible-lint
+      ansible.builtin.shell: /opt/homebrew/bin/brew install ansible-lint
       args:
         creates: /opt/homebrew/bin/ansible-lint
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install Ansible via uv (Debian)
-      shell: ~/.local/bin/uv tool install ansible
+      ansible.builtin.shell: ~/.local/bin/uv tool install ansible
       args:
         creates: ~/.local/share/uv/tools/ansible/bin/ansible
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install ansible-lint via uv (Debian)
-      shell: ~/.local/bin/uv tool install ansible-lint
+      ansible.builtin.shell: ~/.local/bin/uv tool install ansible-lint
       args:
         creates: ~/.local/share/uv/tools/ansible-lint/bin/ansible-lint
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Ansible via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: ansible
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Install ansible-lint via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: ansible-lint
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Add Ansible to shell config
-      blockinfile:
+      ansible.builtin.blockinfile:
         path: ~/.zshrc
         create: true
         marker: "# {mark} ANSIBLE"

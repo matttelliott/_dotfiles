@@ -5,81 +5,81 @@
 
   tasks:
     - name: Set HostName
-      command: scutil --set HostName {{ ansible_host }}
-      become: yes
+      ansible.builtin.command: scutil --set HostName {{ ansible_host }}
+      become: true
       changed_when: false
 
     - name: Set LocalHostName
-      command: scutil --set LocalHostName {{ inventory_hostname_short }}
-      become: yes
+      ansible.builtin.command: scutil --set LocalHostName {{ inventory_hostname_short }}
+      become: true
       changed_when: false
 
     - name: Set ComputerName
-      command: scutil --set ComputerName {{ inventory_hostname }}
-      become: yes
+      ansible.builtin.command: scutil --set ComputerName {{ inventory_hostname }}
+      become: true
       changed_when: false
 
     - name: Install Rosetta 2 for Intel app compatibility
-      command: softwareupdate --install-rosetta --agree-to-license
+      ansible.builtin.command: softwareupdate --install-rosetta --agree-to-license
       args:
         creates: /Library/Apple/usr/share/rosetta/rosetta
-      become: yes
+      become: true
 
     - name: Check if SSH is enabled
-      command: systemsetup -getremotelogin
-      become: yes
+      ansible.builtin.command: systemsetup -getremotelogin
+      become: true
       register: ssh_status
       changed_when: false
 
     - name: Enable Remote Login (SSH)
-      command: systemsetup -setremotelogin on
-      become: yes
+      ansible.builtin.command: systemsetup -setremotelogin on
+      become: true
       when: "'Off' in ssh_status.stdout"
       register: ssh_enable
       failed_when: false
       changed_when: ssh_enable.rc == 0
 
     - name: Notify if SSH enable requires Full Disk Access
-      debug:
+      ansible.builtin.debug:
         msg: "SSH enable failed - grant Full Disk Access to Terminal, or enable manually: System Settings > General > Sharing > Remote Login"
       when: ssh_enable.rc is defined and ssh_enable.rc != 0
 
     - name: Check if Wake on LAN is supported
-      command: pmset -g
-      become: yes
+      ansible.builtin.command: pmset -g
+      become: true
       register: pmset_status
       changed_when: false
 
     - name: Enable Wake on LAN
-      command: pmset -a wolenabled 1
-      become: yes
+      ansible.builtin.command: pmset -a wolenabled 1
+      become: true
       when: "'wolenabled' in pmset_status.stdout"
       register: wol_enable
       failed_when: false
       changed_when: wol_enable.rc == 0
 
     - name: Notify if Wake on LAN not supported
-      debug:
+      ansible.builtin.debug:
         msg: "Wake on LAN not supported on this Mac (no Ethernet interface)"
       when: "'wolenabled' not in pmset_status.stdout"
 
     - name: Notify if Wake on LAN enable failed
-      debug:
+      ansible.builtin.debug:
         msg: "Wake on LAN enable failed: {{ wol_enable.stderr | default(wol_enable.stdout) }}"
       when: wol_enable.rc is defined and wol_enable.rc != 0
 
     - name: Auto-hide Dock
-      command: defaults write com.apple.dock autohide -bool true
+      ansible.builtin.command: defaults write com.apple.dock autohide -bool true
       changed_when: false
 
     - name: Show hidden files in Finder
-      command: defaults write com.apple.finder AppleShowAllFiles -bool true
+      ansible.builtin.command: defaults write com.apple.finder AppleShowAllFiles -bool true
       changed_when: false
 
     - name: Restart Dock to apply changes
-      command: killall Dock
+      ansible.builtin.command: killall Dock
       changed_when: false
 
     - name: Restart Finder to apply changes
-      command: killall Finder
+      ansible.builtin.command: killall Finder
       changed_when: false

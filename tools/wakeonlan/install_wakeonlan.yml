@@ -11,27 +11,27 @@
   tasks:
     # macOS: Enable wake on magic packet via pmset
     - name: Enable Wake-on-LAN (macOS)
-      command: pmset -a womp 1
-      become: yes
+      ansible.builtin.command: pmset -a womp 1
+      become: true
       changed_when: false
       when: ansible_facts['os_family'] == "Darwin"
     # Debian: Install ethtool
     - name: Install ethtool (Debian)
-      apt:
+      ansible.builtin.apt:
         name: ethtool
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
     # Arch: Install ethtool
     - name: Install ethtool (Arch)
-      pacman:
+      community.general.pacman:
         name: ethtool
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
     # Linux: Create systemd service to enable WOL on boot
     - name: Create WOL systemd service (Linux)
-      copy:
+      ansible.builtin.copy:
         dest: /etc/systemd/system/wol.service
         content: |
           [Unit]
@@ -46,14 +46,14 @@
           [Install]
           WantedBy=multi-user.target
         mode: "0644"
-      become: yes
+      become: true
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
     # Linux: Enable and start WOL service
     - name: Enable and start WOL service (Linux)
-      systemd:
+      ansible.builtin.systemd:
         name: wol
-        enabled: yes
+        enabled: true
         state: started
         daemon_reload: yes
-      become: yes
+      become: true
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]

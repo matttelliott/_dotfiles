@@ -5,34 +5,34 @@
 
   tasks:
     - name: Install Opera via Homebrew Cask (macOS)
-      shell: /opt/homebrew/bin/brew install --cask opera
+      ansible.builtin.shell: /opt/homebrew/bin/brew install --cask opera
       args:
         creates: /Applications/Opera.app
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Check if Opera is installed (Debian)
-      stat:
+      ansible.builtin.stat:
         path: /usr/bin/opera
       register: opera_check
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Add Opera apt repository (Debian)
-      shell: |
+      ansible.builtin.shell: |
         curl -fsSL https://deb.opera.com/archive.key | gpg --dearmor -o /usr/share/keyrings/opera.gpg
         echo "deb [signed-by=/usr/share/keyrings/opera.gpg] https://deb.opera.com/opera-stable/ stable non-free" | tee /etc/apt/sources.list.d/opera.list > /dev/null
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian" and not opera_check.stat.exists
 
     - name: Install Opera via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: opera-stable
         state: present
-        update_cache: yes
-      become: yes
+        update_cache: true
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Opera via yay (Arch)
-      shell: yay -S --noconfirm opera
+      ansible.builtin.shell: yay -S --noconfirm opera
       args:
         creates: /usr/bin/opera
       when: ansible_facts['os_family'] == "Archlinux"

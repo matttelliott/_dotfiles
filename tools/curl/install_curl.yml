@@ -5,21 +5,21 @@
 
   tasks:
     - name: Install curl via Homebrew (macOS)
-      shell: /opt/homebrew/bin/brew install curl
+      ansible.builtin.shell: /opt/homebrew/bin/brew install curl
       args:
         creates: /opt/homebrew/bin/curl
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install curl via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: curl
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install curl via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: curl
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"

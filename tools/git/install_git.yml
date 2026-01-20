@@ -5,49 +5,49 @@
 
   tasks:
     - name: Install git via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: git
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install git via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: git
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Install gitconfig (macOS with login)
-      template:
+      ansible.builtin.template:
         src: gitconfig.darwin.j2
         dest: ~/.gitconfig
       when: ansible_facts['os_family'] == "Darwin" and 'with_login_tools' in group_names
 
     - name: Install gitconfig (Linux with login)
-      template:
+      ansible.builtin.template:
         src: gitconfig.debian.j2
         dest: ~/.gitconfig
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and 'with_login_tools' in group_names
 
     - name: Install gitconfig (minimal)
-      template:
+      ansible.builtin.template:
         src: gitconfig.minimal.j2
         dest: ~/.gitconfig
       when: "'with_login_tools' not in group_names"
 
     - name: Create zsh config directory
-      file:
+      ansible.builtin.file:
         path: ~/.config/zsh
         state: directory
 
     - name: Install git aliases
-      copy:
+      ansible.builtin.copy:
         src: git.zsh
         dest: ~/.config/zsh/git.zsh
 
     - name: Source git aliases in zshrc
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: ~/.zshrc
         line: 'source ~/.config/zsh/git.zsh'
-        create: yes
+        create: true

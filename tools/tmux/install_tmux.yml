@@ -5,31 +5,31 @@
 
   tasks:
     - name: Install tmux via Homebrew
-      shell: /opt/homebrew/bin/brew install tmux
+      ansible.builtin.shell: /opt/homebrew/bin/brew install tmux
       args:
         creates: /opt/homebrew/bin/tmux
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install tmux via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: tmux
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install tmux via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: tmux
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Install tmux config
-      template:
+      ansible.builtin.template:
         src: tmux.conf.j2
         dest: ~/.tmux.conf
       register: tmux_config
 
     - name: Reload tmux config
-      shell: tmux source-file ~/.tmux.conf
+      ansible.builtin.shell: tmux source-file ~/.tmux.conf
       when: tmux_config.changed and lookup('env', 'TMUX') != ''

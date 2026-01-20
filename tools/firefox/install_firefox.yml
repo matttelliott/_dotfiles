@@ -3,27 +3,27 @@
   gather_facts: true
   tasks:
     - name: Install Firefox via Homebrew Cask (macOS)
-      shell: /opt/homebrew/bin/brew install --cask firefox
+      ansible.builtin.shell: /opt/homebrew/bin/brew install --cask firefox
       args:
         creates: /Applications/Firefox.app
       when: ansible_facts['os_family'] == "Darwin"
     - name: Install Firefox ESR via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: firefox-esr
         state: present
-      become: yes
+      become: true
       register: firefox_esr_result
-      ignore_errors: yes
+      ignore_errors: true
       when: ansible_facts['os_family'] == "Debian"
     - name: Install Firefox via apt (Debian fallback)
-      apt:
+      ansible.builtin.apt:
         name: firefox
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian" and firefox_esr_result is failed
     - name: Install Firefox via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: firefox
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"

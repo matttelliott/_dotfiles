@@ -5,32 +5,32 @@
 
   tasks:
     - name: Install base-devel and git
-      pacman:
+      community.general.pacman:
         name:
           - base-devel
           - git
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Check if yay is installed
-      stat:
+      ansible.builtin.stat:
         path: /usr/bin/yay
       register: yay_check
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Clone yay repository
-      git:
+      ansible.builtin.git:
         repo: https://aur.archlinux.org/yay.git
         dest: /tmp/yay
       when: ansible_facts['os_family'] == "Archlinux" and not yay_check.stat.exists
 
     - name: Build and install yay
-      shell: cd /tmp/yay && makepkg -si --noconfirm
+      ansible.builtin.shell: cd /tmp/yay && makepkg -si --noconfirm
       when: ansible_facts['os_family'] == "Archlinux" and not yay_check.stat.exists
 
     - name: Clean up yay build directory
-      file:
+      ansible.builtin.file:
         path: /tmp/yay
         state: absent
       when: ansible_facts['os_family'] == "Archlinux"

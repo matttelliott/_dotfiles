@@ -5,11 +5,11 @@
 
   tasks:
     - name: Set hostname
-      hostname:
+      ansible.builtin.hostname:
         name: "{{ ansible_host }}"
-      become: yes
+      become: true
 
     - name: Update package database
-      pacman:
-        update_cache: yes
-      become: yes
+      community.general.pacman:
+        update_cache: true
+      become: true

@@ -6,34 +6,34 @@
   tasks:
     # macOS: Install nvm via Homebrew
     - name: Install nvm via Homebrew
-      shell: /opt/homebrew/bin/brew install nvm
+      ansible.builtin.shell: /opt/homebrew/bin/brew install nvm
       args:
         creates: /opt/homebrew/opt/nvm
       when: ansible_facts['os_family'] == "Darwin"
     - name: Create nvm directory
-      file:
+      ansible.builtin.file:
         path: "{{ nvm_dir }}"
         state: directory
     - name: Create zsh config directory
-      file:
+      ansible.builtin.file:
         path: ~/.config/zsh
         state: directory
     - name: Install node zsh config (lazy-load nvm)
-      copy:
+      ansible.builtin.copy:
         src: node.zsh
         dest: ~/.config/zsh/node.zsh
     - name: Source node config in zshrc
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: ~/.zshrc
         line: source ~/.config/zsh/node.zsh
-        create: yes
+        create: true
     - name: Remove old NVM block from zshrc
-      blockinfile:
+      ansible.builtin.blockinfile:
         path: ~/.zshrc
         marker: "# {mark} NVM"
         state: absent
     - name: Install Node.js LTS (macOS)
-      shell: |
+      ansible.builtin.shell: |
         export NVM_DIR="$HOME/.nvm"
         . /opt/homebrew/opt/nvm/nvm.sh
         nvm install --lts
@@ -43,12 +43,12 @@
       when: ansible_facts['os_family'] == "Darwin"
     # Debian/Arch: Install nvm from official script
     - name: Install nvm from official script (Linux)
-      shell: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+      ansible.builtin.shell: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
       args:
         creates: ~/.nvm/nvm.sh
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
     - name: Install Node.js LTS (Linux)
-      shell: |
+      ansible.builtin.shell: |
         export NVM_DIR="$HOME/.nvm"
         . ~/.nvm/nvm.sh
         nvm install --lts
@@ -57,7 +57,7 @@
         creates: ~/.nvm/alias/default
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
     - name: Install global npm packages (macOS)
-      shell: |
+      ansible.builtin.shell: |
         export NVM_DIR="$HOME/.nvm"
         . /opt/homebrew/opt/nvm/nvm.sh
         npm install -g typescript @fsouza/prettierd eslint_d
@@ -65,7 +65,7 @@
         creates: ~/.nvm/versions/node/*/bin/tsc
       when: ansible_facts['os_family'] == "Darwin"
     - name: Install global npm packages (Linux)
-      shell: |
+      ansible.builtin.shell: |
         export NVM_DIR="$HOME/.nvm"
         . ~/.nvm/nvm.sh
         npm install -g typescript @fsouza/prettierd eslint_d

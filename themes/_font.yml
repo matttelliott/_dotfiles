@@ -133,33 +133,33 @@
   tasks:
     # Install font - macOS
     - name: Install font via Homebrew (macOS)
-      shell: "brew install --cask {{ current.brew_cask }}"
+      ansible.builtin.shell: "brew install --cask {{ current.brew_cask }}"
       args:
         creates: "~/Library/Fonts/{{ current.mac_font_file }}"
       when: ansible_facts['os_family'] == "Darwin"
 
     # Install font - Arch
     - name: Install font via yay (Arch)
-      shell: "yay -S --noconfirm {{ current.arch_pkg }}"
+      ansible.builtin.shell: "yay -S --noconfirm {{ current.arch_pkg }}"
       args:
         creates: "/usr/share/fonts/TTF/{{ current.arch_font_file }}"
       when: ansible_facts['os_family'] == "Archlinux"
 
     # Install font - Debian
     - name: Create fonts directory (Debian)
-      file:
+      ansible.builtin.file:
         path: ~/.local/share/fonts
         state: directory
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Check if font exists (Debian)
-      stat:
+      ansible.builtin.stat:
         path: "~/.local/share/fonts/{{ current.debian_font_file }}"
       register: font_check
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Download and install font (Debian)
-      shell: |
+      ansible.builtin.shell: |
         curl -fLo /tmp/{{ current.debian_tar }}.tar.xz "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/{{ current.debian_tar }}.tar.xz"
         tar -xf /tmp/{{ current.debian_tar }}.tar.xz -C ~/.local/share/fonts
         fc-cache -fv
@@ -176,6 +176,6 @@
       ansible.builtin.replace:
         path: ~/.wezterm.lua
         regexp: 'config\.font = wezterm\.font\("[^"]+"\)'
-        replace: 'config.font = wezterm.font("{{ current.wezterm_name }}")'
+        ansible.builtin.replace: 'config.font = wezterm.font("{{ current.wezterm_name }}")'
       when: wezterm_config.stat.exists
 

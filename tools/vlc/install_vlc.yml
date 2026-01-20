@@ -5,21 +5,21 @@
 
   tasks:
     - name: Install VLC via Homebrew (macOS)
-      shell: /opt/homebrew/bin/brew install --cask vlc
+      ansible.builtin.shell: /opt/homebrew/bin/brew install --cask vlc
       args:
         creates: /Applications/VLC.app
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install VLC via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: vlc
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install VLC via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: vlc
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"

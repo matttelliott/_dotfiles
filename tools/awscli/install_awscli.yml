@@ -5,22 +5,22 @@
 
   tasks:
     - name: Install AWS CLI via Homebrew
-      shell: /opt/homebrew/bin/brew install awscli
+      ansible.builtin.shell: /opt/homebrew/bin/brew install awscli
       args:
         creates: /opt/homebrew/bin/aws
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Check if AWS CLI is installed (Linux)
-      stat:
+      ansible.builtin.stat:
         path: /usr/local/bin/aws
       register: aws_check
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
 
     - name: Download and install AWS CLI (Linux)
-      shell: |
+      ansible.builtin.shell: |
         curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
         unzip -o /tmp/awscliv2.zip -d /tmp
         /tmp/aws/install --update
         rm -rf /tmp/aws /tmp/awscliv2.zip
-      become: yes
+      become: true
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and not aws_check.stat.exists

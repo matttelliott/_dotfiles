@@ -5,34 +5,34 @@
 
   tasks:
     - name: Install LibreWolf via Homebrew Cask (macOS)
-      shell: /opt/homebrew/bin/brew install --cask --no-quarantine librewolf
+      ansible.builtin.shell: /opt/homebrew/bin/brew install --cask --no-quarantine librewolf
       args:
         creates: /Applications/LibreWolf.app
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Check if LibreWolf is installed (Debian)
-      stat:
+      ansible.builtin.stat:
         path: /usr/bin/librewolf
       register: librewolf_check
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Add LibreWolf apt repository (Debian)
-      shell: |
+      ansible.builtin.shell: |
         apt-get update && apt-get install -y extrepo
         extrepo enable librewolf
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian" and not librewolf_check.stat.exists
 
     - name: Install LibreWolf via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: librewolf
         state: present
-        update_cache: yes
-      become: yes
+        update_cache: true
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install LibreWolf via yay (Arch)
-      shell: yay -S --noconfirm librewolf-bin
+      ansible.builtin.shell: yay -S --noconfirm librewolf-bin
       args:
         creates: /usr/bin/librewolf
       when: ansible_facts['os_family'] == "Archlinux"

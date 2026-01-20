@@ -5,39 +5,39 @@
 
   tasks:
     - name: Install asciiquarium via Homebrew
-      shell: /opt/homebrew/bin/brew install asciiquarium
+      ansible.builtin.shell: /opt/homebrew/bin/brew install asciiquarium
       args:
         creates: /opt/homebrew/bin/asciiquarium
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install asciiquarium dependencies via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name:
           - libcurses-perl
           - cpanminus
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Term::Animation via cpan (Debian)
-      shell: cpanm Term::Animation
+      ansible.builtin.shell: cpanm Term::Animation
       args:
         creates: /usr/local/share/perl/*/Term/Animation.pm
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Download and install asciiquarium (Debian)
-      shell: |
+      ansible.builtin.shell: |
         curl -sL https://robobunny.com/projects/asciiquarium/asciiquarium.tar.gz | tar xz -C /tmp
         install /tmp/asciiquarium_1.1/asciiquarium /usr/local/bin/
         rm -rf /tmp/asciiquarium_1.1
       args:
         creates: /usr/local/bin/asciiquarium
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install asciiquarium via yay (Arch)
-      shell: yay -S --noconfirm asciiquarium
+      ansible.builtin.shell: yay -S --noconfirm asciiquarium
       args:
         creates: /usr/bin/asciiquarium
       when: ansible_facts['os_family'] == "Archlinux"

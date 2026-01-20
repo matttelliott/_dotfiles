@@ -17,77 +17,77 @@
   tasks:
     # macOS: Colima + docker CLI + docker-compose
     - name: Install Colima and Docker via Homebrew (macOS)
-      shell: /opt/homebrew/bin/brew install colima docker docker-compose
+      ansible.builtin.shell: /opt/homebrew/bin/brew install colima docker docker-compose
       args:
         creates: /opt/homebrew/bin/colima
       when: ansible_facts['os_family'] == "Darwin"
 
     # Debian: docker-ce from official Docker repo
     - name: Check if Docker CE is installed (Debian)
-      command: dpkg -l docker-ce
+      ansible.builtin.command: dpkg -l docker-ce
       register: docker_ce_check
       changed_when: false
       failed_when: false
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Create keyrings directory (Debian)
-      file:
+      ansible.builtin.file:
         path: /etc/apt/keyrings
         state: directory
         mode: '0755'
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian" and docker_ce_check.rc != 0
 
     - name: Add Docker GPG key (Debian)
-      shell: curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+      ansible.builtin.shell: curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
       args:
         creates: /etc/apt/keyrings/docker.gpg
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian" and docker_ce_check.rc != 0
 
     - name: Add Docker repository (Debian)
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian" and docker_ce_check.rc != 0
 
     - name: Install Docker CE (Debian)
-      apt:
+      ansible.builtin.apt:
         name:
           - docker-ce
           - docker-ce-cli
           - containerd.io
           - docker-compose-plugin
         state: present
-        update_cache: yes
-      become: yes
+        update_cache: true
+      become: true
       when: ansible_facts['os_family'] == "Debian" and docker_ce_check.rc != 0
 
     # Arch: docker from official repos
     - name: Install Docker via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name:
           - docker
           - docker-compose
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
 
     # Linux: Add user to docker group for rootless access
     - name: Add user to docker group (Linux)
-      user:
+      ansible.builtin.user:
         name: "{{ ansible_facts['user_id'] }}"
         groups: docker
-        append: yes
-      become: yes
+        append: true
+      become: true
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
 
     # Linux: Enable Docker service
     - name: Enable and start Docker service (Linux)
-      systemd:
+      ansible.builtin.systemd:
         name: docker
-        enabled: yes
+        enabled: true
         state: started
-      become: yes
+      become: true
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]

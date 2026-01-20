@@ -5,40 +5,40 @@
 
   tasks:
     - name: Install Lua via Homebrew
-      shell: /opt/homebrew/bin/brew install lua
+      ansible.builtin.shell: /opt/homebrew/bin/brew install lua
       args:
         creates: /opt/homebrew/bin/lua
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install Lua via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: lua5.4
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Lua via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: lua
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Install stylua via Homebrew (macOS)
-      shell: /opt/homebrew/bin/brew install stylua
+      ansible.builtin.shell: /opt/homebrew/bin/brew install stylua
       args:
         creates: /opt/homebrew/bin/stylua
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install stylua via cargo (Debian)
-      shell: ~/.cargo/bin/cargo install stylua
+      ansible.builtin.shell: ~/.cargo/bin/cargo install stylua
       args:
         creates: ~/.cargo/bin/stylua
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install stylua via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: stylua
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"

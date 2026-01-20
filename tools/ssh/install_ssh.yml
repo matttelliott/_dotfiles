@@ -5,55 +5,55 @@
 
   tasks:
     - name: Install openssh-server (Debian)
-      apt:
+      ansible.builtin.apt:
         name: openssh-server
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install openssh (Arch)
-      pacman:
+      community.general.pacman:
         name: openssh
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Enable and start sshd (Debian)
-      systemd:
+      ansible.builtin.systemd:
         name: ssh
-        enabled: yes
+        enabled: true
         state: started
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Enable and start sshd (Arch)
-      systemd:
+      ansible.builtin.systemd:
         name: sshd
-        enabled: yes
+        enabled: true
         state: started
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Ensure .ssh directory exists
-      file:
+      ansible.builtin.file:
         path: ~/.ssh
         state: directory
         mode: '0700'
 
     - name: Add macbook public key to authorized_keys
-      authorized_key:
-        user: "{{ ansible_facts['user_id'] }}"
+      ansible.posix.authorized_key:
+        ansible.builtin.user: "{{ ansible_facts['user_id'] }}"
         key: "{{ ssh_public_key }}"
         state: present
 
     - name: Install SSH config
-      template:
+      ansible.builtin.template:
         src: config.j2
         dest: ~/.ssh/config
         mode: '0600'
 
     - name: Add host keys to known_hosts
-      shell: ssh-keyscan -H {{ item }}.home.lan >> ~/.ssh/known_hosts 2>/dev/null
+      ansible.builtin.shell: ssh-keyscan -H {{ item }}.home.lan >> ~/.ssh/known_hosts 2>/dev/null
       args:
         creates: ~/.ssh/.known_hosts_{{ item }}
       loop:
@@ -61,10 +61,10 @@
         - macmini
         - desktop
         - miniserver
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Mark known_hosts as populated
-      file:
+      ansible.builtin.file:
         path: ~/.ssh/.known_hosts_{{ item }}
         state: touch
         mode: '0600'
@@ -75,22 +75,22 @@
         - miniserver
 
     - name: Check if 1Password service account token exists
-      stat:
+      ansible.builtin.stat:
         path: ~/.config/op/service-account-token
       register: op_token_file
 
     - name: Find op CLI path
-      shell: command -v op || echo /opt/homebrew/bin/op
+      ansible.builtin.shell: command -v op || echo /opt/homebrew/bin/op
       register: op_cli_path
       changed_when: false
 
     - name: Check if op CLI is available
-      stat:
+      ansible.builtin.stat:
         path: "{{ op_cli_path.stdout }}"
       register: op_cli_check
 
     - name: Fetch SSH private key from 1Password
-      shell: |
+      ansible.builtin.shell: |
         export OP_SERVICE_ACCOUNT_TOKEN=$(cat ~/.config/op/service-account-token)
         {{ op_cli_path.stdout }} read "{{ op_ssh_private_key_ref }}"
       register: op_ssh_key
@@ -102,7 +102,7 @@
       no_log: true
 
     - name: Deploy SSH private key
-      copy:
+      ansible.builtin.copy:
         content: "{{ op_ssh_key.stdout }}\n"
         dest: ~/.ssh/id_rsa
         mode: '0600'
@@ -110,7 +110,7 @@
       no_log: true
 
     - name: Generate SSH public key from private key
-      shell: ssh-keygen -y -f ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub
+      ansible.builtin.shell: ssh-keygen -y -f ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub
       args:
         creates: ~/.ssh/id_rsa.pub
       when: op_ssh_key is defined and op_ssh_key.stdout is defined and op_ssh_key.stdout | length > 0

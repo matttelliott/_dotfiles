@@ -5,36 +5,36 @@
 
   tasks:
     - name: Install eza via Homebrew
-      shell: /opt/homebrew/bin/brew install eza
+      ansible.builtin.shell: /opt/homebrew/bin/brew install eza
       args:
         creates: /opt/homebrew/bin/eza
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install eza via cargo (Debian)
-      shell: ~/.cargo/bin/cargo install eza
+      ansible.builtin.shell: ~/.cargo/bin/cargo install eza
       args:
         creates: ~/.cargo/bin/eza
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install eza via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: eza
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Create zsh config directory
-      file:
+      ansible.builtin.file:
         path: ~/.config/zsh
         state: directory
 
     - name: Install eza aliases
-      copy:
+      ansible.builtin.copy:
         src: eza.zsh
         dest: ~/.config/zsh/eza.zsh
 
     - name: Source eza aliases in zshrc
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: ~/.zshrc
         line: 'source ~/.config/zsh/eza.zsh'
-        create: yes
+        create: true

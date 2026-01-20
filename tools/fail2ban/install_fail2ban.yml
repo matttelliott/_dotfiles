@@ -5,31 +5,31 @@
 
   tasks:
     - name: Install fail2ban via apt (Debian)
-      apt:
+      ansible.builtin.apt:
         name: fail2ban
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install fail2ban via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: fail2ban
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Create jail.local config
-      copy:
+      ansible.builtin.copy:
         src: jail.local
         dest: /etc/fail2ban/jail.local
         mode: '0644'
-      become: yes
+      become: true
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
 
     - name: Enable and start fail2ban
-      systemd:
+      ansible.builtin.systemd:
         name: fail2ban
-        enabled: yes
+        enabled: true
         state: started
-      become: yes
+      become: true
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]

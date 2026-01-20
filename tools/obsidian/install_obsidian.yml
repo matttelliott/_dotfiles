@@ -5,22 +5,22 @@
 
   tasks:
     - name: Install Obsidian via Homebrew (macOS)
-      shell: /opt/homebrew/bin/brew install --cask obsidian
+      ansible.builtin.shell: /opt/homebrew/bin/brew install --cask obsidian
       args:
         creates: /Applications/Obsidian.app
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Download Obsidian AppImage (Debian)
-      get_url:
+      ansible.builtin.get_url:
         url: https://github.com/obsidianmd/obsidian-releases/releases/download/v1.5.12/Obsidian-1.5.12.AppImage
         dest: /usr/local/bin/obsidian
         mode: '0755'
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Obsidian via pacman (Arch)
-      pacman:
+      community.general.pacman:
         name: obsidian
         state: present
-      become: yes
+      become: true
       when: ansible_facts['os_family'] == "Archlinux"

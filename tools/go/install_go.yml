@@ -5,48 +5,48 @@
     go_version: "1.23.4"
   tasks:
     - name: Check if Go is installed
-      stat:
+      ansible.builtin.stat:
         path: /usr/local/go/bin/go
       register: go_binary
     # macOS: Use .pkg installer
     - name: Download Go installer (macOS)
-      get_url:
+      ansible.builtin.get_url:
         url: "https://go.dev/dl/go{{ go_version }}.darwin-arm64.pkg"
         dest: /tmp/go.pkg
       when: ansible_facts['os_family'] == "Darwin" and not go_binary.stat.exists
     - name: Install Go (macOS)
-      command: installer -pkg /tmp/go.pkg -target /
-      become: yes
+      ansible.builtin.command: installer -pkg /tmp/go.pkg -target /
+      become: true
       when: ansible_facts['os_family'] == "Darwin" and not go_binary.stat.exists
     - name: Clean up installer (macOS)
-      file:
+      ansible.builtin.file:
         path: /tmp/go.pkg
         state: absent
       when: ansible_facts['os_family'] == "Darwin" and not go_binary.stat.exists
     # Linux: Use tarball
     - name: Download Go tarball (Linux)
-      get_url:
+      ansible.builtin.get_url:
         url: "https://go.dev/dl/go{{ go_version }}.linux-amd64.tar.gz"
         dest: /tmp/go.tar.gz
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and not go_binary.stat.exists
     - name: Install Go (Linux)
-      shell: rm -rf /usr/local/go && tar -C /usr/local -xzf /tmp/go.tar.gz
-      become: yes
+      ansible.builtin.shell: rm -rf /usr/local/go && tar -C /usr/local -xzf /tmp/go.tar.gz
+      become: true
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and not go_binary.stat.exists
     - name: Clean up tarball (Linux)
-      file:
+      ansible.builtin.file:
         path: /tmp/go.tar.gz
         state: absent
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and not go_binary.stat.exists
     - name: Add Go to shell config
-      blockinfile:
+      ansible.builtin.blockinfile:
         path: ~/.zshrc
         create: true
         marker: "# {mark} GO"
         block: |
           export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
     - name: Install Go dev tools
-      shell: |
+      ansible.builtin.shell: |
         export PATH=$PATH:/usr/local/go/bin
         go install mvdan.cc/gofumpt@latest
         go install golang.org/x/tools/cmd/goimports@latest
