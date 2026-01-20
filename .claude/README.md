@@ -38,3 +38,4 @@ The following files are auto-gitignored by Claude Code and should not be committ
 | User (`~/.claude/`) | Ansible playbook | Defines scaffold via `tools/claude-code/` |
 | Portable (`~/.claude/<name>/`) | Package installers | N/A (installed separately) |
 | Repo (`.claude/`) | This repository | This directory |
+
