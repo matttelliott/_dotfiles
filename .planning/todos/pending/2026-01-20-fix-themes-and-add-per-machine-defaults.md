@@ -32,16 +32,24 @@ Two-part task:
    - Apply defaults during provisioning
    - Allow override mechanism for temporary theme changes
 
-Possible approach:
+likely approach:
+
 ```yaml
 # inventory.yml
 macbookair:
-  theme_color: dark
-  theme_font: cascadia
+  theme_color: dracula
+  theme_font: sourcecodepro
   theme_style: round
 
 desktop:
-  theme_color: light
-  theme_font: jetbrains
+  theme_color: onedark
+  theme_font: firacode
+  theme_style: slant
+
+default:
+  theme_color: tokyonight
+  theme_font: dejavu
   theme_style: angle
 ```
+
+also want to create some pre-built combinations of themes that can be easily applied to non-inventoried machines via the themesetting tool

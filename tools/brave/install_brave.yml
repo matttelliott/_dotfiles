@@ -18,8 +18,11 @@
 
     - name: Add Brave apt repository (Debian)
       ansible.builtin.shell: |
-        curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
-        echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" | tee /etc/apt/sources.list.d/brave-browser-release.list > /dev/null
+        curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg \
+          https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] \
+          https://brave-browser-apt-release.s3.brave.com/ stable main" \
+          | tee /etc/apt/sources.list.d/brave-browser-release.list > /dev/null
       become: true
       when: ansible_facts['os_family'] == "Debian" and not brave_check.stat.exists
 

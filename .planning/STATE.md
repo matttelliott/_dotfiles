@@ -44,6 +44,7 @@ Recent decisions affecting current work:
 
 - **gather_facts is not a module** (01-01): Playbook directive, not an Ansible module - must not use FQCN prefix
 - **Comprehensive boolean field coverage** (01-01): Extended truthy fixes beyond common fields (become, update_cache) to include ignore_errors, remote_src, check_mode, append, enabled
+- **Dependency import naming** (01-02): Use "Install {tool} (dependency)" pattern for import_playbook of prerequisites
 
 ### Pending Todos
 
@@ -59,7 +60,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-20
-Stopped at: Plan 01-01 completed, ready for Plan 01-02
+Stopped at: Plan 01-02 completed, ready for Plan 01-03 (final plan in phase)
 Resume file: None
 Note: Plan 01-01 required 2 sessions (previous Claude rate-limited during execution)
 
