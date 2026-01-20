@@ -42,7 +42,8 @@ Progress: [███-------] 33%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- None yet
+- **gather_facts is not a module** (01-01): Playbook directive, not an Ansible module - must not use FQCN prefix
+- **Comprehensive boolean field coverage** (01-01): Extended truthy fixes beyond common fields (become, update_cache) to include ignore_errors, remote_src, check_mode, append, enabled
 
 ### Pending Todos
 
