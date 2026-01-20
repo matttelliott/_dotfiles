@@ -13,7 +13,7 @@
     - name: Install Caps Lock to Ctrl remap LaunchAgent (macOS)
       ansible.builtin.copy:
         src: com.local.KeyRemapping.plist
-        dest: ~/Library/LaunchAgents/com.local.KeyRemapping.plist
+        dest: "~/Library/LaunchAgents/com.local.KeyRemapping.plist"
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Load keyboard remap LaunchAgent (macOS)
@@ -23,7 +23,10 @@
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Apply keyboard remap immediately (macOS)
-      ansible.builtin.command: hidutil property --set '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x7000000E0}]}'
+      ansible.builtin.command: >-
+        hidutil property --set
+        '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,
+        "HIDKeyboardModifierMappingDst":0x7000000E0}]}'
       changed_when: false
       when: ansible_facts['os_family'] == "Darwin"
 

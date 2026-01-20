@@ -18,8 +18,11 @@
 
     - name: Add Google Cloud apt repository (Debian)
       ansible.builtin.shell: |
-        curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
-        echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee /etc/apt/sources.list.d/google-cloud-sdk.list
+        curl https://packages.cloud.google.com/apt/doc/apt-key.gpg \
+          | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+        echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] \
+          https://packages.cloud.google.com/apt cloud-sdk main" \
+          | tee /etc/apt/sources.list.d/google-cloud-sdk.list
       become: true
       when: ansible_facts['os_family'] == "Debian" and not gcloud_check.stat.exists
 

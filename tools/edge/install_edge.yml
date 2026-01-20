@@ -18,8 +18,11 @@
 
     - name: Add Microsoft Edge apt repository (Debian)
       ansible.builtin.shell: |
-        curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-edge.gpg
-        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-edge.gpg] https://packages.microsoft.com/repos/edge stable main" | tee /etc/apt/sources.list.d/microsoft-edge.list > /dev/null
+        curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
+          | gpg --dearmor -o /usr/share/keyrings/microsoft-edge.gpg
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-edge.gpg] \
+          https://packages.microsoft.com/repos/edge stable main" \
+          | tee /etc/apt/sources.list.d/microsoft-edge.list > /dev/null
       become: true
       when: ansible_facts['os_family'] == "Debian" and not edge_check.stat.exists
 
