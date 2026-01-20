@@ -50,7 +50,12 @@
         line: 'source ~/.config/zsh/neovim.zsh'
         create: true
     - name: Install Mason language servers
+      vars:
+        mason_packages: >-
+          typescript-language-server eslint-lsp css-lsp html-lsp json-lsp
+          tailwindcss-language-server pyright rust-analyzer bash-language-server
+          yaml-language-server prettierd stylua shfmt shellcheck black isort ruff
       ansible.builtin.shell: |
-        nvim --headless -c "MasonInstall typescript-language-server eslint-lsp css-lsp html-lsp json-lsp tailwindcss-language-server pyright rust-analyzer bash-language-server yaml-language-server prettierd stylua shfmt shellcheck black isort ruff" -c "sleep 30" -c "qa"
+        nvim --headless -c "MasonInstall {{ mason_packages | replace('\n', ' ') }}" -c "sleep 30" -c "qa"
       args:
         creates: ~/.local/share/nvim/mason/bin/typescript-language-server

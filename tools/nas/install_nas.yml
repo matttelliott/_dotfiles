@@ -62,7 +62,8 @@
         dest: /etc/auto.nas
         content: |
           {% for share in nas_shares %}
-          {{ share.name }} -fstype=cifs,credentials={{ ansible_env.HOME }}/.nas-credentials,uid={{ ansible_user_id }},gid={{ ansible_user_id }} ://{{ nas_server }}/{{ share.name }}
+          {{ share.name }} -fstype=cifs,credentials={{ ansible_env.HOME }}/.nas-credentials \
+            ,uid={{ ansible_user_id }},gid={{ ansible_user_id }} ://{{ nas_server }}/{{ share.name }}
           {% endfor %}
         mode: "0644"
       become: true
@@ -111,7 +112,8 @@
         dest: /etc/autofs/auto.nas
         content: |
           {% for share in nas_shares %}
-          {{ share.name }} -fstype=cifs,credentials={{ ansible_env.HOME }}/.nas-credentials,uid={{ ansible_user_id }},gid={{ ansible_user_id }} ://{{ nas_server }}/{{ share.name }}
+          {{ share.name }} -fstype=cifs,credentials={{ ansible_env.HOME }}/.nas-credentials \
+            ,uid={{ ansible_user_id }},gid={{ ansible_user_id }} ://{{ nas_server }}/{{ share.name }}
           {% endfor %}
         mode: "0644"
       become: true

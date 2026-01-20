@@ -13,7 +13,7 @@
     - name: Install Caps Lock to Ctrl remap LaunchAgent (macOS)
       ansible.builtin.copy:
         src: com.local.KeyRemapping.plist
-        dest: "~/Library/LaunchAgents/com.local.KeyRemapping.plist"
+        dest: ~/Library/LaunchAgents/com.local.KeyRemapping.plist
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Load keyboard remap LaunchAgent (macOS)

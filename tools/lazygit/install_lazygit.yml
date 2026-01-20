@@ -16,7 +16,8 @@
       when: ansible_facts['os_family'] == "Debian"
     - name: Download and install lazygit (Debian)
       ansible.builtin.shell: |
-        curl -Lo /tmp/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v{{ lazygit_version }}/lazygit_{{ lazygit_version }}_Linux_x86_64.tar.gz"
+        LAZYGIT_URL="https://github.com/jesseduffield/lazygit/releases/download"
+        curl -Lo /tmp/lazygit.tar.gz "${LAZYGIT_URL}/v{{ lazygit_version }}/lazygit_{{ lazygit_version }}_Linux_x86_64.tar.gz"
         tar xf /tmp/lazygit.tar.gz -C /tmp lazygit
         install /tmp/lazygit /usr/local/bin
         rm -f /tmp/lazygit /tmp/lazygit.tar.gz
