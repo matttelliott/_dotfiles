@@ -18,8 +18,11 @@
 
     - name: Add Vivaldi apt repository (Debian)
       ansible.builtin.shell: |
-        curl -fsSL https://repo.vivaldi.com/archive/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/vivaldi.gpg
-        echo "deb [signed-by=/usr/share/keyrings/vivaldi.gpg] https://repo.vivaldi.com/archive/deb/ stable main" | tee /etc/apt/sources.list.d/vivaldi.list > /dev/null
+        curl -fsSL https://repo.vivaldi.com/archive/linux_signing_key.pub \
+          | gpg --dearmor -o /usr/share/keyrings/vivaldi.gpg
+        echo "deb [signed-by=/usr/share/keyrings/vivaldi.gpg] \
+          https://repo.vivaldi.com/archive/deb/ stable main" \
+          | tee /etc/apt/sources.list.d/vivaldi.list > /dev/null
       become: true
       when: ansible_facts['os_family'] == "Debian" and not vivaldi_check.stat.exists
 

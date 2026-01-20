@@ -18,8 +18,11 @@
 
     - name: Add Opera apt repository (Debian)
       ansible.builtin.shell: |
-        curl -fsSL https://deb.opera.com/archive.key | gpg --dearmor -o /usr/share/keyrings/opera.gpg
-        echo "deb [signed-by=/usr/share/keyrings/opera.gpg] https://deb.opera.com/opera-stable/ stable non-free" | tee /etc/apt/sources.list.d/opera.list > /dev/null
+        curl -fsSL https://deb.opera.com/archive.key \
+          | gpg --dearmor -o /usr/share/keyrings/opera.gpg
+        echo "deb [signed-by=/usr/share/keyrings/opera.gpg] \
+          https://deb.opera.com/opera-stable/ stable non-free" \
+          | tee /etc/apt/sources.list.d/opera.list > /dev/null
       become: true
       when: ansible_facts['os_family'] == "Debian" and not opera_check.stat.exists
 

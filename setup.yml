@@ -79,12 +79,14 @@
       ansible.builtin.git:
         repo: "{{ dotfiles_ssh_url }}"
         dest: ~/_dotfiles
+        version: master
       when: not dotfiles_dir.stat.exists and use_ssh
 
     - name: Clone dotfiles via HTTPS
       ansible.builtin.git:
         repo: "{{ dotfiles_https_url }}"
         dest: ~/_dotfiles
+        version: master
       when: not dotfiles_dir.stat.exists and not use_ssh
 
     - name: Set remote to SSH
