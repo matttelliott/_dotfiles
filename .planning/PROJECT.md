@@ -2,24 +2,21 @@
 
 ## What This Is
 
-Personal dotfiles for provisioning new machines with a consistent development environment. Ansible-based, cross-platform (macOS, Debian/Ubuntu, Arch Linux), managing 100+ tools and their configurations. One bootstrap command gets the full setup.
+Personal dotfiles for provisioning new machines with a consistent development environment. Ansible-based, cross-platform (macOS, Debian/Ubuntu, Arch Linux), managing 100+ tools and their configurations. One bootstrap command gets the full setup. Now with clean lint baseline and automated validation.
 
 ## Core Value
 
 When you sit down at a new machine, one command gets you your environment.
 
-## Current Milestone: v0.1 Lint & Tooling
+## Current State
 
-**Goal:** Clean up ansible-lint violations and add Claude Code quality hook.
+**Shipped:** v0.1 Lint & Tooling (2026-01-21)
 
-**Target features:**
-- Fix all ansible-lint errors (1122 violations)
-- Add Claude Code post-write hook for ansible-lint
-- Document lint patterns in CLAUDE.md
+Codebase: 107 YAML playbooks, all passing ansible-lint for targeted rules. Claude Code hook validates YAML edits automatically.
 
 **Future milestones:**
-- v0.2: Test infrastructure + test plan
-- v0.3+: Bug fixes (SSH known_hosts, non-free repos), architecture portability, idempotency
+- v0.2: Test infrastructure + CI/CD
+- v0.3+: Bug fixes, architecture portability, idempotency improvements
 
 ## Requirements
 
@@ -36,14 +33,14 @@ When you sit down at a new machine, one command gets you your environment.
 - ✓ Coordinated theming across tmux/starship/neovim — existing
 - ✓ Idempotent execution (safe to re-run) — existing
 - ✓ Remote host provisioning via SSH — existing
+- ✓ All playbooks pass ansible-lint (targeted rules) — v0.1
+- ✓ Claude Code hook validates YAML on write — v0.1
 
 ### Active
 
 <!-- Current scope. Building toward these. -->
 
-- [ ] All playbooks pass ansible-lint
-- [ ] Claude Code hook validates YAML on write
-- [ ] Lint patterns documented in CLAUDE.md
+(No active milestone — run `/gsd:new-milestone` to start v0.2)
 
 ### Out of Scope
 
@@ -52,6 +49,7 @@ When you sit down at a new machine, one command gets you your environment.
 - Windows support — different paradigm, WSL sufficient
 - GUI configuration tool — CLI/playbook interface works fine
 - Automatic updates/scheduled runs — manual control preferred
+- Full ansible-lint compliance — 267 non-targeted violations remain (command-instead-of-shell, risky-file-permissions, etc.) tracked as tech debt for v0.3+
 
 ## Context
 
@@ -62,6 +60,7 @@ Mature codebase with established patterns. Key architecture:
 - `tools/<name>/<name>.zsh` — shell integrations sourced by zshrc
 - `group_vars/all/` — shared variables and encrypted secrets
 - `themes/` — coordinated color/font/style changes
+- `.claude/settings.json` — Claude Code hooks (ansible-lint on YAML edits)
 
 Work typically involves: adding new tools, updating configs, fixing breakage after OS updates.
 
@@ -81,6 +80,9 @@ Work typically involves: adding new tools, updating configs, fixing breakage aft
 | Per-tool modularity | Can install single tool or everything, easy to add new tools | ✓ Good |
 | SOPS + Age for secrets | No GPG complexity, works well with git | ✓ Good |
 | Host groups for features | Flexible per-machine customization without duplication | ✓ Good |
+| Repo-level Claude Code hooks | Shared hooks in .claude/settings.json, personal in settings.local.json | ✓ Good |
+| Targeted lint fixes first | Fix FQCN/truthy/name violations, defer risky-* and command-* to later | ✓ Good |
+| version: master for git | ansible-lint requires explicit branch, HEAD not recognized | ✓ Good |
 
 ---
-*Last updated: 2026-01-19 after starting v0.1 milestone*
+*Last updated: 2026-01-21 after v0.1 milestone*
