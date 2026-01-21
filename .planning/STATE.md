@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Core value:** One command gets you your environment on any new machine
-**Current focus:** v0.1 Lint & Tooling - MILESTONE COMPLETE, ready for /gsd:complete-milestone
+**Current focus:** v0.1 Lint & Tooling - Gap closure phase added
 
 ## Current Position
 
-Phase: 3 of 3 (Tooling) - COMPLETE
-Milestone: v0.1 - All requirements satisfied
-Status: Ready for milestone completion
-Last activity: 2026-01-21 - Validated setup-all.sh, added Ansible hook deployment
+Phase: 4 of 4 (Hook Registration) - PENDING
+Milestone: v0.1 - 8/10 requirements satisfied, 2 blocked by hook wiring
+Status: Gap closure phase created, ready for planning
+Last activity: 2026-01-21 - Audit found hook not registered, added Phase 4
 
-Progress: [██████████] 100% (All Phases)
+Progress: [████████░░] 80% (3/4 Phases)
 
 ## Performance Metrics
 
@@ -49,15 +49,17 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-4 pending todos — /gsd:check-todos to review
+6 pending todos — /gsd:check-todos to review
 
 - Sort tmux sessions alphabetically (config)
 - Fix themes and add default themes for each machine (config)
 - Review architecture for over-engineering pitfalls (planning)
+- Build ChatGPT desktop app with Tauri (tools)
+- Find better way to capture ideas (tooling)
 
 ### Blockers/Concerns
 
-None. Milestone complete.
+- **Hook not registered**: ansible-lint.sh exists but no settings.json entry → Phase 4 will fix
 
 ### Quick Tasks Completed
 
@@ -68,8 +70,9 @@ None. Milestone complete.
 ## Session Continuity
 
 Last session: 2026-01-21
-Stopped at: Completed quick task 001: Add ChatGPT Desktop Linux support
+Stopped at: Created Phase 4 (Hook Registration) to close audit gaps
 Resume file: None
+Next action: /gsd:plan-phase 4
 
 ---
 *State updated: 2026-01-21*

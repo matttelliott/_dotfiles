@@ -8,7 +8,8 @@ Clean up ansible-lint violations and add tooling to prevent regressions. Three p
 
 - [x] **Phase 1: Lint Cleanup** - Fix all 856 ansible-lint violations
 - [x] **Phase 2: Validation** - Verify syntax and full deployment works
-- [x] **Phase 3: Tooling** - Add Claude Code post-write hook for ansible-lint
+- [ ] **Phase 3: Tooling** - Add Claude Code post-write hook for ansible-lint
+- [ ] **Phase 4: Hook Registration** - Wire ansible-lint hook to settings.json
 
 ## Phase Details
 
@@ -52,12 +53,27 @@ Results:
   1. Saving a .yml file in tools/ triggers ansible-lint automatically
   2. Lint errors appear in Claude Code output with file/line info
   3. Clean files produce no output (silent success)
-**Status**: Complete (implemented during gap closure, no formal plan)
+**Status**: Partial — hook created and deployed, but NOT registered
 
-Implementation:
-- Hook source: `tools/claude-code/hooks/ansible-lint.sh`
-- Deployment: Added to `install_claude-code.yml` via ansible.builtin.copy
-- Registration: `~/.claude/settings.json` PostToolUse for Edit|Write
+Implementation (partial):
+- Hook source: `tools/claude-code/hooks/ansible-lint.sh` ✓
+- Deployment: Added to `install_claude-code.yml` via ansible.builtin.copy ✓
+- Registration: **MISSING** — no entry in settings.json
+
+### Phase 4: Hook Registration
+**Goal**: Wire ansible-lint hook to Claude Code PostToolUse trigger
+**Depends on**: Phase 3 (hook must exist before registration)
+**Requirements**: TOOL-01, TOOL-02 (completing what Phase 3 started)
+**Gap Closure**: Closes gaps from v0.1 audit
+**Success Criteria** (what must be TRUE):
+  1. `~/.claude/settings.json` contains PostToolUse entry for ansible-lint.sh
+  2. Editing a .yml file in _dotfiles triggers the hook
+  3. Hook output (lint errors) appears in Claude Code
+**Plans**: 1 plan
+
+Tasks:
+- Add Ansible task to register hook in settings.json
+- Verify E2E: edit .yml → hook triggers → errors shown
 
 ## Progress
 
@@ -65,10 +81,12 @@ Implementation:
 |-------|----------------|--------|-----------|
 | 1. Lint Cleanup | 3/3 | ✓ Complete | 2026-01-20 |
 | 2. Validation | ad-hoc | ✓ Complete | 2026-01-21 |
-| 3. Tooling | ad-hoc | ✓ Complete | 2026-01-21 |
+| 3. Tooling | ad-hoc | ⚠ Partial | — |
+| 4. Hook Registration | 0/1 | Pending | — |
 
 ---
 *Roadmap created: 2026-01-19*
 *Phase 1 completed: 2026-01-20*
-*Phases 2-3 completed: 2026-01-21 (gap closure)*
-*Milestone ready for completion*
+*Phase 2 completed: 2026-01-21*
+*Phase 3 partial: hook exists but not registered*
+*Phase 4 added: 2026-01-21 (gap closure)*
