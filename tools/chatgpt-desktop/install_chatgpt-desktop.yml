@@ -63,11 +63,11 @@
           [Desktop Entry]
           Name=ChatGPT
           Comment=ChatGPT Desktop Application
-          Exec=/opt/chatgpt-desktop/chatgpt --no-sandbox
+          Exec=/opt/chatgpt-desktop/chatgpt --no-sandbox --class=chatgpt-desktop
           Icon=chatgpt
           Terminal=false
           Type=Application
           Categories=Network;Chat;
-          StartupWMClass=Google-chrome
+          StartupWMClass=chatgpt-desktop
       become: true
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
