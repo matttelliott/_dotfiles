@@ -39,6 +39,12 @@
         - ~/.claude/agents
         - ~/.claude/hooks
 
+    - name: Deploy ansible-lint hook for _dotfiles repo
+      ansible.builtin.copy:
+        src: hooks/ansible-lint.sh
+        dest: ~/.claude/hooks/ansible-lint.sh
+        mode: "0755"
+
     - name: Add/update Sequential Thinking MCP server (user level)
       ansible.builtin.shell: |
         export NVM_DIR="$HOME/.nvm"

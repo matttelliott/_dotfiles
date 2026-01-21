@@ -7,8 +7,8 @@ Clean up ansible-lint violations and add tooling to prevent regressions. Three p
 ## Phases
 
 - [x] **Phase 1: Lint Cleanup** - Fix all 856 ansible-lint violations
-- [ ] **Phase 2: Validation** - Verify syntax and full deployment works
-- [ ] **Phase 3: Tooling** - Add Claude Code post-write hook for ansible-lint
+- [x] **Phase 2: Validation** - Verify syntax and full deployment works
+- [x] **Phase 3: Tooling** - Add Claude Code post-write hook for ansible-lint
 
 ## Phase Details
 
