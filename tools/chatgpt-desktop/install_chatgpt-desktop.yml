@@ -10,78 +10,64 @@
         creates: /Applications/ChatGPT.app
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Check if ChatGPT Desktop is installed (Debian)
+    - name: Check if ChatGPT Desktop is installed (Linux)
       ansible.builtin.stat:
         path: /opt/chatgpt-desktop/chatgpt
-      register: chatgpt_debian
-      when: ansible_facts['os_family'] == "Debian"
+      register: chatgpt_linux
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
 
-    - name: Download ChatGPT Desktop AppImage (Debian)
+    - name: Download ChatGPT Desktop AppImage tarball (Linux)
       ansible.builtin.get_url:
-        url: https://github.com/ArcticDev78/chatgpt/releases/download/v1.1.0-mod/ChatGPT_1.1.0_linux_x86_64.AppImage
-        dest: /tmp/ChatGPT.AppImage
-        mode: "0755"
-      when: ansible_facts['os_family'] == "Debian" and not chatgpt_debian.stat.exists
+        url: https://github.com/lencx/ChatGPT/releases/download/v1.1.0/ChatGPT_1.1.0_linux_x86_64.AppImage.tar.gz
+        dest: /tmp/ChatGPT.AppImage.tar.gz
+        mode: "0644"
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and not chatgpt_linux.stat.exists
 
-    - name: Create ChatGPT Desktop directory (Debian)
+    - name: Extract ChatGPT Desktop AppImage (Linux)
+      ansible.builtin.unarchive:
+        src: /tmp/ChatGPT.AppImage.tar.gz
+        dest: /tmp
+        remote_src: true
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and not chatgpt_linux.stat.exists
+
+    - name: Create ChatGPT Desktop directory (Linux)
       ansible.builtin.file:
         path: /opt/chatgpt-desktop
         state: directory
         mode: "0755"
       become: true
-      when: ansible_facts['os_family'] == "Debian" and not chatgpt_debian.stat.exists
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and not chatgpt_linux.stat.exists
 
-    - name: Install ChatGPT Desktop AppImage (Debian)
+    - name: Install ChatGPT Desktop AppImage (Linux)
       ansible.builtin.copy:
-        src: /tmp/ChatGPT.AppImage
+        src: /tmp/chat-gpt_1.1.0_amd64.AppImage
         dest: /opt/chatgpt-desktop/chatgpt
         mode: "0755"
         remote_src: true
       become: true
-      when: ansible_facts['os_family'] == "Debian" and not chatgpt_debian.stat.exists
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and not chatgpt_linux.stat.exists
 
-    - name: Create ChatGPT Desktop symlink (Debian)
+    - name: Create ChatGPT Desktop symlink (Linux)
       ansible.builtin.file:
         src: /opt/chatgpt-desktop/chatgpt
         dest: /usr/local/bin/chatgpt
         state: link
       become: true
-      when: ansible_facts['os_family'] == "Debian"
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
 
-    - name: Check if ChatGPT Desktop is installed (Arch)
-      ansible.builtin.stat:
-        path: /opt/chatgpt-desktop/chatgpt
-      register: chatgpt_arch
-      when: ansible_facts['os_family'] == "Archlinux"
-
-    - name: Download ChatGPT Desktop AppImage (Arch)
-      ansible.builtin.get_url:
-        url: https://github.com/ArcticDev78/chatgpt/releases/download/v1.1.0-mod/ChatGPT_1.1.0_linux_x86_64.AppImage
-        dest: /tmp/ChatGPT.AppImage
-        mode: "0755"
-      when: ansible_facts['os_family'] == "Archlinux" and not chatgpt_arch.stat.exists
-
-    - name: Create ChatGPT Desktop directory (Arch)
-      ansible.builtin.file:
-        path: /opt/chatgpt-desktop
-        state: directory
-        mode: "0755"
-      become: true
-      when: ansible_facts['os_family'] == "Archlinux" and not chatgpt_arch.stat.exists
-
-    - name: Install ChatGPT Desktop AppImage (Arch)
+    - name: Create ChatGPT Desktop .desktop file (Linux)
       ansible.builtin.copy:
-        src: /tmp/ChatGPT.AppImage
-        dest: /opt/chatgpt-desktop/chatgpt
-        mode: "0755"
-        remote_src: true
+        dest: /usr/share/applications/chatgpt-desktop.desktop
+        mode: "0644"
+        content: |
+          [Desktop Entry]
+          Name=ChatGPT
+          Comment=ChatGPT Desktop Application
+          Exec=/opt/chatgpt-desktop/chatgpt --no-sandbox
+          Icon=chatgpt
+          Terminal=false
+          Type=Application
+          Categories=Network;Chat;
+          StartupWMClass=ChatGPT
       become: true
-      when: ansible_facts['os_family'] == "Archlinux" and not chatgpt_arch.stat.exists
-
-    - name: Create ChatGPT Desktop symlink (Arch)
-      ansible.builtin.file:
-        src: /opt/chatgpt-desktop/chatgpt
-        dest: /usr/local/bin/chatgpt
-        state: link
-      become: true
-      when: ansible_facts['os_family'] == "Archlinux"
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"]

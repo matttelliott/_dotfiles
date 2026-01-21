@@ -59,10 +59,16 @@ Recent decisions affecting current work:
 
 None. Milestone complete.
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 001 | Add ChatGPT Desktop Linux support | 2026-01-21 | 37b49fc | [001-add-chatgpt-app-tool](./quick/001-add-chatgpt-app-tool/) |
+
 ## Session Continuity
 
 Last session: 2026-01-21
-Stopped at: Milestone v0.1 complete, audit passed
+Stopped at: Completed quick task 001: Add ChatGPT Desktop Linux support
 Resume file: None
 
 ---
