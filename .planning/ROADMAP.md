@@ -6,7 +6,7 @@ Clean up ansible-lint violations and add tooling to prevent regressions. Three p
 
 ## Phases
 
-- [ ] **Phase 1: Lint Cleanup** - Fix all 856 ansible-lint violations
+- [x] **Phase 1: Lint Cleanup** - Fix all 856 ansible-lint violations
 - [ ] **Phase 2: Validation** - Verify syntax and full deployment works
 - [ ] **Phase 3: Tooling** - Add Claude Code post-write hook for ansible-lint
 
@@ -25,9 +25,9 @@ Clean up ansible-lint violations and add tooling to prevent regressions. Three p
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Fix FQCN and truthy violations across all playbooks
-- [ ] 01-02-PLAN.md — Add names to all plays (import_playbook directives)
-- [ ] 01-03-PLAN.md — Fix line-length and latest[git] violations
+- [x] 01-01-PLAN.md — Fix FQCN and truthy violations across all playbooks
+- [x] 01-02-PLAN.md — Add names to all plays (import_playbook directives)
+- [x] 01-03-PLAN.md — Fix line-length and latest[git] violations
 
 ### Phase 2: Validation
 **Goal**: Confirm lint fixes didn't break anything
@@ -59,9 +59,10 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Lint Cleanup | 0/3 | Planned | - |
+| 1. Lint Cleanup | 3/3 | ✓ Complete | 2026-01-20 |
 | 2. Validation | 0/? | Not started | - |
 | 3. Tooling | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-01-19*
+*Phase 1 completed: 2026-01-20*
