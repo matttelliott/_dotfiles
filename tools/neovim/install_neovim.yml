@@ -59,3 +59,4 @@
         nvim --headless -c "MasonInstall {{ mason_packages | replace('\n', ' ') }}" -c "sleep 30" -c "qa"
       args:
         creates: ~/.local/share/nvim/mason/bin/typescript-language-server
+      ignore_errors: true

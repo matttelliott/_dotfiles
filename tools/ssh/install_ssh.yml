@@ -42,7 +42,7 @@
 
     - name: Add macbook public key to authorized_keys
       ansible.posix.authorized_key:
-        ansible.builtin.user: "{{ ansible_facts['user_id'] }}"
+        user: "{{ ansible_facts['user_id'] }}"
         key: "{{ ssh_public_key }}"
         state: present
 
