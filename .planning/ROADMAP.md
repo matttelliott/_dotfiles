@@ -66,14 +66,13 @@ Implementation (partial):
 **Requirements**: TOOL-01, TOOL-02 (completing what Phase 3 started)
 **Gap Closure**: Closes gaps from v0.1 audit
 **Success Criteria** (what must be TRUE):
-  1. `~/.claude/settings.json` contains PostToolUse entry for ansible-lint.sh
+  1. `.claude/settings.local.json` contains PostToolUse entry for ansible-lint.sh
   2. Editing a .yml file in _dotfiles triggers the hook
   3. Hook output (lint errors) appears in Claude Code
 **Plans**: 1 plan
 
-Tasks:
-- Add Ansible task to register hook in settings.json
-- Verify E2E: edit .yml → hook triggers → errors shown
+Plans:
+- [ ] 04-01-PLAN.md — Add hook registration to repo-level settings.local.json
 
 ## Progress
 
@@ -90,3 +89,4 @@ Tasks:
 *Phase 2 completed: 2026-01-21*
 *Phase 3 partial: hook exists but not registered*
 *Phase 4 added: 2026-01-21 (gap closure)*
+*Phase 4 planned: 2026-01-21*
