@@ -37,10 +37,12 @@ Plans:
   1. `ansible-playbook --syntax-check setup.yml` passes
   2. `ansible-playbook --syntax-check tools/*/install_*.yml` passes for all tools
   3. `./setup-all.sh` completes successfully on all hosts
-**Plans**: TBD
+**Status**: Complete (executed during gap closure, no formal plan)
 
-Plans:
-- [ ] 02-01: TBD
+Results:
+- desktop (local): 323 tasks OK, 0 failures
+- macmini (remote): 318 tasks OK, 0 failures
+- macbookair/miniserver: unreachable (offline)
 
 ### Phase 3: Tooling
 **Goal**: Claude Code automatically validates YAML changes
@@ -50,19 +52,23 @@ Plans:
   1. Saving a .yml file in tools/ triggers ansible-lint automatically
   2. Lint errors appear in Claude Code output with file/line info
   3. Clean files produce no output (silent success)
-**Plans**: TBD
+**Status**: Complete (implemented during gap closure, no formal plan)
 
-Plans:
-- [ ] 03-01: TBD
+Implementation:
+- Hook source: `tools/claude-code/hooks/ansible-lint.sh`
+- Deployment: Added to `install_claude-code.yml` via ansible.builtin.copy
+- Registration: `~/.claude/settings.json` PostToolUse for Edit|Write
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Lint Cleanup | 3/3 | ✓ Complete | 2026-01-20 |
-| 2. Validation | 0/? | Not started | - |
-| 3. Tooling | 0/? | Not started | - |
+| 2. Validation | ad-hoc | ✓ Complete | 2026-01-21 |
+| 3. Tooling | ad-hoc | ✓ Complete | 2026-01-21 |
 
 ---
 *Roadmap created: 2026-01-19*
 *Phase 1 completed: 2026-01-20*
+*Phases 2-3 completed: 2026-01-21 (gap closure)*
+*Milestone ready for completion*
