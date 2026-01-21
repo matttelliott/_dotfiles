@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Core value:** One command gets you your environment on any new machine
-**Current focus:** v0.1 Lint & Tooling - Gap closure phase added
+**Current focus:** v0.1 Lint & Tooling - COMPLETE
 
 ## Current Position
 
-Phase: 4 of 4 (Hook Registration) - PENDING
-Milestone: v0.1 - 8/10 requirements satisfied, 2 blocked by hook wiring
-Status: Gap closure phase created, ready for planning
-Last activity: 2026-01-21 - Audit found hook not registered, added Phase 4
+Phase: 4 of 4 (Hook Registration) - COMPLETE
+Milestone: v0.1 - 10/10 requirements satisfied
+Status: All phases complete, milestone achieved
+Last activity: 2026-01-21 - Completed 04-01-PLAN.md (hook registration)
 
-Progress: [████████░░] 80% (3/4 Phases)
+Progress: [##########] 100% (4/4 Phases)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: ~18 min/plan
+- Total plans completed: 4
+- Average duration: ~15 min/plan
 - Total execution time: ~1 hour
 
 **By Phase:**
@@ -28,10 +28,11 @@ Progress: [████████░░] 80% (3/4 Phases)
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01 | 3/3 | ~1h | ~20m |
+| 04 | 1/1 | ~2m | ~2m |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 ✅, 01-02 ✅, 01-03 ✅
-- Trend: Phase 1 complete
+- Last 5 plans: 01-01, 01-02, 01-03, 04-01
+- Trend: All complete
 
 *Updated after each plan completion*
 
@@ -46,6 +47,7 @@ Recent decisions affecting current work:
 - **Comprehensive boolean field coverage** (01-01): Extended truthy fixes beyond common fields (become, update_cache) to include ignore_errors, remote_src, check_mode, append, enabled
 - **Dependency import naming** (01-02): Use "Install {tool} (dependency)" pattern for import_playbook of prerequisites
 - **version: master for git pins** (01-03): ansible-lint requires explicit branch name, not HEAD, to satisfy latest[git] rule
+- **Shared hooks in settings.json** (04-01): Use .claude/settings.json (tracked) instead of settings.local.json (gitignored) for repo-level hooks
 
 ### Pending Todos
 
@@ -62,7 +64,7 @@ Recent decisions affecting current work:
 
 ### Blockers/Concerns
 
-- **Hook not registered**: ansible-lint.sh exists but no settings.json entry → Phase 4 will fix
+None - v0.1 milestone complete
 
 ### Quick Tasks Completed
 
@@ -73,9 +75,9 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-01-21
-Stopped at: Created Phase 4 (Hook Registration) to close audit gaps
+Stopped at: Completed 04-01-PLAN.md (hook registration)
 Resume file: None
-Next action: /gsd:plan-phase 4
+Next action: v0.1 milestone complete - ready for next milestone
 
 ---
 *State updated: 2026-01-21*
