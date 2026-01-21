@@ -68,6 +68,6 @@
           Terminal=false
           Type=Application
           Categories=Network;Chat;
-          StartupWMClass=ChatGPT
+          StartupWMClass=Google-chrome
       become: true
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
