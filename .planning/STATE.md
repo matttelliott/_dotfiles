@@ -9,13 +9,13 @@ See: .planning/PROJECT.md (updated 2026-01-21)
 
 ## Current Position
 
-Phase: 7 (Bug Fixes) — complete
-Milestone: v0.2 Portability & Bugs
+Phase: 8 (LTS Version Policy) — complete
+Milestone: v0.2 Portability & Bugs — complete
 Epic: Concerns Resolution (v0.2–v0.5)
-Status: Ready for Phase 8
-Last activity: 2026-01-22 — Completed 07-01-PLAN.md, 07-02-PLAN.md
+Status: v0.2 milestone complete
+Last activity: 2026-01-22 — Completed 08-01-PLAN.md
 
-Progress: ████████░░ 75% (3/4 phases in v0.2)
+Progress: ██████████ 100% (4/4 phases in v0.2)
 
 ## Completed Milestones
 
@@ -31,9 +31,9 @@ Progress: ████████░░ 75% (3/4 phases in v0.2)
 - Timeline: 2 days (2026-01-20 → 2026-01-21)
 
 **v0.2 Velocity:**
-- Total plans completed: 4
-- Average duration: ~5 min/plan
-- Total execution time: ~18 min
+- Total plans completed: 5
+- Average duration: ~4 min/plan
+- Total execution time: ~19 min
 - Timeline: 2 days (2026-01-21 → 2026-01-22)
 
 **By Phase:**
@@ -45,6 +45,7 @@ Progress: ████████░░ 75% (3/4 phases in v0.2)
 | 05 | 2/2 | ~16m | ~8m |
 | 06 | 1/1 | ~1m | ~1m |
 | 07 | 2/2 | ~3m | ~1.5m |
+| 08 | 1/1 | ~31s | ~31s |
 
 *Updated after each plan completion*
 
@@ -70,6 +71,7 @@ Recent decisions from v0.2:
 - **ssh-keygen -F pattern** (07-01): Use command module (not shell) for ssh-keygen -F, with changed_when/failed_when for lint compliance
 - **deb822_repository over apt_repository** (07-02): Modern module creates proper .sources files in deb822 format, safer than modifying sources.list directly
 - **Phase 8 scope change** (08-discuss): Replaced PERF-01 (Homebrew skipping) with LTS-01 (LTS version policy) — user prefers always-update and LTS versions
+- **LTS version hierarchy** (08-01): Documented LTS > stable > latest version selection policy with implementation table
 
 ### Pending Todos
 
@@ -78,7 +80,7 @@ Recent decisions from v0.2:
 
 ### Blockers/Concerns
 
-None — Phase 8 context gathered, ready for planning
+None — v0.2 milestone complete, ready for v0.3 planning
 
 ### Quick Tasks Completed
 
@@ -89,24 +91,10 @@ None — Phase 8 context gathered, ready for planning
 
 ## Session Continuity
 
-Last session: 2026-01-22 (late night)
-Stopped at: Completed todo cleanup session
+Last session: 2026-01-22
+Stopped at: Completed 08-01-PLAN.md (Phase 8 complete, v0.2 milestone complete)
 Resume file: None
-Next action: /gsd:plan-phase 8
-
-### Session Summary (2026-01-22 night)
-
-Completed 6 todos:
-- tmux session sorting (`-O name` flag)
-- Context7 + Sequential Thinking MCPs added to claude-code playbook
-- Claude Code switched to native installer
-- WezTerm clip2path script for image pasting on Linux
-- Fixed themes system (88 broken `ansible.builtin.replace:` params)
-- Per-machine theme defaults in inventory + themesetting DEFAULTS option
-
-Also fixed:
-- Nerd Font Mono variant for WezTerm compatibility
-- Desktop default font changed to monaspace
+Next action: /gsd:milestone for v0.3 planning
 
 ---
-*State updated: 2026-01-22 (07-02 complete)*
+*State updated: 2026-01-22 (08-01 complete, v0.2 complete)*
