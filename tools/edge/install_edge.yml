@@ -24,7 +24,10 @@
           https://packages.microsoft.com/repos/edge stable main" \
           | tee /etc/apt/sources.list.d/microsoft-edge.list > /dev/null
       become: true
-      when: ansible_facts['os_family'] == "Debian" and not edge_check.stat.exists
+      when:
+        - ansible_facts['os_family'] == "Debian"
+        - ansible_facts.architecture == "x86_64"
+        - not edge_check.stat.exists
 
     - name: Install Microsoft Edge via apt (Debian)
       ansible.builtin.apt:
@@ -32,7 +35,16 @@
         state: present
         update_cache: true
       become: true
-      when: ansible_facts['os_family'] == "Debian"
+      when:
+        - ansible_facts['os_family'] == "Debian"
+        - ansible_facts.architecture == "x86_64"
+
+    - name: Skip Edge on ARM64 (no Linux packages available)
+      ansible.builtin.debug:
+        msg: "Microsoft Edge is not available for ARM64 Linux. No alternative installation method exists."
+      when:
+        - ansible_facts['os_family'] == "Debian"
+        - ansible_facts.architecture == "aarch64"
 
     - name: Install Microsoft Edge via yay (Arch)
       ansible.builtin.shell: yay -S --noconfirm microsoft-edge-stable-bin
