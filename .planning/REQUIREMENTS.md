@@ -24,8 +24,8 @@ Requirements for v0.2. Focus: ARM64 support, idempotency, bug fixes.
 
 ### Bug Fixes
 
-- [ ] **BUG-01**: SSH known_hosts uses ssh-keygen -F to verify host presence
-- [ ] **BUG-02**: Debian non-free repos use apt_repository module safely
+- [x] **BUG-01**: SSH known_hosts uses ssh-keygen -F to verify host presence
+- [x] **BUG-02**: Debian non-free repos use apt_repository module safely
 
 ### Performance
 
@@ -110,8 +110,8 @@ Acknowledged but deferred indefinitely:
 | IDEM-03 | Phase 6 | Complete |
 | IDEM-04 | Phase 6 | Complete |
 | IDEM-05 | Phase 6 | Complete |
-| BUG-01 | Phase 7 | Pending |
-| BUG-02 | Phase 7 | Pending |
+| BUG-01 | Phase 7 | Complete |
+| BUG-02 | Phase 7 | Complete |
 | PERF-01 | Phase 8 | Pending |
 
 **Coverage:**

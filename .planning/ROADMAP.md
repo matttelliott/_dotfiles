@@ -68,8 +68,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — SSH known_hosts idempotency with ssh-keygen -F
-- [ ] 07-02-PLAN.md — Debian non-free repos via deb822_repository module
+- [x] 07-01-PLAN.md — SSH known_hosts idempotency with ssh-keygen -F
+- [x] 07-02-PLAN.md — Debian non-free repos via deb822_repository module
 
 **Success Criteria:**
 
@@ -101,7 +101,7 @@ Plans:
 |-------|------|--------------|--------|
 | 5 | Architecture Portability | ARCH-01, ARCH-02, ARCH-03 | Complete |
 | 6 | Idempotency Guards | IDEM-01, IDEM-02, IDEM-03, IDEM-04, IDEM-05 | Complete |
-| 7 | Bug Fixes | BUG-01, BUG-02 | Pending |
+| 7 | Bug Fixes | BUG-01, BUG-02 | Complete |
 | 8 | Performance | PERF-01 | Pending |
 
 **Total:** 11 requirements across 4 phases
