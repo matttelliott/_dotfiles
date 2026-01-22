@@ -90,7 +90,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 08-01-PLAN.md — Document version policy in CLAUDE.md
+- [x] 08-01-PLAN.md — Document version policy in CLAUDE.md
 
 **Success Criteria:**
 
@@ -108,7 +108,7 @@ Plans:
 | 5 | Architecture Portability | ARCH-01, ARCH-02, ARCH-03 | Complete |
 | 6 | Idempotency Guards | IDEM-01, IDEM-02, IDEM-03, IDEM-04, IDEM-05 | Complete |
 | 7 | Bug Fixes | BUG-01, BUG-02 | Complete |
-| 8 | LTS Version Policy | LTS-01 | Pending |
+| 8 | LTS Version Policy | LTS-01 | Complete |
 
 **Total:** 11 requirements across 4 phases
 

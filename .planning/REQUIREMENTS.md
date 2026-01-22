@@ -113,7 +113,7 @@ Acknowledged but deferred indefinitely:
 | IDEM-05 | Phase 6 | Complete |
 | BUG-01 | Phase 7 | Complete |
 | BUG-02 | Phase 7 | Complete |
-| LTS-01 | Phase 8 | Pending |
+| LTS-01 | Phase 8 | Complete |
 
 **Coverage:**
 - v0.2 requirements: 11 total
