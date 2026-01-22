@@ -73,11 +73,12 @@ None — ready for v0.2
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 001 | Add ChatGPT Desktop Linux support | 2026-01-21 | 37b49fc | [001-add-chatgpt-app-tool](./quick/001-add-chatgpt-app-tool/) |
+| 002 | Apply mosh to desktop | 2026-01-21 | N/A | [002-add-mosh-tool-and-apply-to-desktop](./quick/002-add-mosh-tool-and-apply-to-desktop/) |
 
 ## Session Continuity
 
 Last session: 2026-01-21
-Stopped at: v0.1 milestone completed and archived
+Stopped at: Completed quick task 002 (mosh to desktop)
 Resume file: None
 Next action: /gsd:new-milestone for v0.2
 
