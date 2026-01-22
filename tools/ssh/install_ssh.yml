@@ -52,27 +52,25 @@
         dest: ~/.ssh/config
         mode: '0600'
 
-    - name: Add host keys to known_hosts
-      ansible.builtin.shell: ssh-keyscan -H {{ item }}.home.lan >> ~/.ssh/known_hosts 2>/dev/null
-      args:
-        creates: ~/.ssh/.known_hosts_{{ item }}
+    - name: Check if hosts already in known_hosts
+      ansible.builtin.command: ssh-keygen -F {{ item }}.home.lan
+      register: known_hosts_check
+      changed_when: false
+      failed_when: false
       loop:
         - macbookair
         - macmini
         - desktop
         - miniserver
-      ignore_errors: true
 
-    - name: Mark known_hosts as populated
-      ansible.builtin.file:
-        path: ~/.ssh/.known_hosts_{{ item }}
-        state: touch
-        mode: '0600'
-      loop:
-        - macbookair
-        - macmini
-        - desktop
-        - miniserver
+    - name: Add missing host keys to known_hosts
+      ansible.builtin.shell: ssh-keyscan -H {{ item.item }}.home.lan >> ~/.ssh/known_hosts 2>/dev/null
+      loop: "{{ known_hosts_check.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+      when: item.rc != 0
+      changed_when: true
+      failed_when: false
 
     - name: Check if 1Password service account token exists
       ansible.builtin.stat:
