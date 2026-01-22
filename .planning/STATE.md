@@ -5,16 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-01-21)
 
 **Core value:** One command gets you your environment on any new machine
-**Current focus:** Planning next milestone (v0.2)
+**Current focus:** v0.2 Portability & Bugs (Phase 5)
 
 ## Current Position
 
-Phase: N/A (between milestones)
-Milestone: v0.1 complete, v0.2 not started
-Status: Ready to plan
-Last activity: 2026-01-21 — v0.1 milestone complete
+Phase: 5 (Architecture Portability) — not started
+Milestone: v0.2 Portability & Bugs
+Epic: Concerns Resolution (v0.2–v0.5)
+Status: Ready to plan phase 5
+Last activity: 2026-01-21 — v0.2 milestone initialized
 
-Progress: Milestone shipped — run /gsd:new-milestone for v0.2
+Progress: ░░░░░░░░░░ 0% (0/4 phases)
 
 ## Completed Milestones
 
@@ -80,7 +81,7 @@ None — ready for v0.2
 Last session: 2026-01-21
 Stopped at: Completed quick task 002 (mosh to all reachable hosts)
 Resume file: None
-Next action: /gsd:new-milestone for v0.2
+Next action: /gsd:plan-phase 5
 
 ---
 *State updated: 2026-01-21*

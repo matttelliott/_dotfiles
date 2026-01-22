@@ -14,9 +14,33 @@ When you sit down at a new machine, one command gets you your environment.
 
 Codebase: 107 YAML playbooks, all passing ansible-lint for targeted rules. Claude Code hook validates YAML edits automatically.
 
-**Future milestones:**
-- v0.2: Test infrastructure + CI/CD
-- v0.3+: Bug fixes, architecture portability, idempotency improvements
+## Current Milestone: v0.2 Portability & Bugs
+
+**Goal:** Fix architecture hardcoding and known bugs so playbooks work on ARM64 and re-runs are truly idempotent.
+
+**Epic:** Concerns Resolution (v0.2–v0.5) — addressing all items from `.planning/codebase/CONCERNS.md`
+
+**Milestone roadmap:**
+
+| Milestone | Theme | Key Deliverables |
+|-----------|-------|------------------|
+| **v0.2** | Portability & Bugs | ARM64 support, idempotency guards, bug fixes |
+| **v0.3** | CI/CD & Testing | GitHub Actions pipeline, Molecule tests |
+| **v0.4** | Security & Documentation | Curl-to-shell hardening, risk documentation |
+| **v0.5** | Polish | Themes refactor, Homebrew optimization, version tracking |
+
+**WONTFIX (with rationale):**
+- SEC-03 (token plaintext) — already mitigated with 600 perms
+- SEC-04 (SSH key handling) — already mitigated with no_log
+- PERF-03 (neovim size) — kickstart pattern, has extensions
+- FRAG-02 (nerd fonts) — already documented in CLAUDE.md
+- SCALE-01/02 (inventory/groups) — 4 hosts, 7 groups sufficient
+- DEP-02 (yay/AUR) — standard Arch practice
+- MISS-03 (version lock) — rolling releases preferred
+
+**DEFERRED:**
+- PERF-02 (parallel installation) — complexity vs benefit
+- TEST-03 (cross-platform CI) — platform matrix expensive
 
 ## Requirements
 
@@ -40,7 +64,13 @@ Codebase: 107 YAML playbooks, all passing ansible-lint for targeted rules. Claud
 
 <!-- Current scope. Building toward these. -->
 
-(No active milestone — run `/gsd:new-milestone` to start v0.2)
+**v0.2 Portability & Bugs:**
+- [ ] ARM64 architecture support for APT repositories (docker, 1password, edge)
+- [ ] Dynamic architecture detection for Go installation
+- [ ] Idempotency guards for shell commands (go install, mason, npm, uv)
+- [ ] SSH known_hosts marker file bug fix
+- [ ] Debian non-free repos safe modification
+- [ ] Homebrew update optimization
 
 ### Out of Scope
 
@@ -85,4 +115,4 @@ Work typically involves: adding new tools, updating configs, fixing breakage aft
 | version: master for git | ansible-lint requires explicit branch, HEAD not recognized | ✓ Good |
 
 ---
-*Last updated: 2026-01-21 after v0.1 milestone*
+*Last updated: 2026-01-21 after starting v0.2 milestone (Concerns Resolution epic)*
