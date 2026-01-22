@@ -45,7 +45,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 06-01-PLAN.md — Add creates guards to Go and Python dev tools
+- [x] 06-01-PLAN.md — Add creates guards to Go and Python dev tools
 
 **Success Criteria:**
 
@@ -94,7 +94,7 @@ Plans:
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
 | 5 | Architecture Portability | ARCH-01, ARCH-02, ARCH-03 | Complete |
-| 6 | Idempotency Guards | IDEM-01, IDEM-02, IDEM-03, IDEM-04, IDEM-05 | Pending |
+| 6 | Idempotency Guards | IDEM-01, IDEM-02, IDEM-03, IDEM-04, IDEM-05 | Complete |
 | 7 | Bug Fixes | BUG-01, BUG-02 | Pending |
 | 8 | Performance | PERF-01 | Pending |
 

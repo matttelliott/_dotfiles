@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-01-21)
 
 **Core value:** One command gets you your environment on any new machine
-**Current focus:** v0.2 Portability & Bugs (Phase 6)
+**Current focus:** v0.2 Portability & Bugs (Phase 7)
 
 ## Current Position
 
-Phase: 5 (Architecture Portability) — complete
+Phase: 6 (Idempotency Guards) — complete
 Milestone: v0.2 Portability & Bugs
 Epic: Concerns Resolution (v0.2–v0.5)
-Status: Ready for Phase 6
-Last activity: 2026-01-21 — Phase 5 verified complete
+Status: Ready for Phase 7
+Last activity: 2026-01-22 — Completed 06-01-PLAN.md
 
-Progress: ██▒░░░░░░░ 25% (1/4 phases)
+Progress: ███░░░░░░░ 50% (2/4 phases in v0.2)
 
 ## Completed Milestones
 
@@ -30,6 +30,12 @@ Progress: ██▒░░░░░░░ 25% (1/4 phases)
 - Total execution time: ~1 hour
 - Timeline: 2 days (2026-01-20 → 2026-01-21)
 
+**v0.2 Velocity:**
+- Total plans completed: 3
+- Average duration: ~5 min/plan
+- Total execution time: ~17 min
+- Timeline: 2 days (2026-01-21 → 2026-01-22)
+
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
@@ -37,6 +43,7 @@ Progress: ██▒░░░░░░░ 25% (1/4 phases)
 | 01 | 3/3 | ~1h | ~20m |
 | 04 | 1/1 | ~2m | ~2m |
 | 05 | 2/2 | ~16m | ~8m |
+| 06 | 1/1 | ~1m | ~1m |
 
 *Updated after each plan completion*
 
@@ -55,6 +62,11 @@ Recent decisions from v0.1:
 - **YAML folding for long lines** (05-01): Use >- syntax to break long repo URLs across lines for lint compliance
 - **ARM64 skip pattern** (05-02): Use list-format when conditions with x86_64 check + aarch64 debug message for ARM64-incompatible tools
 
+Recent decisions from v0.2:
+
+- **Guard on first binary** (06-01): gofumpt for Go, ruff for Python - since all tools in each group are installed together, checking the first is sufficient
+- **Same path for both OS** (06-01): uv symlinks tool binaries to ~/.local/bin regardless of OS, so the guard path is identical for macOS and Linux
+
 ### Pending Todos
 
 10 pending todos — /gsd:check-todos to review
@@ -71,7 +83,7 @@ Recent decisions from v0.1:
 
 ### Blockers/Concerns
 
-None — ready for v0.2
+None — ready for Phase 7
 
 ### Quick Tasks Completed
 
@@ -82,10 +94,10 @@ None — ready for v0.2
 
 ## Session Continuity
 
-Last session: 2026-01-21
-Stopped at: Phase 5 complete, verified
+Last session: 2026-01-22
+Stopped at: Completed 06-01-PLAN.md
 Resume file: None
-Next action: /gsd:plan-phase 6
+Next action: /gsd:plan-phase 7
 
 ---
-*State updated: 2026-01-21*
+*State updated: 2026-01-22*
