@@ -87,6 +87,11 @@ Plans:
 
 **Requirements:** LTS-01
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 08-01-PLAN.md — Document version policy in CLAUDE.md
+
 **Success Criteria:**
 
 1. Node.js installed via nvm uses `--lts` flag
