@@ -37,6 +37,11 @@
         dest: ~/.claude/hooks/ansible-lint.sh
         mode: "0755"
 
+    - name: Deploy /idea command
+      ansible.builtin.copy:
+        src: commands/idea.md
+        dest: ~/.claude/commands/idea.md
+
     - name: Add/update Sequential Thinking MCP server (user level)
       ansible.builtin.shell: |
         export NVM_DIR="$HOME/.nvm"
