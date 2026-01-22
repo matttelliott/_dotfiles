@@ -19,6 +19,12 @@ Fix architecture hardcoding and known bugs so playbooks work on ARM64 (Raspberry
 
 **Requirements:** ARCH-01, ARCH-02, ARCH-03
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — Dynamic architecture mapping for Docker and Go
+- [ ] 05-02-PLAN.md — ARM64 skip with debug messages for 1Password and Edge
+
 **Success Criteria:**
 
 1. APT repository playbooks (docker, 1password, edge) use `ansible_architecture` or equivalent fact for arch detection
@@ -82,7 +88,7 @@ Fix architecture hardcoding and known bugs so playbooks work on ARM64 (Raspberry
 
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
-| 5 | Architecture Portability | ARCH-01, ARCH-02, ARCH-03 | Pending |
+| 5 | Architecture Portability | ARCH-01, ARCH-02, ARCH-03 | Planned |
 | 6 | Idempotency Guards | IDEM-01, IDEM-02, IDEM-03, IDEM-04, IDEM-05 | Pending |
 | 7 | Bug Fixes | BUG-01, BUG-02 | Pending |
 | 8 | Performance | PERF-01 | Pending |
