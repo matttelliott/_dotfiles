@@ -69,10 +69,8 @@ Recent decisions from v0.2:
 
 ### Pending Todos
 
-2 pending todos — /gsd:check-todos to review
+0 pending todos — /gsd:check-todos to review
 
-- Explore parallel GSD work patterns (planning)
-- Build ChatGPT desktop app with Tauri (tools)
 
 ### Blockers/Concerns
 
