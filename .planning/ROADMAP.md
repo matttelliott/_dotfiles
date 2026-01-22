@@ -42,6 +42,11 @@ Plans:
 
 **Requirements:** IDEM-01, IDEM-02, IDEM-03, IDEM-04, IDEM-05
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 06-01-PLAN.md — Add creates guards to Go and Python dev tools
+
 **Success Criteria:**
 
 1. `go install` tasks have `creates:` guards pointing to the installed binary location
