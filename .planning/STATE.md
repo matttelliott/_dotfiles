@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-01-21)
 
 **Core value:** One command gets you your environment on any new machine
-**Current focus:** v0.2 Portability & Bugs (Phase 7)
+**Current focus:** v0.2 Portability & Bugs (Phase 8: LTS Version Policy)
 
 ## Current Position
 
@@ -69,6 +69,7 @@ Recent decisions from v0.2:
 - **Same path for both OS** (06-01): uv symlinks tool binaries to ~/.local/bin regardless of OS, so the guard path is identical for macOS and Linux
 - **ssh-keygen -F pattern** (07-01): Use command module (not shell) for ssh-keygen -F, with changed_when/failed_when for lint compliance
 - **deb822_repository over apt_repository** (07-02): Modern module creates proper .sources files in deb822 format, safer than modifying sources.list directly
+- **Phase 8 scope change** (08-discuss): Replaced PERF-01 (Homebrew skipping) with LTS-01 (LTS version policy) — user prefers always-update and LTS versions
 
 ### Pending Todos
 
@@ -77,7 +78,7 @@ Recent decisions from v0.2:
 
 ### Blockers/Concerns
 
-None — Phase 7 complete, ready for Phase 8
+None — Phase 8 context gathered, ready for planning
 
 ### Quick Tasks Completed
 
@@ -91,7 +92,7 @@ None — Phase 7 complete, ready for Phase 8
 Last session: 2026-01-22 (late night)
 Stopped at: Completed todo cleanup session
 Resume file: None
-Next action: /gsd:plan-phase 7
+Next action: /gsd:plan-phase 8
 
 ### Session Summary (2026-01-22 night)
 

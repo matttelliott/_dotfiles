@@ -27,9 +27,9 @@ Requirements for v0.2. Focus: ARM64 support, idempotency, bug fixes.
 - [x] **BUG-01**: SSH known_hosts uses ssh-keygen -F to verify host presence
 - [x] **BUG-02**: Debian non-free repos use apt_repository module safely
 
-### Performance
+### LTS Version Policy
 
-- [ ] **PERF-01**: Homebrew update skips if recently updated (timestamp check)
+- [ ] **LTS-01**: Tools use LTS versions where available (nvm --lts, uv stable, package manager defaults)
 
 ## v0.3 Requirements: CI/CD & Testing
 
@@ -88,6 +88,7 @@ Explicitly excluded with rationale (WONTFIX items from CONCERNS.md):
 | SCALE-02 | Tag-based tool selection | 7 groups sufficient |
 | DEP-02 | Replace yay/AUR | Standard Arch practice |
 | MISS-03 | System package version locking | Rolling releases preferred |
+| PERF-01 | Homebrew update skipping | User prefers always-update behavior |
 
 ## Deferred
 
@@ -112,7 +113,7 @@ Acknowledged but deferred indefinitely:
 | IDEM-05 | Phase 6 | Complete |
 | BUG-01 | Phase 7 | Complete |
 | BUG-02 | Phase 7 | Complete |
-| PERF-01 | Phase 8 | Pending |
+| LTS-01 | Phase 8 | Pending |
 
 **Coverage:**
 - v0.2 requirements: 11 total

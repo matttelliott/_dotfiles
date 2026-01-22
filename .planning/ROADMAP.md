@@ -79,19 +79,20 @@ Plans:
 
 ---
 
-## Phase 8: Performance
+## Phase 8: LTS Version Policy
 
-**Goal:** Homebrew operations are faster by skipping updates when recently performed.
+**Goal:** Tools with LTS releases use their LTS versions; others use stable or latest.
 
-**Dependencies:** None (independent optimization)
+**Dependencies:** None (independent policy)
 
-**Requirements:** PERF-01
+**Requirements:** LTS-01
 
 **Success Criteria:**
 
-1. Homebrew update checks timestamp of last update (e.g., stat on a marker file or Homebrew cache)
-2. Update is skipped if last update was within configurable threshold (e.g., 1 hour)
-3. Full `setup.yml` run on macOS completes faster on re-runs when Homebrew is already current
+1. Node.js installed via nvm uses `--lts` flag
+2. Python version managers (uv) use LTS/stable versions where applicable
+3. Homebrew/apt packages use package manager defaults (typically stable)
+4. Policy documented: LTS > stable > latest
 
 ---
 
@@ -102,7 +103,7 @@ Plans:
 | 5 | Architecture Portability | ARCH-01, ARCH-02, ARCH-03 | Complete |
 | 6 | Idempotency Guards | IDEM-01, IDEM-02, IDEM-03, IDEM-04, IDEM-05 | Complete |
 | 7 | Bug Fixes | BUG-01, BUG-02 | Complete |
-| 8 | Performance | PERF-01 | Pending |
+| 8 | LTS Version Policy | LTS-01 | Pending |
 
 **Total:** 11 requirements across 4 phases
 
@@ -122,7 +123,7 @@ Plans:
 | IDEM-05 | 6 | Yes |
 | BUG-01 | 7 | Yes |
 | BUG-02 | 7 | Yes |
-| PERF-01 | 8 | Yes |
+| LTS-01 | 8 | Yes |
 
 **Coverage:** 11/11 (100%)
 
