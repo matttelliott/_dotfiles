@@ -96,10 +96,18 @@ mosh desktop
 | macbookair | ⏸️ Unreachable via .home.lan | Online via WireGuard but inventory uses home.lan domain |
 | miniserver | ⏸️ Offline | Will install on next setup.yml run |
 
+## Known Limitation
+
+**WireGuard clients are not reachable from home network hosts.**
+
+When a machine (e.g., macbookair) connects to the home network via WireGuard from outside, the `.home.lan` hostname does not resolve from other home network hosts (e.g., desktop). This is expected behavior - WireGuard tunnels traffic outbound but doesn't make the client addressable inbound via local DNS.
+
+**Workaround:** Run `ansible-playbook setup.yml` locally on the WireGuard-connected machine, or wait until it's back on the local network.
+
 ## Next Phase Readiness
 
-- All reachable hosts accessible via mosh for resilient remote shell sessions
-- Offline hosts will receive mosh on next `ansible-playbook setup.yml` run
+- All locally-reachable hosts accessible via mosh for resilient remote shell sessions
+- WireGuard-connected hosts require local playbook execution
 - No blockers or concerns
 
 ---
