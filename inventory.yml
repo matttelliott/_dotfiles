@@ -34,7 +34,7 @@ all:
           ansible_ssh_timeout: 60
           ansible_python_interpreter: /usr/bin/python3
           theme_color: onedark
-          theme_font: firacode
+          theme_font: monaspace
           theme_style: slant
     with_login_tools:
       hosts:
