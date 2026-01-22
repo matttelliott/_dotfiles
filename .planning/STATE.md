@@ -53,6 +53,7 @@ Recent decisions from v0.1:
 - **version: master for git pins** (01-03): ansible-lint requires explicit branch name, not HEAD, to satisfy latest[git] rule
 - **Shared hooks in settings.json** (04-01): Use .claude/settings.json (tracked) instead of settings.local.json (gitignored) for repo-level hooks
 - **YAML folding for long lines** (05-01): Use >- syntax to break long repo URLs across lines for lint compliance
+- **ARM64 skip pattern** (05-02): Use list-format when conditions with x86_64 check + aarch64 debug message for ARM64-incompatible tools
 
 ### Pending Todos
 
@@ -81,9 +82,9 @@ None — ready for v0.2
 ## Session Continuity
 
 Last session: 2026-01-21
-Stopped at: Completed 05-01-PLAN.md (Docker and Go architecture mapping)
+Stopped at: Completed 05-02-PLAN.md (1Password and Edge ARM64 skip)
 Resume file: None
-Next action: Execute 05-02-PLAN.md (GitHub CLI architecture mapping)
+Next action: Execute 05-03-PLAN.md or 05-04-PLAN.md
 
 ---
 *State updated: 2026-01-21*
