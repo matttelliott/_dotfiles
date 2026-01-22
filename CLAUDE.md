@@ -129,6 +129,27 @@ Tools with shell config source their `<tool>.zsh` file in the zshrc.
 - Always use `become: yes` for package manager tasks on Linux
 - Use `creates:` for idempotent Homebrew shell commands
 
+## Version Policy
+
+Tools use the most stable available version:
+
+1. **LTS preferred** - Use LTS when available (e.g., `nvm install --lts`)
+2. **Stable fallback** - Use stable channel when no LTS (e.g., Rust, Neovim)
+3. **Latest acceptable** - Use latest when no LTS/stable distinction (e.g., Pulumi)
+
+Package managers (Homebrew, apt, pacman) provide stable versions by default.
+
+### Current Implementation
+
+| Tool | Version Strategy | Method |
+|------|-----------------|--------|
+| Node.js | LTS | `nvm install --lts`, `nvm alias default lts/*` |
+| Rust | Stable | rustup defaults to stable toolchain |
+| Neovim | Latest stable | GitHub releases (NOT apt - apt versions are outdated) |
+| Go | Current stable | Pinned version (Go has no LTS) |
+| All Homebrew | Stable | Formulae provide stable versions |
+| All apt/pacman | Stable | Repos provide stable versions |
+
 ## Claude Code Configuration
 
 ### Three-Layer Architecture Overview
