@@ -29,28 +29,11 @@ Requirements for v0.2. Focus: ARM64 support, idempotency, bug fixes.
 
 ### LTS Version Policy
 
-- [ ] **LTS-01**: Tools use LTS versions where available (nvm --lts, uv stable, package manager defaults)
+- [x] **LTS-01**: Tools use LTS versions where available (nvm --lts, uv stable, package manager defaults)
 
-## v0.3 Requirements: CI/CD & Testing
+## v0.3 Requirements: Security & Documentation
 
-Deferred to next milestone. Tracked for roadmap continuity.
-
-### CI/CD Pipeline
-
-- **CI-01**: GitHub Actions workflow for ansible-lint on PR
-- **CI-02**: GitHub Actions workflow for YAML syntax validation
-- **CI-03**: CI blocks merge on lint failures
-
-### Test Infrastructure
-
-- **TEST-01**: Molecule test framework configured
-- **TEST-02**: Molecule tests for ssh playbook
-- **TEST-03**: Molecule tests for git playbook
-- **TEST-04**: Molecule tests for zsh playbook
-
-## v0.4 Requirements: Security & Documentation
-
-Deferred. Tracked for roadmap continuity.
+Tracked for roadmap continuity.
 
 ### Security Hardening
 
@@ -65,9 +48,24 @@ Deferred. Tracked for roadmap continuity.
 - **DOC-03**: Rollback/recovery procedures documented
 - **DOC-04**: Bootstrap script OS detection improved with /etc/os-release
 
+## v0.4 Requirements: Ephemeral Environments
+
+Tracked for roadmap continuity.
+
+### Container Support
+
+- **EPHEM-01**: Headless bootstrap completes without GUI dependencies blocking
+- **EPHEM-02**: Container-optimized host group or playbook subset available
+- **EPHEM-03**: Dockerfile provided for ready-to-use Claude sandbox environment
+
+### VPS Support
+
+- **EPHEM-04**: Fresh Debian/Ubuntu VPS bootstrap works cleanly
+- **EPHEM-05**: Claude sandbox setup workflow documented
+
 ## v0.5 Requirements: Polish
 
-Deferred. Tracked for roadmap continuity.
+Tracked for roadmap continuity.
 
 ### Refactoring
 
@@ -96,8 +94,14 @@ Acknowledged but deferred indefinitely:
 
 | ID | Feature | Reason |
 |----|---------|--------|
+| CI-01 | GitHub Actions for ansible-lint | Manual testing on real machines preferred |
+| CI-02 | GitHub Actions for YAML validation | Claude Code hook already validates on write |
+| CI-03 | CI blocks merge on lint failures | Personal repo, no PR workflow needed |
+| TEST-01 | Molecule test framework | Dotfiles tested on real machines; container testing limited value |
+| TEST-02 | Molecule tests for ssh | Real machine testing more accurate |
+| TEST-03 | Molecule tests for git | Real machine testing more accurate |
+| TEST-04 | Molecule tests for zsh | Real machine testing more accurate |
 | PERF-02 | Parallel tool installation | Complexity vs benefit; current runtime acceptable |
-| TEST-03 | Cross-platform CI matrix | Platform runners expensive; manual testing sufficient |
 
 ## Traceability
 

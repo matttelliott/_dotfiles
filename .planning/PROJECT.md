@@ -10,13 +10,15 @@ When you sit down at a new machine, one command gets you your environment.
 
 ## Current State
 
-**Shipped:** v0.1 Lint & Tooling (2026-01-21)
+**Shipped:**
+- v0.1 Lint & Tooling (2026-01-21)
+- v0.2 Portability & Bugs (2026-01-22)
 
-Codebase: 107 YAML playbooks, all passing ansible-lint for targeted rules. Claude Code hook validates YAML edits automatically.
+Codebase: 107 YAML playbooks, all passing ansible-lint. ARM64 portable, idempotent re-runs, LTS version policy documented.
 
-## Current Milestone: v0.2 Portability & Bugs
+## Current Milestone: v0.3 Security & Documentation
 
-**Goal:** Fix architecture hardcoding and known bugs so playbooks work on ARM64 and re-runs are truly idempotent.
+**Goal:** Harden curl-to-shell scripts and document risks/rollback procedures.
 
 **Epic:** Concerns Resolution (v0.2–v0.5) — addressing all items from `.planning/codebase/CONCERNS.md`
 
@@ -24,10 +26,10 @@ Codebase: 107 YAML playbooks, all passing ansible-lint for targeted rules. Claud
 
 | Milestone | Theme | Key Deliverables |
 |-----------|-------|------------------|
-| **v0.2** | Portability & Bugs | ARM64 support, idempotency guards, bug fixes |
-| **v0.3** | CI/CD & Testing | GitHub Actions pipeline, Molecule tests |
-| **v0.4** | Security & Documentation | Curl-to-shell hardening, risk documentation |
-| **v0.5** | Polish | Themes refactor, Homebrew optimization, version tracking |
+| ✓ v0.2 | Portability & Bugs | ARM64 support, idempotency guards, bug fixes, LTS policy |
+| **v0.3** | Security & Documentation | Curl-to-shell hardening, risk documentation |
+| v0.4 | Ephemeral Environments | Container/VPS support, Claude sandbox Dockerfile |
+| v0.5 | Polish | Themes refactor, version tracking |
 
 **WONTFIX (with rationale):**
 - SEC-03 (token plaintext) — already mitigated with 600 perms
@@ -39,8 +41,9 @@ Codebase: 107 YAML playbooks, all passing ansible-lint for targeted rules. Claud
 - MISS-03 (version lock) — rolling releases preferred
 
 **DEFERRED:**
+- CI/CD pipeline — personal repo tested on real machines
+- Molecule tests — real machine testing more accurate than containers
 - PERF-02 (parallel installation) — complexity vs benefit
-- TEST-03 (cross-platform CI) — platform matrix expensive
 
 ## Requirements
 
@@ -59,18 +62,23 @@ Codebase: 107 YAML playbooks, all passing ansible-lint for targeted rules. Claud
 - ✓ Remote host provisioning via SSH — existing
 - ✓ All playbooks pass ansible-lint (targeted rules) — v0.1
 - ✓ Claude Code hook validates YAML on write — v0.1
+- ✓ ARM64 architecture support (dynamic detection) — v0.2
+- ✓ Idempotency guards for shell commands — v0.2
+- ✓ SSH known_hosts idempotency fix — v0.2
+- ✓ Debian non-free repos safe modification — v0.2
+- ✓ LTS version policy documented — v0.2
 
 ### Active
 
 <!-- Current scope. Building toward these. -->
 
-**v0.2 Portability & Bugs:**
-- [ ] ARM64 architecture support for APT repositories (docker, 1password, edge)
-- [ ] Dynamic architecture detection for Go installation
-- [ ] Idempotency guards for shell commands (go install, mason, npm, uv)
-- [ ] SSH known_hosts marker file bug fix
-- [ ] Debian non-free repos safe modification
-- [ ] Homebrew update optimization
+**v0.3 Security & Documentation:**
+- [ ] Curl-to-shell scripts pinned to specific commits
+- [ ] Checksums verified for downloaded scripts where available
+- [ ] GPG key fingerprints documented in playbook comments
+- [ ] Theme system testing guidance in CLAUDE.md
+- [ ] nvm dependency risk documented
+- [ ] Rollback/recovery procedures documented
 
 ### Out of Scope
 
@@ -115,4 +123,4 @@ Work typically involves: adding new tools, updating configs, fixing breakage aft
 | version: master for git | ansible-lint requires explicit branch, HEAD not recognized | ✓ Good |
 
 ---
-*Last updated: 2026-01-21 after starting v0.2 milestone (Concerns Resolution epic)*
+*Last updated: 2026-01-22 after completing v0.2 milestone*
