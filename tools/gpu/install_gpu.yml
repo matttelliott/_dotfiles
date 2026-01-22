@@ -102,24 +102,25 @@
       when: ansible_facts['os_family'] == "Archlinux"
 
     # Debian - Enable non-free repos for NVIDIA
-    - name: Check if non-free repos enabled (Debian)
-      ansible.builtin.shell: grep -E 'non-free|contrib' /etc/apt/sources.list /etc/apt/sources.list.d/*.list 2>/dev/null || true
-      register: nonfree_check
-      changed_when: false
+    - name: Add Debian non-free repository for NVIDIA (Debian)
+      ansible.builtin.deb822_repository:
+        name: debian-nonfree
+        types: deb
+        uris: https://deb.debian.org/debian
+        suites: "{{ ansible_distribution_release }}"
+        components:
+          - contrib
+          - non-free
+          - non-free-firmware
+        state: present
+      become: true
       when: ansible_facts['os_family'] == "Debian" and has_nvidia | default(false)
 
-    - name: Enable non-free and contrib repos (Debian)
-      ansible.builtin.shell: |
-        sed -i 's/main$/main contrib non-free non-free-firmware/' /etc/apt/sources.list
-      become: true
-      when: ansible_facts['os_family'] == "Debian" and has_nvidia | default(false) and 'non-free' not in nonfree_check.stdout
-      changed_when: true
-
-    - name: Update apt cache after enabling non-free (Debian)
+    - name: Update apt cache after adding non-free repo (Debian)
       ansible.builtin.apt:
         update_cache: true
       become: true
-      when: ansible_facts['os_family'] == "Debian" and has_nvidia | default(false) and 'non-free' not in nonfree_check.stdout
+      when: ansible_facts['os_family'] == "Debian" and has_nvidia | default(false)
 
     # Debian - NVIDIA
     - name: Install NVIDIA drivers (Debian)
