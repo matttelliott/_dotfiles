@@ -10,17 +10,17 @@ Requirements for v0.2. Focus: ARM64 support, idempotency, bug fixes.
 
 ### Architecture Portability
 
-- [ ] **ARCH-01**: APT repositories use dynamic architecture detection (docker, 1password, edge)
-- [ ] **ARCH-02**: Go installation detects architecture via ansible_architecture fact
-- [ ] **ARCH-03**: All playbooks work on ARM64 Debian (Raspberry Pi compatible)
+- [x] **ARCH-01**: APT repositories use dynamic architecture detection (docker, 1password, edge)
+- [x] **ARCH-02**: Go installation detects architecture via ansible_architecture fact
+- [x] **ARCH-03**: All playbooks work on ARM64 Debian (Raspberry Pi compatible)
 
 ### Idempotency
 
-- [ ] **IDEM-01**: go install commands have creates: guards
-- [ ] **IDEM-02**: mason install commands have creates: guards
-- [ ] **IDEM-03**: npm install -g commands have creates: guards
-- [ ] **IDEM-04**: uv tool install commands have creates: guards
-- [ ] **IDEM-05**: Re-runs show no false "changed" status
+- [x] **IDEM-01**: go install commands have creates: guards
+- [x] **IDEM-02**: mason install commands have creates: guards
+- [x] **IDEM-03**: npm install -g commands have creates: guards
+- [x] **IDEM-04**: uv tool install commands have creates: guards
+- [x] **IDEM-05**: Re-runs show no false "changed" status
 
 ### Bug Fixes
 
@@ -102,14 +102,14 @@ Acknowledged but deferred indefinitely:
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ARCH-01 | Phase 5 | Pending |
-| ARCH-02 | Phase 5 | Pending |
-| ARCH-03 | Phase 5 | Pending |
-| IDEM-01 | Phase 6 | Pending |
-| IDEM-02 | Phase 6 | Pending |
-| IDEM-03 | Phase 6 | Pending |
-| IDEM-04 | Phase 6 | Pending |
-| IDEM-05 | Phase 6 | Pending |
+| ARCH-01 | Phase 5 | Complete |
+| ARCH-02 | Phase 5 | Complete |
+| ARCH-03 | Phase 5 | Complete |
+| IDEM-01 | Phase 6 | Complete |
+| IDEM-02 | Phase 6 | Complete |
+| IDEM-03 | Phase 6 | Complete |
+| IDEM-04 | Phase 6 | Complete |
+| IDEM-05 | Phase 6 | Complete |
 | BUG-01 | Phase 7 | Pending |
 | BUG-02 | Phase 7 | Pending |
 | PERF-01 | Phase 8 | Pending |
@@ -122,4 +122,4 @@ Acknowledged but deferred indefinitely:
 ---
 *Requirements defined: 2026-01-21*
 *Epic: Concerns Resolution (v0.2-v0.5)*
-*Traceability updated: 2026-01-21*
+*Traceability updated: 2026-01-22*
