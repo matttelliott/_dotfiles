@@ -3,6 +3,15 @@
   gather_facts: true
   vars:
     go_version: "1.23.4"
+    go_os_map:
+      Darwin: darwin
+      Debian: linux
+      Archlinux: linux
+    go_arch_map:
+      x86_64: amd64
+      aarch64: arm64
+    go_os: "{{ go_os_map[ansible_facts.os_family] }}"
+    go_arch: "{{ go_arch_map[ansible_facts.architecture] }}"
   tasks:
     - name: Check if Go is installed
       ansible.builtin.stat:
@@ -11,7 +20,7 @@
     # macOS: Use .pkg installer
     - name: Download Go installer (macOS)
       ansible.builtin.get_url:
-        url: "https://go.dev/dl/go{{ go_version }}.darwin-arm64.pkg"
+        url: "https://go.dev/dl/go{{ go_version }}.{{ go_os }}-{{ go_arch }}.pkg"
         dest: /tmp/go.pkg
       when: ansible_facts['os_family'] == "Darwin" and not go_binary.stat.exists
     - name: Install Go (macOS)
@@ -26,7 +35,7 @@
     # Linux: Use tarball
     - name: Download Go tarball (Linux)
       ansible.builtin.get_url:
-        url: "https://go.dev/dl/go{{ go_version }}.linux-amd64.tar.gz"
+        url: "https://go.dev/dl/go{{ go_version }}.{{ go_os }}-{{ go_arch }}.tar.gz"
         dest: /tmp/go.tar.gz
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and not go_binary.stat.exists
     - name: Install Go (Linux)
