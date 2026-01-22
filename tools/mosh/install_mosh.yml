@@ -5,7 +5,7 @@
 
   tasks:
     - name: Install mosh via Homebrew
-      ansible.builtin.shell: /opt/homebrew/bin/brew install mosh
+      ansible.builtin.command: /opt/homebrew/bin/brew install mosh
       args:
         creates: /opt/homebrew/bin/mosh
       when: ansible_facts['os_family'] == "Darwin"
@@ -23,3 +23,21 @@
         state: present
       become: true
       when: ansible_facts['os_family'] == "Archlinux"
+
+    - name: Check if firewalld is running
+      ansible.builtin.systemd:
+        name: firewalld
+      register: firewalld_status
+      when: ansible_facts['os_family'] != "Darwin"
+      ignore_errors: true
+
+    - name: Allow mosh through firewalld
+      ansible.posix.firewalld:
+        service: mosh
+        state: enabled
+        permanent: true
+        immediate: true
+      become: true
+      when:
+        - ansible_facts['os_family'] != "Darwin"
+        - firewalld_status.status.ActiveState == "active"
