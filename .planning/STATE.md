@@ -57,7 +57,7 @@ Recent decisions from v0.1:
 
 ### Pending Todos
 
-9 pending todos — /gsd:check-todos to review
+10 pending todos — /gsd:check-todos to review
 
 - Sort tmux sessions alphabetically (config)
 - Fix themes and add default themes for each machine (config)
@@ -67,6 +67,7 @@ Recent decisions from v0.1:
 - Review architecture for over-engineering pitfalls (planning)
 - Build ChatGPT desktop app with Tauri (tools)
 - Find better way to capture ideas (tooling)
+- Update Claude Code to native installer (tools)
 
 ### Blockers/Concerns
 
