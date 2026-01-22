@@ -176,6 +176,6 @@
       ansible.builtin.replace:
         path: ~/.wezterm.lua
         regexp: 'config\.font = wezterm\.font\("[^"]+"\)'
-        ansible.builtin.replace: 'config.font = wezterm.font("{{ current.wezterm_name }}")'
+        replace: 'config.font = wezterm.font("{{ current.wezterm_name }}")'
       when: wezterm_config.stat.exists
 
