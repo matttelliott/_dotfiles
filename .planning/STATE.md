@@ -67,6 +67,7 @@ Recent decisions from v0.2:
 
 - **Guard on first binary** (06-01): gofumpt for Go, ruff for Python - since all tools in each group are installed together, checking the first is sufficient
 - **Same path for both OS** (06-01): uv symlinks tool binaries to ~/.local/bin regardless of OS, so the guard path is identical for macOS and Linux
+- **ssh-keygen -F pattern** (07-01): Use command module (not shell) for ssh-keygen -F, with changed_when/failed_when for lint compliance
 - **deb822_repository over apt_repository** (07-02): Modern module creates proper .sources files in deb822 format, safer than modifying sources.list directly
 
 ### Pending Todos
