@@ -58,6 +58,19 @@
       changed_when: true
       failed_when: false
 
+    - name: Add/update Context7 MCP server (user level)
+      ansible.builtin.shell: |
+        export NVM_DIR="$HOME/.nvm"
+        {% if ansible_facts['os_family'] == "Darwin" %}
+        . /opt/homebrew/opt/nvm/nvm.sh
+        {% else %}
+        . ~/.nvm/nvm.sh
+        {% endif %}
+        claude mcp remove --scope user context7 2>/dev/null || true
+        claude mcp add --scope user --transport stdio context7 -- npx -y @upstash/context7-mcp@latest
+      changed_when: true
+      failed_when: false
+
     - name: Add/update Playwright MCP server (user level)
       ansible.builtin.shell: |
         export NVM_DIR="$HOME/.nvm"
