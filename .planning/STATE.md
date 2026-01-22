@@ -69,9 +69,8 @@ Recent decisions from v0.2:
 
 ### Pending Todos
 
-10 pending todos — /gsd:check-todos to review
+9 pending todos — /gsd:check-todos to review
 
-- Sort tmux sessions alphabetically (config)
 - Fix themes and add default themes for each machine (config)
 - Add WezTerm image paste script and keybinding (config)
 - Install Sequential Thinking MCP (config)
