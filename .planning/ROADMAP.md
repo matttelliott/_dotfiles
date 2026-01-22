@@ -65,6 +65,12 @@ Plans:
 
 **Requirements:** BUG-01, BUG-02
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — SSH known_hosts idempotency with ssh-keygen -F
+- [ ] 07-02-PLAN.md — Debian non-free repos via deb822_repository module
+
 **Success Criteria:**
 
 1. SSH known_hosts task uses `ssh-keygen -F` to check host presence before adding (no duplicate entries)
