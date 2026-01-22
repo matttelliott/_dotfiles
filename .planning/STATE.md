@@ -5,18 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-01-21)
 
 **Core value:** One command gets you your environment on any new machine
-**Current focus:** v0.2 Portability & Bugs (Phase 5)
+**Current focus:** v0.2 Portability & Bugs (Phase 6)
 
 ## Current Position
 
-Phase: 5 (Architecture Portability) — in progress
+Phase: 5 (Architecture Portability) — complete
 Milestone: v0.2 Portability & Bugs
 Epic: Concerns Resolution (v0.2–v0.5)
-Plan: 2 of 4 complete
-Status: In progress
-Last activity: 2026-01-21 — Completed 05-02-PLAN.md
+Status: Ready for Phase 6
+Last activity: 2026-01-21 — Phase 5 verified complete
 
-Progress: █████░░░░░ 50% (2/4 plans)
+Progress: ██▒░░░░░░░ 25% (1/4 phases)
 
 ## Completed Milestones
 
@@ -37,6 +36,7 @@ Progress: █████░░░░░ 50% (2/4 plans)
 |-------|-------|-------|----------|
 | 01 | 3/3 | ~1h | ~20m |
 | 04 | 1/1 | ~2m | ~2m |
+| 05 | 2/2 | ~16m | ~8m |
 
 *Updated after each plan completion*
 
@@ -82,9 +82,9 @@ None — ready for v0.2
 ## Session Continuity
 
 Last session: 2026-01-21
-Stopped at: Completed 05-02-PLAN.md (1Password and Edge ARM64 skip)
+Stopped at: Phase 5 complete, verified
 Resume file: None
-Next action: Execute 05-03-PLAN.md or 05-04-PLAN.md
+Next action: /gsd:plan-phase 6
 
 ---
 *State updated: 2026-01-21*
