@@ -24,10 +24,16 @@ Ensure tools with LTS (Long Term Support) releases use their LTS versions. Tools
 - Homebrew/apt packages already provide stable versions by default
 - Keep it simple: just use the right flags where tools support them
 
-### Tools with Known LTS Support
+### Scope
+- **All tools** — this policy applies universally, not just specific tools
+- Any tool that offers LTS should use it
+- Any tool that offers "stable" channel should use it
+- Homebrew/apt packages already follow this pattern (they provide stable versions)
+
+### Examples of LTS-capable tools
 - **Node.js (nvm):** `nvm install --lts` and `nvm alias default lts/*`
-- **uv/Python:** Check if uv has LTS flag; if not, use default (stable)
-- **Homebrew/apt:** Already provides stable versions, no changes needed
+- **Python:** Python has LTS-like support cycles (e.g., 3.11, 3.12)
+- **Other tools:** Check if tool offers LTS or stable channel
 
 ### Claude's Discretion
 - Specific implementation details for each tool
