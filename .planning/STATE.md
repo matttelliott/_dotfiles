@@ -71,6 +71,7 @@ Recent decisions from v0.2:
 
 4 pending todos — /gsd:check-todos to review
 
+- Explore parallel GSD work patterns (planning)
 - Review architecture for over-engineering pitfalls (planning)
 - Build ChatGPT desktop app with Tauri (tools)
 - Find better way to capture ideas (tooling)
@@ -88,10 +89,24 @@ None — ready for Phase 7
 
 ## Session Continuity
 
-Last session: 2026-01-22
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-01-22 (late night)
+Stopped at: Completed todo cleanup session
 Resume file: None
 Next action: /gsd:plan-phase 7
+
+### Session Summary (2026-01-22 night)
+
+Completed 6 todos:
+- tmux session sorting (`-O name` flag)
+- Context7 + Sequential Thinking MCPs added to claude-code playbook
+- Claude Code switched to native installer
+- WezTerm clip2path script for image pasting on Linux
+- Fixed themes system (88 broken `ansible.builtin.replace:` params)
+- Per-machine theme defaults in inventory + themesetting DEFAULTS option
+
+Also fixed:
+- Nerd Font Mono variant for WezTerm compatibility
+- Desktop default font changed to monaspace
 
 ---
 *State updated: 2026-01-22*
