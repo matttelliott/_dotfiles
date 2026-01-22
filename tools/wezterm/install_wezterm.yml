@@ -73,3 +73,16 @@
       ansible.builtin.copy:
         src: wezterm.lua
         dest: ~/.wezterm.lua
+
+    - name: Create ~/.local/bin directory
+      ansible.builtin.file:
+        path: ~/.local/bin
+        state: directory
+      when: ansible_facts['os_family'] != "Darwin"
+
+    - name: Install clip2path script for image pasting (Linux)
+      ansible.builtin.copy:
+        src: clip2path
+        dest: ~/.local/bin/clip2path
+        mode: "0755"
+      when: ansible_facts['os_family'] != "Darwin"

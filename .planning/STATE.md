@@ -69,10 +69,9 @@ Recent decisions from v0.2:
 
 ### Pending Todos
 
-6 pending todos — /gsd:check-todos to review
+5 pending todos — /gsd:check-todos to review
 
 - Fix themes and add default themes for each machine (config)
-- Add WezTerm image paste script and keybinding (config)
 - Review architecture for over-engineering pitfalls (planning)
 - Build ChatGPT desktop app with Tauri (tools)
 - Find better way to capture ideas (tooling)
