@@ -125,13 +125,15 @@ idea() {
 	local ideas_file="$HOME/.ideas.md"
 	local sops_file="$DOTFILES/ideas.sops.md"
 
+	local age_key="age13vqkx5d70vqhdvlnkm3y5htprafj0x0g6nngcqvn65at2lhs73hs3pgsgl"
+
 	case "$1" in
 		sync)
 			if [[ ! -f "$ideas_file" ]]; then
 				echo "No ideas to sync"
 				return 0
 			fi
-			sops -e "$ideas_file" > "$sops_file"
+			sops --config /dev/null --age "$age_key" -e "$ideas_file" > "$sops_file"
 			cd "$DOTFILES" && git add ideas.sops.md && git commit -m "docs: sync ideas" && git push
 			echo "Ideas synced and pushed"
 			;;
