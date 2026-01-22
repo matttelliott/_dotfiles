@@ -70,19 +70,40 @@ themesetting () {
 		echo "Set DOTFILES environment variable to your dotfiles location"
 		return 1
 	fi
-	# Parse available options from shared YAML files
-	# Colors/fonts: keys on own line ending with colon (filter out ansible keywords)
-	# Styles: inline dicts with { after colon
-	local themes=$(
+
+	# Get machine defaults from inventory
+	local inventory="$DOTFILES/localhost.yml"
+	local default_color=$(grep -A20 "$(hostname)" "$inventory" 2>/dev/null | grep "theme_color:" | head -1 | awk '{print $2}')
+	local default_font=$(grep -A20 "$(hostname)" "$inventory" 2>/dev/null | grep "theme_font:" | head -1 | awk '{print $2}')
+	local default_style=$(grep -A20 "$(hostname)" "$inventory" 2>/dev/null | grep "theme_style:" | head -1 | awk '{print $2}')
+	# Fall back to global defaults
+	[[ -z "$default_color" ]] && default_color=$(grep "theme_color:" "$inventory" 2>/dev/null | head -1 | awk '{print $2}')
+	[[ -z "$default_font" ]] && default_font=$(grep "theme_font:" "$inventory" 2>/dev/null | head -1 | awk '{print $2}')
+	[[ -z "$default_style" ]] && default_style=$(grep "theme_style:" "$inventory" 2>/dev/null | head -1 | awk '{print $2}')
+
+	# Parse available theme choices from shared YAML files
+	local choices=$(
     grep -E '^      [a-z_]+:$' "$themes_dir/_color.yml" 2>/dev/null | grep -vE '(args|file|stat|when|loop|shell|register|path|state):' | sed 's/^ *//; s/:$//' | sed 's/^/color: /'
     grep -E '^      [a-z_]+:$' "$themes_dir/_font.yml" 2>/dev/null | grep -vE '(args|file|stat|when|loop|shell|register|path|state):' | sed 's/^ *//; s/:$//' | sed 's/^/font: /'
     grep -E '^      [a-z_]+:  *\{' "$themes_dir/_style.yml" 2>/dev/null | sed 's/:.*//; s/^ *//' | sed 's/^/style: /'
   )
-	local selection=$(echo "$themes" | sort | fzf --height=40% --reverse --prompt="Select theme: ")
+	# Put defaults at top, then sorted choices
+	local themes=$(echo "DEFAULTS ($default_color / $default_font / $default_style)"; echo "$choices" | sort)
+	local selection=$(echo "$themes" | fzf --height=40% --reverse --prompt="Select theme: ")
 	if [[ -z "$selection" ]]
 	then
 		return 0
 	fi
+
+	# Handle defaults selection
+	if [[ "$selection" == "DEFAULTS"* ]]; then
+		echo "Applying machine defaults: $default_color / $default_font / $default_style"
+		ansible-playbook "$themes_dir/apply_defaults.yml" --connection=local --limit "$(hostname -s)"
+		echo ""
+		echo "Reload: tmux source ~/.tmux.conf"
+		return
+	fi
+
 	local type=$(echo "$selection" | cut -d: -f1)
 	local name=$(echo "$selection" | cut -d: -f2 | xargs)
 	case "$type" in

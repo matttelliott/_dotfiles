@@ -1,0 +1,17 @@
+---
+# Apply default themes from inventory
+# Run: ansible-playbook themes/apply_defaults.yml --limit <host>
+- name: Apply default color theme
+  import_playbook: _color.yml
+  vars:
+    color: "{{ theme_color }}"
+
+- name: Apply default font
+  import_playbook: _font.yml
+  vars:
+    font: "{{ theme_font }}"
+
+- name: Apply default style
+  import_playbook: _style.yml
+  vars:
+    style: "{{ theme_style }}"

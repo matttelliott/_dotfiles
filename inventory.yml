@@ -1,4 +1,8 @@
 all:
+  vars:
+    theme_color: tokyonight
+    theme_font: dejavu
+    theme_style: angle
   children:
     macs:
       hosts:
@@ -7,6 +11,9 @@ all:
           ansible_user: matt
           ansible_ssh_timeout: 60
           ansible_python_interpreter: /opt/homebrew/bin/python3
+          theme_color: dracula
+          theme_font: sourcecodepro
+          theme_style: round
         macmini:
           ansible_host: macmini.home.lan
           ansible_user: matt
@@ -26,6 +33,9 @@ all:
           ansible_user: matt
           ansible_ssh_timeout: 60
           ansible_python_interpreter: /usr/bin/python3
+          theme_color: onedark
+          theme_font: firacode
+          theme_style: slant
     with_login_tools:
       hosts:
         macbookair:
