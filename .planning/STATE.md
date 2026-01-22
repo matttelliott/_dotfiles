@@ -9,13 +9,13 @@ See: .planning/PROJECT.md (updated 2026-01-21)
 
 ## Current Position
 
-Phase: 6 (Idempotency Guards) — complete
+Phase: 7 (Bug Fixes) — complete
 Milestone: v0.2 Portability & Bugs
 Epic: Concerns Resolution (v0.2–v0.5)
-Status: Ready for Phase 7
-Last activity: 2026-01-22 — Completed 06-01-PLAN.md
+Status: Ready for Phase 8
+Last activity: 2026-01-22 — Completed 07-01-PLAN.md, 07-02-PLAN.md
 
-Progress: ███░░░░░░░ 50% (2/4 phases in v0.2)
+Progress: ████████░░ 75% (3/4 phases in v0.2)
 
 ## Completed Milestones
 
@@ -31,9 +31,9 @@ Progress: ███░░░░░░░ 50% (2/4 phases in v0.2)
 - Timeline: 2 days (2026-01-20 → 2026-01-21)
 
 **v0.2 Velocity:**
-- Total plans completed: 3
+- Total plans completed: 4
 - Average duration: ~5 min/plan
-- Total execution time: ~17 min
+- Total execution time: ~18 min
 - Timeline: 2 days (2026-01-21 → 2026-01-22)
 
 **By Phase:**
@@ -44,6 +44,7 @@ Progress: ███░░░░░░░ 50% (2/4 phases in v0.2)
 | 04 | 1/1 | ~2m | ~2m |
 | 05 | 2/2 | ~16m | ~8m |
 | 06 | 1/1 | ~1m | ~1m |
+| 07 | 2/2 | ~3m | ~1.5m |
 
 *Updated after each plan completion*
 
@@ -66,6 +67,7 @@ Recent decisions from v0.2:
 
 - **Guard on first binary** (06-01): gofumpt for Go, ruff for Python - since all tools in each group are installed together, checking the first is sufficient
 - **Same path for both OS** (06-01): uv symlinks tool binaries to ~/.local/bin regardless of OS, so the guard path is identical for macOS and Linux
+- **deb822_repository over apt_repository** (07-02): Modern module creates proper .sources files in deb822 format, safer than modifying sources.list directly
 
 ### Pending Todos
 
@@ -74,7 +76,7 @@ Recent decisions from v0.2:
 
 ### Blockers/Concerns
 
-None — ready for Phase 7
+None — Phase 7 complete, ready for Phase 8
 
 ### Quick Tasks Completed
 
@@ -105,4 +107,4 @@ Also fixed:
 - Desktop default font changed to monaspace
 
 ---
-*State updated: 2026-01-22*
+*State updated: 2026-01-22 (07-02 complete)*
