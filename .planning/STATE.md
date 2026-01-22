@@ -9,13 +9,14 @@ See: .planning/PROJECT.md (updated 2026-01-21)
 
 ## Current Position
 
-Phase: 5 (Architecture Portability) — not started
+Phase: 5 (Architecture Portability) — in progress
 Milestone: v0.2 Portability & Bugs
 Epic: Concerns Resolution (v0.2–v0.5)
-Status: Ready to plan phase 5
-Last activity: 2026-01-21 — v0.2 milestone initialized
+Plan: 2 of 4 complete
+Status: In progress
+Last activity: 2026-01-21 — Completed 05-02-PLAN.md
 
-Progress: ░░░░░░░░░░ 0% (0/4 phases)
+Progress: █████░░░░░ 50% (2/4 plans)
 
 ## Completed Milestones
 
@@ -51,6 +52,7 @@ Recent decisions from v0.1:
 - **Dependency import naming** (01-02): Use "Install {tool} (dependency)" pattern for import_playbook of prerequisites
 - **version: master for git pins** (01-03): ansible-lint requires explicit branch name, not HEAD, to satisfy latest[git] rule
 - **Shared hooks in settings.json** (04-01): Use .claude/settings.json (tracked) instead of settings.local.json (gitignored) for repo-level hooks
+- **YAML folding for long lines** (05-01): Use >- syntax to break long repo URLs across lines for lint compliance
 
 ### Pending Todos
 
@@ -79,9 +81,9 @@ None — ready for v0.2
 ## Session Continuity
 
 Last session: 2026-01-21
-Stopped at: Completed quick task 002 (mosh to all reachable hosts)
+Stopped at: Completed 05-01-PLAN.md (Docker and Go architecture mapping)
 Resume file: None
-Next action: /gsd:plan-phase 5
+Next action: Execute 05-02-PLAN.md (GitHub CLI architecture mapping)
 
 ---
 *State updated: 2026-01-21*
