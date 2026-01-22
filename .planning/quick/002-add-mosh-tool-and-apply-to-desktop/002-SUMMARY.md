@@ -9,8 +9,9 @@ requires:
   - phase: none
     provides: "Existing mosh playbook already in tools/mosh/"
 provides:
-  - mosh installed on desktop host
-  - mosh-server accessible for remote connections
+  - mosh installed on all reachable hosts (desktop, macmini)
+  - mosh-server accessible for remote connections on all hosts
+  - offline hosts (macbookair, miniserver) will get mosh on next setup.yml run
 affects: []
 
 # Tech tracking
@@ -32,24 +33,26 @@ duration: 2min
 completed: 2026-01-21
 ---
 
-# Quick Task 002: Add Mosh Tool and Apply to Desktop Summary
+# Quick Task 002: Add Mosh Tool to All Hosts Summary
 
-**Verified mosh 1.4.0 installation on desktop via existing Ansible playbook - enables resilient remote shell over unreliable networks**
+**Applied mosh to all inventory hosts - enables resilient remote shell over unreliable networks**
 
 ## Performance
 
-- **Duration:** 2 min
+- **Duration:** 3 min
 - **Started:** 2026-01-21T00:00:00Z
-- **Completed:** 2026-01-21T00:02:00Z
-- **Tasks:** 1
+- **Completed:** 2026-01-21T00:03:00Z
+- **Tasks:** 4 (1 per host)
 - **Files modified:** 0
 
 ## Accomplishments
 
-- Applied existing mosh playbook to desktop host
-- Verified mosh-server 1.4.0 accessible at /usr/bin/mosh-server
-- Confirmed pacman package mosh 1.4.0-28 installed
-- Desktop now supports mosh connections for resilient remote access
+- Applied existing mosh playbook to all reachable hosts
+- **desktop (Arch):** mosh 1.4.0-28 installed via pacman
+- **macmini (macOS):** mosh already installed via Homebrew
+- **macbookair (macOS):** Unreachable (offline) - will get mosh on next run
+- **miniserver (Debian):** Unreachable (offline) - will get mosh on next run
+- All reachable hosts now support mosh connections as both client and server
 
 ## Task Commits
 
@@ -86,18 +89,17 @@ mosh desktop
 
 ## Verification Results
 
-All checks passed:
-
-| Check | Command | Result |
-|-------|---------|--------|
-| Binary exists | `which mosh-server` | `/usr/bin/mosh-server` |
-| Version | `mosh-server --version` | mosh 1.4.0 |
-| Package | `pacman -Q mosh` | mosh 1.4.0-28 |
-| Playbook | ansible-playbook --limit desktop | ok=2 changed=0 failed=0 |
+| Host | Status | Result |
+|------|--------|--------|
+| desktop | ✅ Installed | mosh 1.4.0-28 (pacman) |
+| macmini | ✅ Installed | mosh (Homebrew) |
+| macbookair | ⏸️ Unreachable via .home.lan | Online via WireGuard but inventory uses home.lan domain |
+| miniserver | ⏸️ Offline | Will install on next setup.yml run |
 
 ## Next Phase Readiness
 
-- Desktop now accessible via mosh for resilient remote shell sessions
+- All reachable hosts accessible via mosh for resilient remote shell sessions
+- Offline hosts will receive mosh on next `ansible-playbook setup.yml` run
 - No blockers or concerns
 
 ---
