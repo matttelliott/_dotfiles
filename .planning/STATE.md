@@ -9,13 +9,13 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 
 ## Current Position
 
-Phase: 9 (Script Security)
+Phase: 9 (Script Security) - COMPLETE
 Milestone: v0.3 Security & Documentation
 Epic: Concerns Resolution (v0.2-v0.5)
-Status: Plan 09-01 complete
-Last activity: 2026-01-23 - Completed 09-01-PLAN.md (script pinning)
+Status: Phase 9 complete, ready for Phase 10
+Last activity: 2026-01-23 - Completed 09-02-PLAN.md (download verification)
 
-Progress: █████░░░░░ 50% (1/2 phases in v0.3)
+Progress: ██████████ 100% (2/2 plans in Phase 9)
 
 ## Completed Milestones
 
@@ -39,8 +39,9 @@ Progress: █████░░░░░ 50% (1/2 phases in v0.3)
 - Timeline: 2 days (2026-01-21 -> 2026-01-22)
 
 **v0.3 Velocity (in progress):**
-- Plans completed: 1
-- Latest duration: 2 min
+- Plans completed: 2
+- Total duration: 6 min (2 min + 4 min)
+- Average duration: 3 min/plan
 
 ## Accumulated Context
 
@@ -55,6 +56,9 @@ See milestone archives for phase-level decisions:
 - Pin to latest Homebrew commit SHA (90fa3d5) for reproducibility
 - Use version flags for Pulumi (3.216.0) and uv (0.9.26)
 - Document unpinnable scripts with alternatives rather than removing them
+- Use ansible.builtin.get_url with checksum instead of curl for binary downloads
+- Document GPG fingerprints as YAML comments with verification URLs
+- Include key expiration notes where known (e.g., gh key expires Sep 2026)
 
 ### Pending Todos
 
@@ -62,7 +66,7 @@ See milestone archives for phase-level decisions:
 
 ### Blockers/Concerns
 
-None
+None - ready for Phase 10 (Secrets Documentation)
 
 ### Quick Tasks Completed
 
@@ -74,9 +78,9 @@ None
 ## Session Continuity
 
 Last session: 2026-01-23
-Stopped at: Completed 09-01-PLAN.md
+Stopped at: Completed 09-02-PLAN.md (Phase 9 complete)
 Resume file: None
-Next action: Phase 10 (Secrets Documentation) or next plan
+Next action: Phase 10 (Secrets Documentation) or archive v0.3
 
 ---
-*State updated: 2026-01-23 (09-01 complete)*
+*State updated: 2026-01-23 (Phase 9 complete)*
