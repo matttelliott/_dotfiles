@@ -5,20 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-22)
 
 **Core value:** One command gets you your environment on any new machine
-**Current focus:** v0.3 Security & Documentation
+**Current focus:** v0.3 Security & Documentation - COMPLETE
 
 ## Current Position
 
-Phase: 9 (Script Security) - COMPLETE
-Milestone: v0.3 Security & Documentation
+Phase: 10 (Documentation) - COMPLETE
+Milestone: v0.3 Security & Documentation - COMPLETE
 Epic: Concerns Resolution (v0.2-v0.5)
-Status: Phase 9 complete, ready for Phase 10
-Last activity: 2026-01-23 - Completed 09-02-PLAN.md (download verification)
+Status: v0.3 complete, ready for v0.4 or v0.5
+Last activity: 2026-01-23 - Completed 10-01-PLAN.md (documentation)
 
-Progress: █████░░░░░ 50% (1/2 phases in v0.3)
+Progress: ██████████ 100% (2/2 phases in v0.3)
 
 ## Completed Milestones
 
+- **v0.3 Security & Documentation** (2026-01-23) - 2 phases, 3 plans
+  - Phase 9: Script Security (2 plans) - Pinned curl-to-shell scripts, checksum verification
+  - Phase 10: Documentation (1 plan) - Security docs, troubleshooting, theme testing
 - **v0.2 Portability & Bugs** (2026-01-22) - 4 phases, 6 plans
   - See: .planning/milestones/v0.2-ROADMAP.md
 - **v0.1 Lint & Tooling** (2026-01-21) - 4 phases, 4 plans
@@ -38,10 +41,11 @@ Progress: █████░░░░░ 50% (1/2 phases in v0.3)
 - Total execution time: ~20 min
 - Timeline: 2 days (2026-01-21 -> 2026-01-22)
 
-**v0.3 Velocity (in progress):**
-- Plans completed: 2
-- Total duration: 6 min (2 min + 4 min)
-- Average duration: 3 min/plan
+**v0.3 Velocity:**
+- Plans completed: 3
+- Total duration: 8 min (2 min + 4 min + 2 min)
+- Average duration: 2.7 min/plan
+- Timeline: 1 day (2026-01-23)
 
 ## Accumulated Context
 
@@ -60,13 +64,18 @@ See milestone archives for phase-level decisions:
 - Document GPG fingerprints as YAML comments with verification URLs
 - Include key expiration notes where known (e.g., gh key expires Sep 2026)
 
+**Phase 10 Decisions:**
+- Combined Security and Troubleshooting sections in README.md for discoverability
+- Theme testing guidance placed in CLAUDE.md Nerd Font section (maintainer-focused)
+- Documented unpinnable tools (rustup, starship) with alternatives
+
 ### Pending Todos
 
 0 pending todos - /gsd:check-todos to review
 
 ### Blockers/Concerns
 
-None - ready for Phase 10 (Secrets Documentation)
+None - v0.3 complete, ready for next milestone
 
 ### Quick Tasks Completed
 
@@ -78,9 +87,9 @@ None - ready for Phase 10 (Secrets Documentation)
 ## Session Continuity
 
 Last session: 2026-01-23
-Stopped at: Completed 09-02-PLAN.md (Phase 9 complete)
+Stopped at: Completed 10-01-PLAN.md (v0.3 complete)
 Resume file: None
-Next action: /gsd:discuss-phase 10 (Documentation)
+Next action: /gsd:discuss-milestone (v0.4 or v0.5 planning)
 
 ---
-*State updated: 2026-01-23 (Phase 9 complete)*
+*State updated: 2026-01-23 (v0.3 complete)*
