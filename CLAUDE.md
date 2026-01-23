@@ -242,3 +242,53 @@ POWERLINE_RIGHT = chr(0xE0B0)
 See `themes/style_angle.yml` and `themes/style_round.yml` for complete working examples of replacing Nerd Font characters across tmux, starship, and neovim using Ansible.
 
 See `README.md` section "Nerd Font / Powerline Characters" for full documentation.
+
+### Testing Theme Changes
+
+Theme playbooks modify 9 config files (tmux, starship, neovim, wezterm, lazygit, fzf, bat, lazydocker) using regex replacements. Because Nerd Font characters are problematic for LLMs and text editors, theme changes require careful testing before committing.
+
+**Before committing theme changes:**
+
+1. **Run in check mode first:**
+   ```bash
+   ansible-playbook themes/_color.yml -e color=dracula --check --diff
+   ```
+   Review the diff output - should show only hex color changes, not character corruption.
+
+2. **Verify special characters not corrupted:**
+   ```bash
+   git diff themes/ | grep -E '\\u[0-9A-Fa-f]{4}|nr2char'
+   ```
+   You should see escape sequences like `\uE0B0` or `nr2char(0xe0b0)`, NOT boxes, question marks, or empty strings where characters used to be.
+
+3. **Visual validation after applying theme:**
+   - [ ] **tmux statusline:** Powerline arrows visible between segments (detach with `<C-b> d` and reattach to verify)
+   - [ ] **starship prompt:** Powerline separators visible (run any command, check prompt renders correctly)
+   - [ ] **neovim statusline:** Open nvim, check bottom bar has arrow separators
+   - [ ] **fzf:** Press `Ctrl+R` for history, verify border and preview styling
+   - [ ] **lazygit:** Run `gg`, verify border colors changed appropriately
+
+4. **Common mistakes checklist:**
+   - [ ] Did NOT edit Nerd Font characters directly in files (use escape sequences)
+   - [ ] Verified tmux reloaded config: `tmux source-file ~/.tmux.conf`
+   - [ ] Restarted shell for starship/fzf changes to take effect
+   - [ ] Tested on actual machine, not just `--check` mode
+
+**If theme breaks:**
+
+1. Restore defaults: `ansible-playbook themes/apply_defaults.yml`
+2. Check what changed: `git diff themes/`
+3. Restore corrupted files: `git checkout -- themes/_style.yml themes/_color.yml`
+
+**Testing new theme definitions:**
+
+When adding a new color scheme to `themes/_color.yml`:
+
+1. Add color definition to the `colors:` dictionary in the playbook
+2. Apply the new theme: `ansible-playbook themes/_color.yml -e color=newtheme`
+3. Manually verify each affected tool (tmux, starship, neovim, fzf, lazygit, etc.)
+4. Document any terminal-specific requirements in README.md if needed
+
+**Why this matters:**
+
+Theme playbooks touch multiple config files with special Unicode characters (Nerd Font glyphs in Private Use Area U+E0xx). A single corrupted glyph can break multiple tools. The regex patterns are fragile - they rely on exact character matching. Visual testing is required because automated tests cannot verify glyph rendering. Always test visually before committing theme changes.
