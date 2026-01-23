@@ -363,6 +363,161 @@ round_right = chr(0xE0B4)
 
 See `themes/style_angle.yml` and `themes/style_round.yml` for complete examples.
 
+## Security Considerations
+
+### Curl-to-Shell Installation Patterns
+
+Some tools use `curl | bash` installation patterns (downloading and executing remote scripts). This is a known supply chain security risk but sometimes unavoidable when package managers don't provide the tool or the official installation method requires it.
+
+**Mitigation strategies applied in this repo:**
+- **Pinned versions:** Scripts locked to specific versions/commits to prevent silent updates
+- **Documented risks:** Unpinnable scripts have security comments in playbooks
+- **HTTPS only:** All curl commands require HTTPS
+- **Checksum verification:** Binary downloads use SHA256 checksums (see Phase 9)
+
+**Affected tools:**
+
+| Tool | Status | Mitigation | File |
+|------|--------|------------|------|
+| nvm | Pinned to v0.40.1 | Version in URL | `tools/node/install_node.yml` |
+| Homebrew | Pinned to commit SHA | Git commit `90fa3d58...` | `bootstrap.sh`, `tools/homebrew/install_homebrew.yml` |
+| Pulumi | Pinned to v3.216.0 | `--version` flag | `tools/pulumi/install_pulumi.yml` |
+| uv | Pinned to v0.9.26 | Version in URL | `tools/python/install_python.yml` |
+| rustup | Cannot pin | HTTPS + official domain | `tools/rust/install_rust.yml` |
+| starship | Cannot pin | HTTPS + official domain | `tools/starship/install_starship.yml` |
+
+### Updating Pinned Versions
+
+To update a pinned curl-to-shell script:
+
+1. **Check for latest release:**
+   ```bash
+   # For GitHub repos (nvm, Homebrew)
+   curl -s https://api.github.com/repos/<org>/<repo>/releases/latest | jq -r .tag_name
+
+   # For Homebrew (uses commits, not releases)
+   # Visit: https://github.com/Homebrew/install/commits/master
+   ```
+
+2. **Review changelog** for security fixes or breaking changes
+
+3. **Update version** in the corresponding playbook file
+
+4. **Test with check mode:**
+   ```bash
+   ansible-playbook tools/<tool>/install_<tool>.yml --check --diff
+   ```
+
+5. **Test on clean system** or VM if possible
+
+### Unpinnable Tools
+
+Some installers have no versioning mechanism:
+
+- **rustup:** The official installer at `https://sh.rustup.rs` has no version parameter.
+  - Alternative: [Standalone installers with GPG signatures](https://forge.rust-lang.org/infra/other-installation-methods.html)
+  - Current mitigation: HTTPS-only, official domain, documented risk in playbook
+
+- **starship:** The installer at `https://starship.rs/install.sh` has no version parameter.
+  - Alternative: Download binary directly from [GitHub releases](https://github.com/starship/starship/releases) with SHA256 verification
+  - Current mitigation: HTTPS-only, official domain
+
+## Troubleshooting
+
+### Theme Changes
+
+#### Powerline Separators Show as Boxes
+
+**Cause:** Terminal doesn't have a Nerd Font installed or configured.
+
+**Fix:**
+1. The playbook installs JetBrainsMono Nerd Font automatically
+2. Set your terminal font to "JetBrainsMono Nerd Font" (or another Nerd Font)
+3. Restart your terminal
+
+#### Colors Unreadable After Theme Change
+
+**Cause:** Theme colors don't match your terminal background or personal preference.
+
+**Fix:**
+1. Restore defaults: `ansible-playbook themes/apply_defaults.yml`
+2. Try a different theme interactively: `themesetting`
+
+#### Theme Playbook Corrupted Special Characters
+
+**Cause:** Nerd Font glyphs were edited directly instead of using escape sequences (common when LLMs or editors modify these files).
+
+**Fix:**
+1. Restore from git: `git checkout -- themes/_style.yml themes/_color.yml`
+2. Review CLAUDE.md "Nerd Font / Powerline Characters" section
+3. Use escape sequences for any edits (`\uE0B0` not the literal character)
+
+### Playbook Failures
+
+#### Playbook Stopped with Error
+
+**Recovery:** Ansible playbooks are idempotent - safe to rerun.
+
+1. Read the error message - usually indicates missing dependency or network issue
+2. Rerun the playbook: `ansible-playbook setup.yml`
+3. If a single tool fails, run just that tool: `ansible-playbook tools/<tool>/install_<tool>.yml`
+
+**Common causes:**
+- Network timeout - rerun playbook
+- Missing dependency - install manually first, then rerun
+- Permission denied - check `become: yes` in task (required for apt/pacman)
+
+#### GPG Key Expired (APT Update Fails)
+
+**Symptoms:**
+```
+Err:1 https://cli.github.com/packages stable InRelease
+  The following signatures were invalid: EXPKEYSIG ...
+```
+
+**Recovery:**
+1. Check the playbook for key fingerprint comment (e.g., `tools/gh/install_gh.yml`)
+2. Re-download the key: `curl -fsSL <KEY_URL> | sudo gpg --dearmor -o /etc/apt/keyrings/<tool>.gpg`
+3. Rerun apt update: `sudo apt update`
+
+**Known expirations:**
+- GitHub CLI key expires September 2026 (check [GitHub changelog](https://github.blog/changelog) for key rotation announcements)
+
+#### SOPS Decryption Failed
+
+**Symptoms:**
+```
+Failed to get the data key required to decrypt the SOPS file.
+```
+
+**Recovery:**
+1. Check Age key exists: `ls ~/.config/sops/age/keys.txt`
+2. If missing, restore from 1Password:
+   ```bash
+   op read "op://Automation/Age Key/Private Key" > ~/.config/sops/age/keys.txt
+   chmod 600 ~/.config/sops/age/keys.txt
+   ```
+3. Rerun the playbook
+
+### Starting Over
+
+If everything is broken and you want a clean slate:
+
+```bash
+# Backup your customizations
+cp ~/.zshrc ~/.zshrc.backup
+cp ~/.tmux.conf ~/.tmux.conf.backup
+
+# Remove dotfiles
+cd ~
+rm -rf _dotfiles
+
+# Re-bootstrap
+curl -fsSL https://raw.githubusercontent.com/matttelliott/_dotfiles/master/bootstrap.sh | bash
+```
+
+**Note:** Ansible playbooks are idempotent - they will not break existing working setups. Most "failures" are recoverable by simply rerunning the playbook. The nuclear option above is rarely needed.
+
 ## Project Structure
 
 ```
