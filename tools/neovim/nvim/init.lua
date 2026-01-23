@@ -812,7 +812,17 @@ require('lazy').setup({
           --   end,
           -- },
         },
-        opts = {},
+        config = function()
+          local ls = require 'luasnip'
+          -- Load custom Lua snippets from snippets/ directory
+          require('luasnip.loaders.from_lua').lazy_load {
+            paths = { vim.fn.stdpath 'config' .. '/snippets' },
+          }
+          -- Extend TypeScript snippets to related filetypes
+          ls.filetype_extend('javascript', { 'typescript' })
+          ls.filetype_extend('javascriptreact', { 'typescript' })
+          ls.filetype_extend('typescriptreact', { 'typescript' })
+        end,
       },
       'folke/lazydev.nvim',
     },
