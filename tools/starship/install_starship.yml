@@ -17,6 +17,9 @@
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Starship via curl (Debian)
+      # SECURITY: Starship installer cannot be pinned - no versioned installer exists
+      # Alternative: Download binary directly with checksum from GitHub releases
+      # https://github.com/starship/starship/releases (provides SHA256 checksums)
       ansible.builtin.shell: curl -sS https://starship.rs/install.sh | sh -s -- -y
       become: true
       when: ansible_facts['os_family'] == "Debian" and not starship_check.stat.exists

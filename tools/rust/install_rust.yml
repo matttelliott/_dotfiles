@@ -5,6 +5,10 @@
 
   tasks:
     - name: Install Rust via rustup.rs
+      # SECURITY: rustup installer cannot be pinned - no versioned installer exists
+      # The rustup project maintains https://sh.rustup.rs as the canonical installer.
+      # Mitigation: Trust HTTPS + official domain. Alternative: standalone installers
+      # with GPG signatures at https://forge.rust-lang.org/infra/other-installation-methods.html
       ansible.builtin.shell: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
       args:
         creates: ~/.cargo/bin/rustc
