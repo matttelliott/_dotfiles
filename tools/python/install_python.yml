@@ -11,7 +11,9 @@
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install uv via official installer (Linux)
-      ansible.builtin.shell: curl -LsSf https://astral.sh/uv/install.sh | sh
+      # uv installer pinned to version (update periodically)
+      # Latest version: https://github.com/astral-sh/uv/releases
+      ansible.builtin.shell: curl -LsSf https://astral.sh/uv/0.9.26/install.sh | sh
       args:
         creates: ~/.local/bin/uv
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]

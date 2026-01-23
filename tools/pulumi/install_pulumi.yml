@@ -11,7 +11,9 @@
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install Pulumi via official installer (Linux)
-      ansible.builtin.shell: curl -fsSL https://get.pulumi.com | sh
+      # Pulumi installer with pinned version (update periodically)
+      # Latest version: https://github.com/pulumi/pulumi/releases
+      ansible.builtin.shell: curl -fsSL https://get.pulumi.com | sh -s -- --version 3.216.0
       args:
         creates: ~/.pulumi/bin/pulumi
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
