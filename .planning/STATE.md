@@ -89,7 +89,7 @@ None - v0.3 complete, ready for next milestone
 Last session: 2026-01-23
 Stopped at: Completed 10-01-PLAN.md (v0.3 complete)
 Resume file: None
-Next action: /gsd:discuss-milestone (v0.4 or v0.5 planning)
+Next action: /gsd:audit-milestone (verify requirements and integration before archiving)
 
 ---
 *State updated: 2026-01-23 (v0.3 complete)*

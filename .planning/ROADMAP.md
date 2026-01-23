@@ -12,12 +12,12 @@ This milestone hardens curl-to-shell script patterns used in bootstrap/tool inst
 
 - ✅ **v0.1 Lint & Tooling** - Phases 1-4 (shipped 2026-01-21)
 - ✅ **v0.2 Portability & Bugs** - Phases 5-8 (shipped 2026-01-22)
-- 🚧 **v0.3 Security & Documentation** - Phases 9-10 (in progress)
+- ✅ **v0.3 Security & Documentation** - Phases 9-10 (shipped 2026-01-23)
 
 ## Phases
 
 - [x] **Phase 9: Script Security** - Harden curl-to-shell scripts with pinning and verification
-- [ ] **Phase 10: Documentation** - Document risks, recovery procedures, and testing guidance
+- [x] **Phase 10: Documentation** - Document risks, recovery procedures, and testing guidance
 
 ## Phase Details
 
@@ -48,7 +48,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 10-01-PLAN.md - Add Security Considerations, Troubleshooting, and theme testing documentation
+- [x] 10-01-PLAN.md - Add Security Considerations, Troubleshooting, and theme testing documentation
 
 ## Coverage
 
@@ -68,8 +68,8 @@ All 6/6 v0.3 requirements mapped.
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 9. Script Security | v0.3 | 2/2 | Complete | 2026-01-23 |
-| 10. Documentation | v0.3 | 0/? | Not started | - |
+| 10. Documentation | v0.3 | 1/1 | Complete | 2026-01-23 |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-23 (Phase 9 complete)*
+*Last updated: 2026-01-23 (v0.3 complete)*

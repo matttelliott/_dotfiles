@@ -15,9 +15,9 @@ Requirements for v0.3 Security & Documentation milestone.
 
 ### Documentation
 
-- [ ] **DOC-01**: nvm dependency risk documented (curl-to-shell pattern)
-- [ ] **DOC-02**: Rollback/recovery procedures documented
-- [ ] **DOC-03**: Theme system testing guidance added to CLAUDE.md
+- [x] **DOC-01**: nvm dependency risk documented (curl-to-shell pattern)
+- [x] **DOC-02**: Rollback/recovery procedures documented
+- [x] **DOC-03**: Theme system testing guidance added to CLAUDE.md
 
 ## Future Requirements
 
@@ -49,9 +49,9 @@ Deferred to future milestones.
 | SEC-01 | Phase 9 | Complete |
 | SEC-02 | Phase 9 | Complete |
 | SEC-03 | Phase 9 | Complete |
-| DOC-01 | Phase 10 | Pending |
-| DOC-02 | Phase 10 | Pending |
-| DOC-03 | Phase 10 | Pending |
+| DOC-01 | Phase 10 | Complete |
+| DOC-02 | Phase 10 | Complete |
+| DOC-03 | Phase 10 | Complete |
 
 **Coverage:**
 - v0.3 requirements: 6 total
