@@ -17,6 +17,8 @@
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Add Vivaldi apt repository (Debian)
+      # GPG Key Fingerprint: CB63 144F 1BA3 1BC3 9E27 79A8 FEB6 023D C27A A466
+      # Verify at: https://vivaldi.com/download/
       ansible.builtin.shell: |
         curl -fsSL https://repo.vivaldi.com/archive/linux_signing_key.pub \
           | gpg --dearmor -o /usr/share/keyrings/vivaldi.gpg

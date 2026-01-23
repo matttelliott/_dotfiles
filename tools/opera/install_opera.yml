@@ -17,6 +17,8 @@
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Add Opera apt repository (Debian)
+      # GPG Key Fingerprint: 6C86BE214648376680CA957B11EE8C00B693A745
+      # Verify at: https://www.opera.com/download
       ansible.builtin.shell: |
         curl -fsSL https://deb.opera.com/archive.key \
           | gpg --dearmor -o /usr/share/keyrings/opera.gpg

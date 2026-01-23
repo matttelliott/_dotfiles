@@ -17,6 +17,8 @@
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Add Google Cloud apt repository (Debian)
+      # GPG Key ID: 3746 C208 A731 7B0F
+      # Verify at: https://cloud.google.com/sdk/docs/install
       ansible.builtin.shell: |
         curl https://packages.cloud.google.com/apt/doc/apt-key.gpg \
           | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
