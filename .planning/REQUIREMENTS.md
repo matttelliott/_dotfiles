@@ -9,9 +9,9 @@ Requirements for v0.3 Security & Documentation milestone.
 
 ### Script Security
 
-- [ ] **SEC-01**: Curl-to-shell scripts pinned to specific commits/tags
-- [ ] **SEC-02**: Checksums verified for downloaded scripts where available
-- [ ] **SEC-03**: GPG key fingerprints documented in playbook comments
+- [x] **SEC-01**: Curl-to-shell scripts pinned to specific commits/tags
+- [x] **SEC-02**: Checksums verified for downloaded scripts where available
+- [x] **SEC-03**: GPG key fingerprints documented in playbook comments
 
 ### Documentation
 
@@ -46,9 +46,9 @@ Deferred to future milestones.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SEC-01 | Phase 9 | Pending |
-| SEC-02 | Phase 9 | Pending |
-| SEC-03 | Phase 9 | Pending |
+| SEC-01 | Phase 9 | Complete |
+| SEC-02 | Phase 9 | Complete |
+| SEC-03 | Phase 9 | Complete |
 | DOC-01 | Phase 10 | Pending |
 | DOC-02 | Phase 10 | Pending |
 | DOC-03 | Phase 10 | Pending |

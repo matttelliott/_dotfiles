@@ -16,7 +16,7 @@ This milestone hardens curl-to-shell script patterns used in bootstrap/tool inst
 
 ## Phases
 
-- [ ] **Phase 9: Script Security** - Harden curl-to-shell scripts with pinning and verification
+- [x] **Phase 9: Script Security** - Harden curl-to-shell scripts with pinning and verification
 - [ ] **Phase 10: Documentation** - Document risks, recovery procedures, and testing guidance
 
 ## Phase Details
@@ -33,8 +33,8 @@ This milestone hardens curl-to-shell script patterns used in bootstrap/tool inst
 **Plans**: 2 plans
 
 Plans:
-- [ ] 09-01-PLAN.md - Pin curl-to-shell scripts (Homebrew, Pulumi, uv) + security comments for unpinnable scripts
-- [ ] 09-02-PLAN.md - Add checksum verification to sops + GPG fingerprint comments to 9 APT tools
+- [x] 09-01-PLAN.md - Pin curl-to-shell scripts (Homebrew, Pulumi, uv) + security comments for unpinnable scripts
+- [x] 09-02-PLAN.md - Add checksum verification to sops + GPG fingerprint comments to 9 APT tools
 
 ### Phase 10: Documentation
 **Goal**: Operational risks and procedures are documented for maintainer reference
@@ -67,9 +67,9 @@ All 6/6 v0.3 requirements mapped.
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 9. Script Security | v0.3 | 0/2 | Planned | - |
+| 9. Script Security | v0.3 | 2/2 | Complete | 2026-01-23 |
 | 10. Documentation | v0.3 | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-01-23*
-*Last updated: 2026-01-23*
+*Last updated: 2026-01-23 (Phase 9 complete)*
