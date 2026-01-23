@@ -156,7 +156,9 @@ if [[ "$OS" == "darwin" ]]; then
 
   if [ ! -f /opt/homebrew/bin/brew ]; then
     echo "Installing Homebrew..."
-    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    # Homebrew installer pinned to commit 90fa3d5881cedc0d60c4a3cc5babdb867ef42e5a (2026-01-23)
+    # Verify/update at: https://github.com/Homebrew/install/commits/master
+    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/90fa3d5881cedc0d60c4a3cc5babdb867ef42e5a/install.sh)"
   fi
 
   if [ ! -f /opt/homebrew/bin/ansible ]; then
