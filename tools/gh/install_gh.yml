@@ -17,6 +17,9 @@
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Add GitHub CLI apt repository (Debian)
+      # GPG Key Fingerprint: 2C6106201985B60E6C7AC87323F3D4EA75716059
+      # Key expires: September 2026 (check https://github.blog for rotation announcements)
+      # Verify at: https://github.com/cli/cli/blob/trunk/docs/install_linux.md
       ansible.builtin.shell: |
         curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
           | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
