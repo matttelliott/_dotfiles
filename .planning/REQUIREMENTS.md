@@ -46,18 +46,18 @@ Deferred to future milestones.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SEC-01 | TBD | Pending |
-| SEC-02 | TBD | Pending |
-| SEC-03 | TBD | Pending |
-| DOC-01 | TBD | Pending |
-| DOC-02 | TBD | Pending |
-| DOC-03 | TBD | Pending |
+| SEC-01 | Phase 9 | Pending |
+| SEC-02 | Phase 9 | Pending |
+| SEC-03 | Phase 9 | Pending |
+| DOC-01 | Phase 10 | Pending |
+| DOC-02 | Phase 10 | Pending |
+| DOC-03 | Phase 10 | Pending |
 
 **Coverage:**
 - v0.3 requirements: 6 total
-- Mapped to phases: 0
-- Unmapped: 6 ⚠️
+- Mapped to phases: 6
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-23*
-*Last updated: 2026-01-23 after initial definition*
+*Last updated: 2026-01-23 after roadmap creation*
