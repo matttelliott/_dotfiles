@@ -12,10 +12,10 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 Phase: 9 (Script Security)
 Milestone: v0.3 Security & Documentation
 Epic: Concerns Resolution (v0.2-v0.5)
-Status: Roadmap created, ready for phase planning
-Last activity: 2026-01-23 - Roadmap created with 2 phases
+Status: Plan 09-01 complete
+Last activity: 2026-01-23 - Completed 09-01-PLAN.md (script pinning)
 
-Progress: ░░░░░░░░░░ 0% (0/2 phases in v0.3)
+Progress: █████░░░░░ 50% (1/2 phases in v0.3)
 
 ## Completed Milestones
 
@@ -38,6 +38,10 @@ Progress: ░░░░░░░░░░ 0% (0/2 phases in v0.3)
 - Total execution time: ~20 min
 - Timeline: 2 days (2026-01-21 -> 2026-01-22)
 
+**v0.3 Velocity (in progress):**
+- Plans completed: 1
+- Latest duration: 2 min
+
 ## Accumulated Context
 
 ### Decisions
@@ -47,13 +51,18 @@ See milestone archives for phase-level decisions:
 - v0.1: .planning/milestones/v0.1-ROADMAP.md
 - v0.2: .planning/milestones/v0.2-ROADMAP.md
 
+**Phase 9 Decisions:**
+- Pin to latest Homebrew commit SHA (90fa3d5) for reproducibility
+- Use version flags for Pulumi (3.216.0) and uv (0.9.26)
+- Document unpinnable scripts with alternatives rather than removing them
+
 ### Pending Todos
 
 0 pending todos - /gsd:check-todos to review
 
 ### Blockers/Concerns
 
-None - ready for phase 9 planning
+None
 
 ### Quick Tasks Completed
 
@@ -65,9 +74,9 @@ None - ready for phase 9 planning
 ## Session Continuity
 
 Last session: 2026-01-23
-Stopped at: Roadmap created for v0.3
+Stopped at: Completed 09-01-PLAN.md
 Resume file: None
-Next action: /gsd:plan-phase 9
+Next action: Phase 10 (Secrets Documentation) or next plan
 
 ---
-*State updated: 2026-01-23 (v0.3 roadmap created)*
+*State updated: 2026-01-23 (09-01 complete)*
