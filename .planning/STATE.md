@@ -9,11 +9,11 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 
 ## Current Position
 
-Phase: Not started
+Phase: Not started (defining requirements)
 Milestone: v0.3 Security & Documentation
 Epic: Concerns Resolution (v0.2–v0.5)
-Status: Ready to plan v0.3
-Last activity: 2026-01-22 — Completed v0.2 milestone
+Status: Defining requirements → roadmap creation
+Last activity: 2026-01-23 — Milestone v0.3 started
 
 Progress: ░░░░░░░░░░ 0% (0/? phases in v0.3)
 
