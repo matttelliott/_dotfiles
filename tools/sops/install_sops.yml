@@ -1,23 +1,28 @@
 - name: Install sops
   hosts: all
   gather_facts: true
+
+  vars:
+    sops_version: "3.11.0"
+    # Checksum from https://github.com/getsops/sops/releases/download/v3.11.0/sops-v3.11.0.checksums.txt
+    sops_checksum: "sha256:775f1384d55decfad228e7196a3f683791914f92a473f78fc47700531c29dfef"
+
   tasks:
     - name: Install sops via Homebrew
       ansible.builtin.shell: /opt/homebrew/bin/brew install sops
       args:
         creates: /opt/homebrew/bin/sops
       when: ansible_facts['os_family'] == "Darwin"
-    - name: Check if sops is installed (Debian)
-      ansible.builtin.stat:
-        path: /usr/local/bin/sops
-      register: sops_check
-      when: ansible_facts['os_family'] == "Debian"
-    - name: Download and install sops (Debian)
-      ansible.builtin.shell: |
-        curl -Lo /usr/local/bin/sops "https://github.com/getsops/sops/releases/latest/download/sops-v3.9.4.linux.amd64"
-        chmod +x /usr/local/bin/sops
+
+    - name: Download sops with checksum verification (Debian)
+      ansible.builtin.get_url:
+        url: "https://github.com/getsops/sops/releases/download/v{{ sops_version }}/sops-v{{ sops_version }}.linux.amd64"
+        dest: /usr/local/bin/sops
+        mode: '0755'
+        checksum: "{{ sops_checksum }}"
       become: true
-      when: ansible_facts['os_family'] == "Debian" and not sops_check.stat.exists
+      when: ansible_facts['os_family'] == "Debian"
+
     - name: Install sops via yay (Arch)
       ansible.builtin.shell: yay -S --noconfirm sops
       args:
