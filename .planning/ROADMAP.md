@@ -30,10 +30,11 @@ This milestone hardens curl-to-shell script patterns used in bootstrap/tool inst
   2. Scripts with published checksums have verification steps in playbooks
   3. GPG key fingerprints for package repositories are documented in playbook comments
   4. Running `ansible-lint` still passes after changes
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 09-01: [TBD - to be defined by plan-phase]
+- [ ] 09-01-PLAN.md - Pin curl-to-shell scripts (Homebrew, Pulumi, uv) + security comments for unpinnable scripts
+- [ ] 09-02-PLAN.md - Add checksum verification to sops + GPG fingerprint comments to 9 APT tools
 
 ### Phase 10: Documentation
 **Goal**: Operational risks and procedures are documented for maintainer reference
@@ -66,7 +67,7 @@ All 6/6 v0.3 requirements mapped.
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 9. Script Security | v0.3 | 0/? | Not started | - |
+| 9. Script Security | v0.3 | 0/2 | Planned | - |
 | 10. Documentation | v0.3 | 0/? | Not started | - |
 
 ---
