@@ -13,12 +13,11 @@ When you sit down at a new machine, one command gets you your environment.
 **Shipped:**
 - v0.1 Lint & Tooling (2026-01-21)
 - v0.2 Portability & Bugs (2026-01-22)
+- v0.3 Security & Documentation (2026-01-23)
 
-Codebase: 107 YAML playbooks, all passing ansible-lint. ARM64 portable, idempotent re-runs, LTS version policy documented.
+Codebase: 107 YAML playbooks, all passing ansible-lint. ARM64 portable, idempotent re-runs, curl-to-shell scripts pinned to specific versions, security and troubleshooting documentation complete.
 
-## Current Milestone: v0.3 Security & Documentation
-
-**Goal:** Harden curl-to-shell scripts and document risks/rollback procedures.
+## Next Milestone
 
 **Epic:** Concerns Resolution (v0.2–v0.5) — addressing all items from `.planning/codebase/CONCERNS.md`
 
@@ -27,7 +26,7 @@ Codebase: 107 YAML playbooks, all passing ansible-lint. ARM64 portable, idempote
 | Milestone | Theme | Key Deliverables |
 |-----------|-------|------------------|
 | ✓ v0.2 | Portability & Bugs | ARM64 support, idempotency guards, bug fixes, LTS policy |
-| **v0.3** | Security & Documentation | Curl-to-shell hardening, risk documentation |
+| ✓ v0.3 | Security & Documentation | Curl-to-shell hardening, risk documentation |
 | v0.4 | Ephemeral Environments | Container/VPS support, Claude sandbox Dockerfile |
 | v0.5 | Polish | Themes refactor, version tracking |
 
@@ -67,18 +66,18 @@ Codebase: 107 YAML playbooks, all passing ansible-lint. ARM64 portable, idempote
 - ✓ SSH known_hosts idempotency fix — v0.2
 - ✓ Debian non-free repos safe modification — v0.2
 - ✓ LTS version policy documented — v0.2
+- ✓ Curl-to-shell scripts pinned to specific commits — v0.3
+- ✓ Checksums verified for downloaded scripts where available — v0.3
+- ✓ GPG key fingerprints documented in playbook comments — v0.3
+- ✓ Theme system testing guidance in CLAUDE.md — v0.3
+- ✓ nvm dependency risk documented — v0.3
+- ✓ Rollback/recovery procedures documented — v0.3
 
 ### Active
 
 <!-- Current scope. Building toward these. -->
 
-**v0.3 Security & Documentation:**
-- [ ] Curl-to-shell scripts pinned to specific commits
-- [ ] Checksums verified for downloaded scripts where available
-- [ ] GPG key fingerprints documented in playbook comments
-- [ ] Theme system testing guidance in CLAUDE.md
-- [ ] nvm dependency risk documented
-- [ ] Rollback/recovery procedures documented
+No active milestone. Run `/gsd:new-milestone` to start v0.4 or v0.5.
 
 ### Out of Scope
 
@@ -123,4 +122,4 @@ Work typically involves: adding new tools, updating configs, fixing breakage aft
 | version: master for git | ansible-lint requires explicit branch, HEAD not recognized | ✓ Good |
 
 ---
-*Last updated: 2026-01-22 after completing v0.2 milestone*
+*Last updated: 2026-01-24 after completing v0.3 milestone*
