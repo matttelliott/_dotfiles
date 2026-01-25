@@ -21,8 +21,8 @@ all:
           ansible_python_interpreter: /opt/homebrew/bin/python3
     debian:
       hosts:
-        miniserver:
-          ansible_host: miniserver.home.lan
+        optiplex-0:
+          ansible_host: optiplex-0.home.lan
           ansible_user: matt
           ansible_ssh_timeout: 60
           ansible_python_interpreter: /usr/bin/python3
@@ -41,7 +41,7 @@ all:
         macbookair:
         desktop:
         macmini:
-        miniserver:
+        optiplex-0:
     with_gui_tools:
       hosts:
         macbookair:

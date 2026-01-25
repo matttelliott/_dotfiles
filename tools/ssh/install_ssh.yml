@@ -61,7 +61,7 @@
         - macbookair
         - macmini
         - desktop
-        - miniserver
+        - optiplex-0
 
     - name: Add missing host keys to known_hosts
       ansible.builtin.shell: ssh-keyscan -H {{ item.item }}.home.lan >> ~/.ssh/known_hosts 2>/dev/null
