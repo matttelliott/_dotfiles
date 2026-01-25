@@ -10,10 +10,12 @@
         creates: /opt/homebrew/bin/helm
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install helm via apt (Debian)
-      ansible.builtin.apt:
-        name: helm
-        state: present
+    - name: Install helm via official installer (Debian)
+      # SECURITY: Pinned to v3.17.3. Update: check https://github.com/helm/helm/releases
+      ansible.builtin.shell: |
+        curl -fsSL https://raw.githubusercontent.com/helm/helm/v3.17.3/scripts/get-helm-3 | bash
+      args:
+        creates: /usr/local/bin/helm
       become: true
       when: ansible_facts['os_family'] == "Debian"
 
