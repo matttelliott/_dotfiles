@@ -34,6 +34,9 @@ read -p "with_ai_tools (Claude Code)? [y/n]: " AI
 
 echo
 
+# 1Password and Age key setup only needed for login tools (git signing, SSH keys)
+if [[ "$LOGIN" =~ ^[Yy]$ ]]; then
+
 # 1Password service account token setup (for secrets)
 OP_TOKEN_DIR="$HOME/.config/op"
 OP_TOKEN_FILE="$OP_TOKEN_DIR/service-account-token"
@@ -145,6 +148,8 @@ if [[ ! -f "$AGE_KEY_FILE" ]]; then
   fi
 fi
 
+fi  # end with_login_tools credential setup
+
 # Install dependencies
 if [[ "$OS" == "darwin" ]]; then
   if [ ! -f /Library/Developer/CommandLineTools/usr/bin/git ]; then
@@ -178,9 +183,11 @@ if [[ "$OS" == "arch" ]]; then
   sudo pacman -Sy --noconfirm git ansible
 fi
 
-# Install SOPS ansible collection
-echo "Installing Ansible SOPS collection..."
-ansible-galaxy collection install community.sops
+# Install SOPS ansible collection (only needed for login tools secrets)
+if [[ "$LOGIN" =~ ^[Yy]$ ]]; then
+  echo "Installing Ansible SOPS collection..."
+  ansible-galaxy collection install community.sops
+fi
 
 echo "Cloning dotfiles..."
 rm -rf $DOTFILES_DIR
