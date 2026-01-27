@@ -71,15 +71,25 @@ themesetting () {
 		return 1
 	fi
 
-	# Get machine defaults from inventory
-	local inventory="$DOTFILES/localhost.yml"
-	local default_color=$(grep -A20 "$(hostname)" "$inventory" 2>/dev/null | grep "theme_color:" | head -1 | awk '{print $2}')
-	local default_font=$(grep -A20 "$(hostname)" "$inventory" 2>/dev/null | grep "theme_font:" | head -1 | awk '{print $2}')
-	local default_style=$(grep -A20 "$(hostname)" "$inventory" 2>/dev/null | grep "theme_style:" | head -1 | awk '{print $2}')
-	# Fall back to global defaults
-	[[ -z "$default_color" ]] && default_color=$(grep "theme_color:" "$inventory" 2>/dev/null | head -1 | awk '{print $2}')
-	[[ -z "$default_font" ]] && default_font=$(grep "theme_font:" "$inventory" 2>/dev/null | head -1 | awk '{print $2}')
-	[[ -z "$default_style" ]] && default_style=$(grep "theme_style:" "$inventory" 2>/dev/null | head -1 | awk '{print $2}')
+	# Get machine defaults from inventory (check localhost.yml first, then inventory.yml)
+	local localhost_inv="$DOTFILES/localhost.yml"
+	local remote_inv="$DOTFILES/inventory.yml"
+	local hostname_short=$(hostname -s)
+
+	# Try localhost.yml first (host-specific)
+	local default_color=$(grep -A20 "$hostname_short" "$localhost_inv" 2>/dev/null | grep "theme_color:" | head -1 | awk '{print $2}')
+	local default_font=$(grep -A20 "$hostname_short" "$localhost_inv" 2>/dev/null | grep "theme_font:" | head -1 | awk '{print $2}')
+	local default_style=$(grep -A20 "$hostname_short" "$localhost_inv" 2>/dev/null | grep "theme_style:" | head -1 | awk '{print $2}')
+
+	# Fall back to inventory.yml (host-specific)
+	[[ -z "$default_color" ]] && default_color=$(grep -A20 "$hostname_short" "$remote_inv" 2>/dev/null | grep "theme_color:" | head -1 | awk '{print $2}')
+	[[ -z "$default_font" ]] && default_font=$(grep -A20 "$hostname_short" "$remote_inv" 2>/dev/null | grep "theme_font:" | head -1 | awk '{print $2}')
+	[[ -z "$default_style" ]] && default_style=$(grep -A20 "$hostname_short" "$remote_inv" 2>/dev/null | grep "theme_style:" | head -1 | awk '{print $2}')
+
+	# Fall back to global defaults in inventory.yml
+	[[ -z "$default_color" ]] && default_color=$(grep "theme_color:" "$remote_inv" 2>/dev/null | head -1 | awk '{print $2}')
+	[[ -z "$default_font" ]] && default_font=$(grep "theme_font:" "$remote_inv" 2>/dev/null | head -1 | awk '{print $2}')
+	[[ -z "$default_style" ]] && default_style=$(grep "theme_style:" "$remote_inv" 2>/dev/null | head -1 | awk '{print $2}')
 
 	# Parse available theme choices from shared YAML files
 	local choices=$(
