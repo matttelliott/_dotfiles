@@ -93,14 +93,20 @@
       ansible.builtin.command: git remote set-url origin {{ dotfiles_ssh_url }}
       args:
         chdir: ~/_dotfiles
-      when: dotfiles_dir.stat.exists and use_ssh
+      when:
+        - dotfiles_dir.stat.exists
+        - use_ssh
+        - "'with_login_tools' in group_names"
       changed_when: false
 
     - name: Set remote to HTTPS
       ansible.builtin.command: git remote set-url origin {{ dotfiles_https_url }}
       args:
         chdir: ~/_dotfiles
-      when: dotfiles_dir.stat.exists and not use_ssh
+      when:
+        - dotfiles_dir.stat.exists
+        - not use_ssh
+        - "'with_login_tools' in group_names"
       changed_when: false
 
     - name: Update dotfiles repo
