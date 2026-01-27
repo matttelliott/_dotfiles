@@ -116,6 +116,17 @@
       register: git_pull
       changed_when: "'Already up to date' not in git_pull.stdout"
       when: dotfiles_dir.stat.exists
+
+- name: Generate localhost.yml
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Generate localhost.yml from template
+      ansible.builtin.template:
+        src: templates/localhost.yml.j2
+        dest: ~/_dotfiles/localhost.yml
+        mode: "0644"
+
 - name: Install mosh
   import_playbook: tools/mosh/install_mosh.yml
 - name: Install Homebrew
