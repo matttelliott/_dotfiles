@@ -1,0 +1,50 @@
+---
+all:
+  children:
+    macs:
+      hosts:
+{% if ansible_facts['os_family'] == 'Darwin' %}
+        {{ inventory_hostname_short }}:
+          ansible_connection: local
+          ansible_python_interpreter: /opt/homebrew/bin/python3
+{% endif %}
+
+    debian:
+      hosts:
+{% if ansible_facts['os_family'] == 'Debian' %}
+        {{ inventory_hostname_short }}:
+          ansible_connection: local
+          ansible_python_interpreter: /usr/bin/python3
+{% endif %}
+
+    arch:
+      hosts:
+{% if ansible_facts['os_family'] == 'Archlinux' %}
+        {{ inventory_hostname_short }}:
+          ansible_connection: local
+          ansible_python_interpreter: /usr/bin/python3
+{% endif %}
+{% if 'with_login_tools' in group_names %}
+
+    with_login_tools:
+      hosts:
+        {{ inventory_hostname_short }}:
+{% endif %}
+{% if 'with_gui_tools' in group_names %}
+
+    with_gui_tools:
+      hosts:
+        {{ inventory_hostname_short }}:
+{% endif %}
+{% if 'with_browsers' in group_names %}
+
+    with_browsers:
+      hosts:
+        {{ inventory_hostname_short }}:
+{% endif %}
+{% if 'with_ai_tools' in group_names %}
+
+    with_ai_tools:
+      hosts:
+        {{ inventory_hostname_short }}:
+{% endif %}
