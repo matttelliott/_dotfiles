@@ -73,7 +73,7 @@
 
     - name: Set use_ssh fact
       ansible.builtin.set_fact:
-        use_ssh: "{{ (inventory_hostname in groups['with_login_tools']) and ssh_key_file.stat.exists }}"
+        use_ssh: "{{ (inventory_hostname in (groups['with_login_tools'] | default([]))) and ssh_key_file.stat.exists }}"
 
     - name: Clone dotfiles via SSH
       ansible.builtin.git:
