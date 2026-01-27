@@ -31,6 +31,6 @@
       register: tmux_config
 
     - name: Reload tmux config
-      ansible.builtin.shell: tmux source-file ~/.tmux.conf
+      ansible.builtin.shell: PATH="/opt/homebrew/bin:$PATH" tmux source-file ~/.tmux.conf
       when: tmux_config.changed and lookup('env', 'TMUX') != ''
       ignore_errors: true

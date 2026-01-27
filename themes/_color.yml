@@ -230,7 +230,7 @@
         replace: '# {{ c.name }} colors'
 
     - name: Reload tmux config
-      ansible.builtin.shell: tmux source-file ~/.tmux.conf
+      ansible.builtin.shell: PATH="/opt/homebrew/bin:$PATH" tmux source-file ~/.tmux.conf
       ignore_errors: true
 
     # ===================
