@@ -398,7 +398,7 @@
     - name: Update lazygit activeBorderColor
       ansible.builtin.replace:
         path: ~/.config/lazygit/config.yml
-        regexp: 'activeBorderColor:\n\s+- "#[0-9a-fA-F]{6}"'
+        regexp: '(?<![a-zA-Z])activeBorderColor:\n\s+- "#[0-9a-fA-F]{6}"'
         replace: 'activeBorderColor:\n      - "{{ c.accent }}"'
 
     - name: Update lazygit inactiveBorderColor
@@ -557,7 +557,7 @@
     - name: Update lazydocker activeBorderColor
       ansible.builtin.replace:
         path: ~/.config/lazydocker/config.yml
-        regexp: 'activeBorderColor:\n\s+- "#[0-9a-fA-F]{6}"'
+        regexp: '(?<![a-zA-Z])activeBorderColor:\n\s+- "#[0-9a-fA-F]{6}"'
         replace: 'activeBorderColor:\n      - "{{ c.accent }}"'
 
     - name: Update lazydocker inactiveBorderColor
