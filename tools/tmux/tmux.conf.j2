@@ -95,5 +95,8 @@ bind C-c command-prompt -p "Session name:" "new-session -s '%%'"
 # Mouse Support
 set -g mouse on
 
+# Session switcher (explicit default to prevent stray bindings from persisting)
+bind s choose-tree -Zs
+
 # Click session name to switch sessions
 bind-key -T root MouseUp1StatusLeft choose-tree -sO name
