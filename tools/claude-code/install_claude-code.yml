@@ -7,15 +7,8 @@
   gather_facts: true
 
   tasks:
-    - name: Check if Claude Code is installed
-      ansible.builtin.shell: command -v claude
-      register: claude_check
-      changed_when: false
-      failed_when: false
-
     - name: Install Claude Code via native installer
       ansible.builtin.shell: curl -fsSL https://claude.ai/install.sh | bash
-      when: claude_check.rc != 0
 
     - name: Create Claude config directory
       ansible.builtin.file:
