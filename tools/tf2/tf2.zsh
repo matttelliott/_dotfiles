@@ -27,7 +27,7 @@ tf2-hud() {
   mkdir -p "$storage_dir"
 
   # Migrate any .disabled HUDs to storage (one-time migration)
-  for d in "$custom_dir"/*.disabled; do
+  for d in "$custom_dir"/*.disabled(N); do
     [[ -d "$d" ]] || continue
     local name="$(basename "$d" .disabled)"
     if [[ ! -d "$storage_dir/$name" ]]; then
@@ -42,7 +42,7 @@ tf2-hud() {
   local current=""
 
   # Check active HUD in custom dir
-  for d in "$custom_dir"/*/; do
+  for d in "$custom_dir"/*/(N); do
     [[ -d "$d" ]] || continue
     local name="$(basename "$d")"
     [[ -d "$d/resource" ]] || [[ -d "$d/scripts" ]] || continue
@@ -51,7 +51,7 @@ tf2-hud() {
   done
 
   # Check stored HUDs
-  for d in "$storage_dir"/*/; do
+  for d in "$storage_dir"/*/(N); do
     [[ -d "$d" ]] || continue
     local name="$(basename "$d")"
     [[ -d "$d/resource" ]] || [[ -d "$d/scripts" ]] || continue
@@ -112,7 +112,7 @@ tf2-hud-list() {
   echo ""
 
   # Active HUDs in custom dir
-  for d in "$custom_dir"/*/; do
+  for d in "$custom_dir"/*/(N); do
     [[ -d "$d" ]] || continue
     local name="$(basename "$d")"
     [[ -d "$d/resource" ]] || [[ -d "$d/scripts" ]] || continue
@@ -122,7 +122,7 @@ tf2-hud-list() {
 
   # Stored HUDs
   if [[ -d "$storage_dir" ]]; then
-    for d in "$storage_dir"/*/; do
+    for d in "$storage_dir"/*/(N); do
       [[ -d "$d" ]] || continue
       local name="$(basename "$d")"
       [[ -d "$d/resource" ]] || [[ -d "$d/scripts" ]] || continue
