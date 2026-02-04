@@ -153,10 +153,12 @@
         dest: "/tmp/{{ item.item.name }}.zip"
         mode: "0644"
       loop: "{{ hud_check.results }}"
+      loop_control:
+        index_var: hud_idx
       when:
         - tf2_dir.stat.exists
         - not item.stat.exists
-        - not (hud_check_disabled.results[loop_index0].stat.exists | default(false))
+        - not (hud_check_disabled.results[hud_idx].stat.exists | default(false))
       register: hud_downloads
       ignore_errors: true
 
