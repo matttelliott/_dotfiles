@@ -113,3 +113,10 @@
           TF2 installation not detected.
           Re-run this playbook after TF2 finishes installing.
       when: not tf2_dir.stat.exists
+
+    - name: Source TF2 shell functions in zshrc
+      ansible.builtin.lineinfile:
+        path: ~/.zshrc
+        line: '[[ -f "$DOTFILES/tools/tf2/tf2.zsh" ]] && source "$DOTFILES/tools/tf2/tf2.zsh"'
+        regexp: 'tf2\.zsh'
+        state: present
