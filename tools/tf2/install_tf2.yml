@@ -9,13 +9,39 @@
     tf2_cfg_src: "{{ playbook_dir }}/cfg"
     tf2_cfg_dest_linux: "~/.steam/steam/steamapps/common/Team Fortress 2/tf/cfg"
     tf2_cfg_dest_mac: "~/Library/Application Support/Steam/steamapps/common/Team Fortress 2/tf/cfg"
+    tf2_custom_linux: "~/.steam/steam/steamapps/common/Team Fortress 2/tf/custom"
+    tf2_custom_mac: "~/Library/Application Support/Steam/steamapps/common/Team Fortress 2/tf/custom"
     steam_login_file_linux: "~/.steam/steam/config/loginusers.vdf"
     steam_login_file_mac: "~/Library/Application Support/Steam/config/loginusers.vdf"
+
+    # Default HUDs to install (first one will be active, rest disabled)
+    tf2_huds:
+      - name: rayshud
+        repo: raysfire/rayshud
+      - name: flawhud
+        repo: CriticalFlaw/flawhud
+      - name: budhud
+        repo: rbjaxter/budhud
+      - name: zeeshud
+        repo: Zeesastrous/ZeesHUD
+      - name: m0rehud
+        repo: Hypnootize/m0rehud
+      - name: hypnotizehud
+        repo: Hypnootize/hypnotizehud
+      - name: hexhud
+        repo: Hypnootize/hexhud
+      - name: 7hud
+        repo: Sevin7/7hud
+      - name: kbnhud
+        repo: Jotunn/kbnhud
+      - name: peachhud
+        repo: PapaPeach/peachhud
 
   tasks:
     - name: Set OS-specific paths
       ansible.builtin.set_fact:
         tf2_cfg_dest: "{{ tf2_cfg_dest_mac if ansible_facts['os_family'] == 'Darwin' else tf2_cfg_dest_linux }}"
+        tf2_custom_dest: "{{ tf2_custom_mac if ansible_facts['os_family'] == 'Darwin' else tf2_custom_linux }}"
         steam_login_file: "{{ steam_login_file_mac if ansible_facts['os_family'] == 'Darwin' else steam_login_file_linux }}"
 
     - name: Check Steam login file exists
@@ -97,10 +123,91 @@
         mode: "0644"
       when: tf2_dir.stat.exists
 
+    # =========================================================================
+    # HUD Installation
+    # =========================================================================
+    - name: Create TF2 custom directory
+      ansible.builtin.file:
+        path: "{{ tf2_custom_dest }}"
+        state: directory
+        mode: "0755"
+      when: tf2_dir.stat.exists
+
+    - name: Check which HUDs are already installed
+      ansible.builtin.stat:
+        path: "{{ tf2_custom_dest }}/{{ item.name }}"
+      loop: "{{ tf2_huds }}"
+      register: hud_check
+      when: tf2_dir.stat.exists
+
+    - name: Check which HUDs are installed (disabled)
+      ansible.builtin.stat:
+        path: "{{ tf2_custom_dest }}/{{ item.name }}.disabled"
+      loop: "{{ tf2_huds }}"
+      register: hud_check_disabled
+      when: tf2_dir.stat.exists
+
+    - name: Download HUDs from GitHub
+      ansible.builtin.get_url:
+        url: "https://github.com/{{ item.item.repo }}/archive/refs/heads/master.zip"
+        dest: "/tmp/{{ item.item.name }}.zip"
+        mode: "0644"
+      loop: "{{ hud_check.results }}"
+      when:
+        - tf2_dir.stat.exists
+        - not item.stat.exists
+        - not (hud_check_disabled.results[loop_index0].stat.exists | default(false))
+      register: hud_downloads
+      ignore_errors: true
+
+    - name: Extract HUDs to custom folder
+      ansible.builtin.unarchive:
+        src: "/tmp/{{ item.item.item.name }}.zip"
+        dest: "{{ tf2_custom_dest }}"
+        remote_src: true
+      loop: "{{ hud_downloads.results }}"
+      when:
+        - tf2_dir.stat.exists
+        - item.changed | default(false)
+      ignore_errors: true
+
+    - name: Find extracted HUD folders
+      ansible.builtin.find:
+        paths: "{{ tf2_custom_dest }}"
+        patterns: "*-master"
+        file_type: directory
+      register: extracted_huds
+      when: tf2_dir.stat.exists
+
+    - name: Rename extracted HUDs (disable by default)
+      ansible.builtin.command:
+        cmd: "mv {{ item.path }} {{ tf2_custom_dest }}/{{ item.path | basename | regex_replace('-master$', '') }}.disabled"
+        removes: "{{ item.path }}"
+        creates: "{{ tf2_custom_dest }}/{{ item.path | basename | regex_replace('-master$', '') }}.disabled"
+      loop: "{{ extracted_huds.files | default([]) }}"
+      when: tf2_dir.stat.exists
+
+    - name: Enable rayshud (default HUD)
+      ansible.builtin.command:
+        cmd: "mv {{ tf2_custom_dest }}/rayshud.disabled {{ tf2_custom_dest }}/rayshud"
+        removes: "{{ tf2_custom_dest }}/rayshud.disabled"
+        creates: "{{ tf2_custom_dest }}/rayshud"
+      when: tf2_dir.stat.exists
+      ignore_errors: true
+
+    - name: Clean up HUD zip files
+      ansible.builtin.file:
+        path: "/tmp/{{ item.name }}.zip"
+        state: absent
+      loop: "{{ tf2_huds }}"
+
     - name: Display launch options
       ansible.builtin.debug:
         msg: |
           TF2 configs deployed to: {{ tf2_cfg_dest }}
+          HUDs installed to: {{ tf2_custom_dest }}
+
+          Active HUD: rayshud (use 'tf2-hud' to switch)
 
           Set launch options in Steam:
           Right-click TF2 > Properties > Launch Options:
