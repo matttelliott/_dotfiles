@@ -124,7 +124,7 @@
       when: tf2_dir.stat.exists
 
     # =========================================================================
-    # HUD Installation
+    # Custom Overrides (server browser size, etc.)
     # =========================================================================
     - name: Create TF2 custom directory
       ansible.builtin.file:
@@ -133,6 +133,16 @@
         mode: "0755"
       when: tf2_dir.stat.exists
 
+    - name: Copy custom overrides
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/custom-overrides/"
+        dest: "{{ tf2_custom_dest }}/custom-overrides/"
+        mode: "0644"
+      when: tf2_dir.stat.exists
+
+    # =========================================================================
+    # HUD Installation
+    # =========================================================================
     - name: Check which HUDs are already installed
       ansible.builtin.stat:
         path: "{{ tf2_custom_dest }}/{{ item.name }}"
