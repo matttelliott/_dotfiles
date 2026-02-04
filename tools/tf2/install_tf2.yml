@@ -207,23 +207,23 @@
       loop: "{{ extracted_huds.files | default([]) }}"
       when: tf2_dir.stat.exists
 
-    - name: Check if rayshud is in storage
+    - name: Check if 7hud is in storage
       ansible.builtin.stat:
-        path: "{{ tf2_hud_storage }}/rayshud"
-      register: rayshud_storage
+        path: "{{ tf2_hud_storage }}/7hud"
+      register: default_hud_storage
 
-    - name: Check if rayshud is already active
+    - name: Check if 7hud is already active
       ansible.builtin.stat:
-        path: "{{ tf2_custom_dest }}/rayshud"
-      register: rayshud_active
+        path: "{{ tf2_custom_dest }}/7hud"
+      register: default_hud_active
 
-    - name: Enable rayshud (default HUD)
+    - name: Enable 7hud (default HUD)
       ansible.builtin.shell: |
-        mv "{{ tf2_hud_storage }}/rayshud" "$HOME/.steam/steam/steamapps/common/Team Fortress 2/tf/custom/rayshud"
+        mv "{{ tf2_hud_storage }}/7hud" "$HOME/.steam/steam/steamapps/common/Team Fortress 2/tf/custom/7hud"
       when:
         - tf2_dir.stat.exists
-        - rayshud_storage.stat.exists | default(false)
-        - not (rayshud_active.stat.exists | default(false))
+        - default_hud_storage.stat.exists | default(false)
+        - not (default_hud_active.stat.exists | default(false))
 
     - name: Clean up HUD zip files
       ansible.builtin.file:
@@ -326,7 +326,7 @@
           TF2 configs deployed to: {{ tf2_cfg_dest }}
           HUDs installed to: {{ tf2_custom_dest }}
 
-          Active HUD: rayshud (use 'tf2-hud' to switch)
+          Active HUD: 7hud (use 'tf2-hud' to switch)
           Launch options: {{ tf2_launch_options }}
       when: tf2_dir.stat.exists
 
