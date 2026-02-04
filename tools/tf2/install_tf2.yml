@@ -151,11 +151,11 @@
       register: hud_check
       when: tf2_dir.stat.exists
 
-    - name: Check which HUDs are installed (disabled)
+    - name: Check which HUDs are in storage
       ansible.builtin.stat:
-        path: "{{ tf2_custom_dest }}/{{ item.name }}.disabled"
+        path: "{{ tf2_hud_storage }}/{{ item.name }}"
       loop: "{{ tf2_huds }}"
-      register: hud_check_disabled
+      register: hud_check_storage
       when: tf2_dir.stat.exists
 
     - name: Download HUDs from GitHub
@@ -169,7 +169,7 @@
       when:
         - tf2_dir.stat.exists
         - not item.stat.exists
-        - not (hud_check_disabled.results[hud_idx].stat.exists | default(false))
+        - not (hud_check_storage.results[hud_idx].stat.exists | default(false))
       register: hud_downloads
       ignore_errors: true
 
