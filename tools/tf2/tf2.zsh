@@ -68,18 +68,29 @@ tf2-hud() {
     [[ -d "$d/resource" ]] || [[ -d "$d/scripts" ]] || continue
 
     if [[ "$name" == "$base_name" ]]; then
-      mv "$name" "${name}.disabled" 2>/dev/null
+      if ! mv "$name" "${name}.disabled"; then
+        echo "Error: Failed to disable $name"
+        cd - > /dev/null
+        return 1
+      fi
     fi
   done
 
   # Enable selected HUD
   if [[ -d "${selected}.disabled" ]]; then
-    mv "${selected}.disabled" "$selected"
-    echo "Enabled HUD: $selected"
+    if mv "${selected}.disabled" "$selected"; then
+      echo "Enabled HUD: $selected"
+      echo "Restart TF2 to apply changes"
+    else
+      echo "Error: Failed to enable $selected"
+      cd - > /dev/null
+      return 1
+    fi
   elif [[ -d "$selected" ]]; then
     echo "HUD already enabled: $selected"
   else
     echo "Error: HUD not found: $selected"
+    cd - > /dev/null
     return 1
   fi
 
