@@ -4,6 +4,8 @@
 
 # TF2 custom folder path
 export TF2_CUSTOM_DIR="$HOME/.steam/steam/steamapps/common/Team Fortress 2/tf/custom"
+# Storage for disabled HUDs (outside custom folder so TF2 doesn't load them)
+export TF2_HUD_STORAGE="$HOME/.local/share/tf2-huds"
 
 # -----------------------------------------------------------------------------
 # tf2-hud: Select and enable a HUD using fzf
@@ -13,6 +15,7 @@ export TF2_CUSTOM_DIR="$HOME/.steam/steam/steamapps/common/Team Fortress 2/tf/cu
 # -----------------------------------------------------------------------------
 tf2-hud() {
   local custom_dir="$TF2_CUSTOM_DIR"
+  local storage_dir="$TF2_HUD_STORAGE"
 
   # Check if custom dir exists
   if [[ ! -d "$custom_dir" ]]; then
@@ -20,81 +23,82 @@ tf2-hud() {
     return 1
   fi
 
-  cd "$custom_dir" || return 1
+  # Create storage dir if needed
+  mkdir -p "$storage_dir"
 
-  # Get list of HUDs (directories, strip .disabled suffix for display)
-  local huds=()
-  local current=""
-
-  for d in */; do
+  # Migrate any .disabled HUDs to storage (one-time migration)
+  for d in "$custom_dir"/*.disabled; do
     [[ -d "$d" ]] || continue
-    local name="${d%/}"
-    local display_name="${name%.disabled}"
-
-    # Skip non-HUD folders (configs, etc)
-    [[ -d "$d/resource" ]] || [[ -d "$d/scripts" ]] || continue
-
-    # Track current active HUD
-    if [[ "$name" == "$display_name" ]]; then
-      current="$display_name"
-      huds+=("* $display_name")
+    local name="$(basename "$d" .disabled)"
+    if [[ ! -d "$storage_dir/$name" ]]; then
+      mv "$d" "$storage_dir/$name"
     else
-      huds+=("  $display_name")
+      rm -rf "$d"
     fi
   done
 
+  # Get list of HUDs from both locations
+  local huds=()
+  local current=""
+
+  # Check active HUD in custom dir
+  for d in "$custom_dir"/*/; do
+    [[ -d "$d" ]] || continue
+    local name="$(basename "$d")"
+    [[ -d "$d/resource" ]] || [[ -d "$d/scripts" ]] || continue
+    current="$name"
+    huds+=("* $name")
+  done
+
+  # Check stored HUDs
+  for d in "$storage_dir"/*/; do
+    [[ -d "$d" ]] || continue
+    local name="$(basename "$d")"
+    [[ -d "$d/resource" ]] || [[ -d "$d/scripts" ]] || continue
+    huds+=("  $name")
+  done
+
   if [[ ${#huds[@]} -eq 0 ]]; then
-    echo "No HUDs found in $custom_dir"
-    echo "Install HUDs to: $custom_dir/<hud-name>/"
+    echo "No HUDs found"
+    echo "Install HUDs with: tf2-hud-install <github-user/repo>"
     return 1
   fi
 
   local selected
   if [[ -n "$1" ]]; then
-    # Direct selection
     selected="$1"
   else
-    # Interactive fzf picker
     selected=$(printf '%s\n' "${huds[@]}" | fzf --prompt="Select HUD: " --header="Current: ${current:-none}" | sed 's/^[* ] //')
   fi
 
   [[ -z "$selected" ]] && return 0
 
-  # Disable all HUDs
-  for d in */; do
-    [[ -d "$d" ]] || continue
-    local name="${d%/}"
-    local base_name="${name%.disabled}"
-    [[ -d "$d/resource" ]] || [[ -d "$d/scripts" ]] || continue
-
-    if [[ "$name" == "$base_name" ]]; then
-      if ! mv "$name" "${name}.disabled"; then
-        echo "Error: Failed to disable $name"
-        cd - > /dev/null
+  # Move current HUD to storage
+  if [[ -n "$current" && "$current" != "$selected" ]]; then
+    if [[ -d "$custom_dir/$current" ]]; then
+      rm -rf "$storage_dir/$current"
+      if ! mv "$custom_dir/$current" "$storage_dir/$current"; then
+        echo "Error: Failed to disable $current"
         return 1
       fi
     fi
-  done
+  fi
 
-  # Enable selected HUD
-  if [[ -d "${selected}.disabled" ]]; then
-    if mv "${selected}.disabled" "$selected"; then
+  # Enable selected HUD (move from storage to custom)
+  if [[ -d "$storage_dir/$selected" ]]; then
+    if mv "$storage_dir/$selected" "$custom_dir/$selected"; then
       echo "Enabled HUD: $selected"
       echo "Restart TF2 to apply changes"
     else
       echo "Error: Failed to enable $selected"
-      cd - > /dev/null
       return 1
     fi
-  elif [[ -d "$selected" ]]; then
+  elif [[ -d "$custom_dir/$selected" ]]; then
     echo "HUD already enabled: $selected"
   else
     echo "Error: HUD not found: $selected"
-    cd - > /dev/null
     return 1
   fi
-
-  cd - > /dev/null
 }
 
 # -----------------------------------------------------------------------------
@@ -102,26 +106,29 @@ tf2-hud() {
 # -----------------------------------------------------------------------------
 tf2-hud-list() {
   local custom_dir="$TF2_CUSTOM_DIR"
+  local storage_dir="$TF2_HUD_STORAGE"
 
-  if [[ ! -d "$custom_dir" ]]; then
-    echo "Error: TF2 custom directory not found"
-    return 1
-  fi
-
-  echo "Installed HUDs ($custom_dir):"
+  echo "Installed HUDs:"
   echo ""
 
+  # Active HUDs in custom dir
   for d in "$custom_dir"/*/; do
     [[ -d "$d" ]] || continue
     local name="$(basename "$d")"
     [[ -d "$d/resource" ]] || [[ -d "$d/scripts" ]] || continue
-
-    if [[ "$name" == *.disabled ]]; then
-      echo "  [ ] ${name%.disabled}"
-    else
-      echo "  [*] $name"
-    fi
+    [[ "$name" == *.disabled ]] && continue
+    echo "  [*] $name"
   done
+
+  # Stored HUDs
+  if [[ -d "$storage_dir" ]]; then
+    for d in "$storage_dir"/*/; do
+      [[ -d "$d" ]] || continue
+      local name="$(basename "$d")"
+      [[ -d "$d/resource" ]] || [[ -d "$d/scripts" ]] || continue
+      echo "  [ ] $name"
+    done
+  fi
 }
 
 # -----------------------------------------------------------------------------
@@ -133,7 +140,7 @@ tf2-hud-list() {
 tf2-hud-install() {
   local repo="$1"
   local name="${2:-$(basename "$repo")}"
-  local custom_dir="$TF2_CUSTOM_DIR"
+  local storage_dir="$TF2_HUD_STORAGE"
   local tmp_zip="/tmp/${name}.zip"
 
   if [[ -z "$repo" ]]; then
@@ -148,27 +155,29 @@ tf2-hud-install() {
     return 1
   fi
 
+  mkdir -p "$storage_dir"
+
   echo "Downloading $repo..."
   curl -sL "https://github.com/$repo/archive/refs/heads/master.zip" -o "$tmp_zip" || {
     echo "Error: Failed to download from GitHub"
     return 1
   }
 
-  echo "Extracting to $custom_dir..."
-  unzip -q -o "$tmp_zip" -d "$custom_dir" || {
+  echo "Extracting..."
+  unzip -q -o "$tmp_zip" -d "$storage_dir" || {
     echo "Error: Failed to extract"
     return 1
   }
 
   # Rename extracted folder (GitHub adds -master suffix)
   local extracted_name="$(basename "$repo")-master"
-  if [[ -d "$custom_dir/$extracted_name" ]]; then
-    rm -rf "$custom_dir/${name}.disabled" "$custom_dir/$name" 2>/dev/null
-    mv "$custom_dir/$extracted_name" "$custom_dir/${name}.disabled"
+  if [[ -d "$storage_dir/$extracted_name" ]]; then
+    rm -rf "$storage_dir/$name" 2>/dev/null
+    mv "$storage_dir/$extracted_name" "$storage_dir/$name"
   fi
 
   rm -f "$tmp_zip"
 
-  echo "Installed: $name (disabled by default)"
+  echo "Installed: $name"
   echo "Run 'tf2-hud $name' to enable"
 }
