@@ -2,7 +2,7 @@
 {
 	"ServerBrowserDialog"
 	{
-		"wide"			"1200"
-		"tall"			"800"
+		"wide"			"1800"
+		"tall"			"1000"
 	}
 }
