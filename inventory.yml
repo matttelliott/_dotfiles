@@ -26,6 +26,12 @@ all:
           ansible_user: matt
           ansible_ssh_timeout: 60
           ansible_python_interpreter: /usr/bin/python3
+        moxley-gaming-server:
+          ansible_host: 134.199.207.117
+          ansible_user: root
+          ansible_ssh_timeout: 60
+          ansible_python_interpreter: /usr/bin/python3
+          github_username: matttelliott
     arch:
       hosts:
         desktop:
@@ -62,3 +68,6 @@ all:
         macbookair:
         desktop:
         macmini:
+    with_games:
+      hosts:
+        desktop:

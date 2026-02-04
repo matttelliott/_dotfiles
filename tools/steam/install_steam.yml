@@ -1,6 +1,6 @@
 ---
 - name: Install Steam
-  hosts: with_gui_tools:&with_login_tools
+  hosts: with_games
   gather_facts: true
 
   tasks:

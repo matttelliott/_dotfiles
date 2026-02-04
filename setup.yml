@@ -263,6 +263,8 @@
   import_playbook: tools/obsidian/install_obsidian.yml
 - name: Install VLC
   import_playbook: tools/vlc/install_vlc.yml
+- name: Install Mumble
+  import_playbook: tools/mumble/install_mumble.yml
 - name: Install Chrome
   import_playbook: tools/chrome/install_chrome.yml
 - name: Install Chromium
@@ -297,6 +299,8 @@
   import_playbook: tools/gpu/install_gpu.yml
 - name: Install Steam
   import_playbook: tools/steam/install_steam.yml
+- name: Install Team Fortress 2
+  import_playbook: tools/tf2/install_tf2.yml
 - name: Allow sleep after setup (macOS)
   hosts: macs
   gather_facts: false

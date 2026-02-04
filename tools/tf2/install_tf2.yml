@@ -1,0 +1,115 @@
+---
+- name: Install Team Fortress 2
+  hosts: with_games
+  gather_facts: true
+
+  vars:
+    tf2_app_id: "440"
+    tf2_launch_options: "-novid -nojoy -nosteamcontroller -nohltv -particles 1 -windowed -noborder"
+    tf2_cfg_src: "{{ playbook_dir }}/cfg"
+    tf2_cfg_dest_linux: "~/.steam/steam/steamapps/common/Team Fortress 2/tf/cfg"
+    tf2_cfg_dest_mac: "~/Library/Application Support/Steam/steamapps/common/Team Fortress 2/tf/cfg"
+    steam_login_file_linux: "~/.steam/steam/config/loginusers.vdf"
+    steam_login_file_mac: "~/Library/Application Support/Steam/config/loginusers.vdf"
+
+  tasks:
+    - name: Set OS-specific paths
+      ansible.builtin.set_fact:
+        tf2_cfg_dest: "{{ tf2_cfg_dest_mac if ansible_facts['os_family'] == 'Darwin' else tf2_cfg_dest_linux }}"
+        steam_login_file: "{{ steam_login_file_mac if ansible_facts['os_family'] == 'Darwin' else steam_login_file_linux }}"
+
+    - name: Check Steam login file exists
+      ansible.builtin.stat:
+        path: "{{ steam_login_file }}"
+      register: steam_login_stat
+
+    - name: Read Steam login file
+      ansible.builtin.slurp:
+        src: "{{ steam_login_file }}"
+      register: steam_login_content
+      when: steam_login_stat.stat.exists
+
+    - name: Check if Steam user is logged in
+      ansible.builtin.set_fact:
+        steam_logged_in: "{{ steam_login_stat.stat.exists and ('MostRecent' in (steam_login_content.content | b64decode)) }}"
+
+    - name: Fail if Steam not logged in
+      ansible.builtin.fail:
+        msg: "Steam must be installed and logged in to install TF2. Open Steam and log in first."
+      when: not steam_logged_in
+
+    - name: Check if TF2 is installed
+      ansible.builtin.stat:
+        path: "{{ tf2_cfg_dest | dirname | dirname }}"
+      register: tf2_dir
+
+    - name: Install TF2 via Steam (macOS)
+      ansible.builtin.command: open "steam://install/{{ tf2_app_id }}"
+      when:
+        - ansible_facts['os_family'] == "Darwin"
+        - not tf2_dir.stat.exists
+      changed_when: true
+
+    - name: Install TF2 via Steam (Linux)
+      ansible.builtin.command: steam "steam://install/{{ tf2_app_id }}"
+      when:
+        - ansible_facts['os_family'] != "Darwin"
+        - not tf2_dir.stat.exists
+      changed_when: true
+
+    - name: Wait for TF2 installation
+      ansible.builtin.pause:
+        prompt: |
+          Steam should now be prompting to install TF2.
+          Press ENTER after TF2 installation completes (or Ctrl+C to skip config deployment)
+      when: not tf2_dir.stat.exists
+
+    - name: Re-check if TF2 is installed
+      ansible.builtin.stat:
+        path: "{{ tf2_cfg_dest | dirname | dirname }}"
+      register: tf2_dir
+
+    - name: Create TF2 cfg directory
+      ansible.builtin.file:
+        path: "{{ tf2_cfg_dest }}"
+        state: directory
+        mode: "0755"
+      when: tf2_dir.stat.exists
+
+    - name: Create crosshairswitcher directory
+      ansible.builtin.file:
+        path: "{{ tf2_cfg_dest }}/crosshairswitcher"
+        state: directory
+        mode: "0755"
+      when: tf2_dir.stat.exists
+
+    - name: Create tweaks directory
+      ansible.builtin.file:
+        path: "{{ tf2_cfg_dest }}/tweaks"
+        state: directory
+        mode: "0755"
+      when: tf2_dir.stat.exists
+
+    - name: Copy TF2 config files
+      ansible.builtin.copy:
+        src: "{{ tf2_cfg_src }}/"
+        dest: "{{ tf2_cfg_dest }}/"
+        mode: "0644"
+      when: tf2_dir.stat.exists
+
+    - name: Display launch options
+      ansible.builtin.debug:
+        msg: |
+          TF2 configs deployed to: {{ tf2_cfg_dest }}
+
+          Set launch options in Steam:
+          Right-click TF2 > Properties > Launch Options:
+          {{ tf2_launch_options }}
+      when: tf2_dir.stat.exists
+
+    - name: Warn if TF2 not installed
+      ansible.builtin.debug:
+        msg: |
+          TF2 installation not detected.
+          Re-run this playbook after TF2 finishes installing.
+      when: not tf2_dir.stat.exists
