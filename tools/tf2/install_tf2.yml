@@ -5,7 +5,7 @@
 
   vars:
     tf2_app_id: "440"
-    tf2_launch_options: "-novid -nojoy -nosteamcontroller -nohltv -particles 1 -windowed -noborder"
+    tf2_launch_options: "-novid -nojoy -nosteamcontroller -nohltv -particles 1 -vulkan -windowed -noborder"
     tf2_cfg_src: "{{ playbook_dir }}/cfg"
     tf2_cfg_dest_linux: "~/.steam/steam/steamapps/common/Team Fortress 2/tf/cfg"
     tf2_cfg_dest_mac: "~/Library/Application Support/Steam/steamapps/common/Team Fortress 2/tf/cfg"
@@ -203,17 +203,103 @@
         state: absent
       loop: "{{ tf2_huds }}"
 
-    - name: Display launch options
+    # =========================================================================
+    # Set Steam Launch Options
+    # =========================================================================
+    - name: Find Steam userdata directory
+      ansible.builtin.find:
+        paths: "~/.steam/steam/userdata"
+        file_type: directory
+        recurse: false
+      register: steam_userdata
+
+    - name: Set TF2 launch options in Steam
+      ansible.builtin.shell: |
+        CONFIG_FILE="{{ steam_userdata.files[0].path }}/config/localconfig.vdf"
+        LAUNCH_OPTS='{{ tf2_launch_options }}'
+
+        if [[ ! -f "$CONFIG_FILE" ]]; then
+          echo "Config file not found"
+          exit 0
+        fi
+
+        # Check if TF2 app section exists and has LaunchOptions
+        if grep -q '"440"' "$CONFIG_FILE"; then
+          # Use Python to safely modify VDF file
+          python3 << 'PYTHON'
+        import re
+        import sys
+
+        config_file = "{{ steam_userdata.files[0].path }}/config/localconfig.vdf"
+        launch_opts = '{{ tf2_launch_options }}'
+
+        with open(config_file, 'r') as f:
+            content = f.read()
+
+        # Pattern to find the 440 block and its LaunchOptions
+        # This handles the nested VDF structure
+        in_440_block = False
+        brace_depth = 0
+        lines = content.split('\n')
+        new_lines = []
+        found_launch_options = False
+        inserted = False
+
+        for i, line in enumerate(lines):
+            stripped = line.strip()
+
+            if '"440"' in stripped and not in_440_block:
+                in_440_block = True
+                brace_depth = 0
+                new_lines.append(line)
+                continue
+
+            if in_440_block:
+                if '{' in stripped:
+                    brace_depth += stripped.count('{')
+                if '}' in stripped:
+                    brace_depth -= stripped.count('}')
+
+                if '"LaunchOptions"' in stripped:
+                    # Replace existing LaunchOptions
+                    indent = len(line) - len(line.lstrip())
+                    new_lines.append(' ' * indent + f'"LaunchOptions"\t\t"{launch_opts}"')
+                    found_launch_options = True
+                    inserted = True
+                    continue
+
+                if brace_depth == 0 and '}' in stripped:
+                    # End of 440 block, insert LaunchOptions if not found
+                    if not found_launch_options and not inserted:
+                        indent = len(line) - len(line.lstrip()) + 1
+                        new_lines.append('\t\t\t\t\t\t\t"LaunchOptions"\t\t"' + launch_opts + '"')
+                        inserted = True
+                    in_440_block = False
+
+            new_lines.append(line)
+
+        with open(config_file, 'w') as f:
+            f.write('\n'.join(new_lines))
+
+        print(f"Set launch options for TF2: {launch_opts}")
+        PYTHON
+        fi
+      args:
+        executable: /bin/bash
+      when:
+        - tf2_dir.stat.exists
+        - steam_userdata.files | length > 0
+      register: launch_options_result
+      changed_when: "'Set launch options' in launch_options_result.stdout"
+
+    - name: Display deployment info
       ansible.builtin.debug:
         msg: |
           TF2 configs deployed to: {{ tf2_cfg_dest }}
           HUDs installed to: {{ tf2_custom_dest }}
 
           Active HUD: rayshud (use 'tf2-hud' to switch)
-
-          Set launch options in Steam:
-          Right-click TF2 > Properties > Launch Options:
-          {{ tf2_launch_options }}
+          Launch options: {{ tf2_launch_options }}
       when: tf2_dir.stat.exists
 
     - name: Warn if TF2 not installed
