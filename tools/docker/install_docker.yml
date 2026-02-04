@@ -44,20 +44,20 @@
       become: true
       when: ansible_facts['os_family'] == "Debian" and docker_ce_check.rc != 0
 
-    - name: Add Docker GPG key (Debian)
+    - name: Add Docker GPG key (Debian/Ubuntu)
       # GPG Key Fingerprint: 9DC8 5822 9FC7 DD38 854A E2D8 8D81 803C 0EBF CD88
       # Verify at: https://docs.docker.com/engine/install/ubuntu/
-      ansible.builtin.shell: curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+      ansible.builtin.shell: curl -fsSL https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
       args:
         creates: /etc/apt/keyrings/docker.gpg
       become: true
       when: ansible_facts['os_family'] == "Debian" and docker_ce_check.rc != 0
 
-    - name: Add Docker repository (Debian)
+    - name: Add Docker repository (Debian/Ubuntu)
       ansible.builtin.apt_repository:
         repo: >-
           deb [arch={{ deb_arch }} signed-by=/etc/apt/keyrings/docker.gpg]
-          https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
+          https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable
         state: present
       become: true
       when: ansible_facts['os_family'] == "Debian" and docker_ce_check.rc != 0

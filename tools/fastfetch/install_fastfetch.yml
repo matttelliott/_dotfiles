@@ -10,12 +10,39 @@
         state: present
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install fastfetch (Debian/Ubuntu)
+    - name: Check if fastfetch is installed (Debian)
+      ansible.builtin.command: which fastfetch
+      register: fastfetch_check
+      ignore_errors: true
+      changed_when: false
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Get latest fastfetch release version (Debian)
+      ansible.builtin.uri:
+        url: https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest
+        return_content: true
+      register: fastfetch_release
+      when:
+        - ansible_facts['os_family'] == "Debian"
+        - fastfetch_check.rc != 0
+
+    - name: Download fastfetch deb package (Debian)
+      ansible.builtin.get_url:
+        url: "https://github.com/fastfetch-cli/fastfetch/releases/download/{{ fastfetch_release.json.tag_name }}/fastfetch-linux-amd64.deb"
+        dest: /tmp/fastfetch.deb
+        mode: "0644"
+      when:
+        - ansible_facts['os_family'] == "Debian"
+        - fastfetch_check.rc != 0
+
+    - name: Install fastfetch from deb (Debian)
       ansible.builtin.apt:
-        name: fastfetch
+        deb: /tmp/fastfetch.deb
         state: present
       become: true
-      when: ansible_facts['os_family'] == "Debian"
+      when:
+        - ansible_facts['os_family'] == "Debian"
+        - fastfetch_check.rc != 0
 
     - name: Install fastfetch (Arch)
       community.general.pacman:

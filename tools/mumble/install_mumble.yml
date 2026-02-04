@@ -1,0 +1,25 @@
+---
+- name: Install Mumble
+  hosts: with_gui_tools
+  gather_facts: true
+
+  tasks:
+    - name: Install Mumble via Homebrew (macOS)
+      ansible.builtin.shell: /opt/homebrew/bin/brew install --cask mumble
+      args:
+        creates: /Applications/Mumble.app
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install Mumble via apt (Debian)
+      ansible.builtin.apt:
+        name: mumble
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install Mumble via pacman (Arch)
+      community.general.pacman:
+        name: mumble
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == "Archlinux"
