@@ -11,6 +11,7 @@
     tf2_cfg_dest_mac: "~/Library/Application Support/Steam/steamapps/common/Team Fortress 2/tf/cfg"
     tf2_custom_linux: "~/.steam/steam/steamapps/common/Team Fortress 2/tf/custom"
     tf2_custom_mac: "~/Library/Application Support/Steam/steamapps/common/Team Fortress 2/tf/custom"
+    tf2_hud_storage: "{{ ansible_env.HOME }}/.local/share/tf2-huds"
     steam_login_file_linux: "~/.steam/steam/config/loginusers.vdf"
     steam_login_file_mac: "~/Library/Application Support/Steam/config/loginusers.vdf"
 
@@ -183,6 +184,12 @@
         - item.changed | default(false)
       ignore_errors: true
 
+    - name: Create HUD storage directory
+      ansible.builtin.file:
+        path: "{{ tf2_hud_storage }}"
+        state: directory
+        mode: "0755"
+
     - name: Find extracted HUD folders
       ansible.builtin.find:
         paths: "{{ tf2_custom_dest }}"
@@ -191,21 +198,32 @@
       register: extracted_huds
       when: tf2_dir.stat.exists
 
-    - name: Rename extracted HUDs (disable by default)
-      ansible.builtin.command:
-        cmd: "mv {{ item.path }} {{ tf2_custom_dest }}/{{ item.path | basename | regex_replace('-master$', '') }}.disabled"
+    - name: Move extracted HUDs to storage
+      ansible.builtin.shell: |
+        mv "{{ item.path }}" "{{ tf2_hud_storage }}/{{ item.path | basename | regex_replace('-master$', '') }}"
+      args:
         removes: "{{ item.path }}"
-        creates: "{{ tf2_custom_dest }}/{{ item.path | basename | regex_replace('-master$', '') }}.disabled"
+        creates: "{{ tf2_hud_storage }}/{{ item.path | basename | regex_replace('-master$', '') }}"
       loop: "{{ extracted_huds.files | default([]) }}"
       when: tf2_dir.stat.exists
 
+    - name: Check if rayshud is in storage
+      ansible.builtin.stat:
+        path: "{{ tf2_hud_storage }}/rayshud"
+      register: rayshud_storage
+
+    - name: Check if rayshud is already active
+      ansible.builtin.stat:
+        path: "{{ tf2_custom_dest }}/rayshud"
+      register: rayshud_active
+
     - name: Enable rayshud (default HUD)
-      ansible.builtin.command:
-        cmd: "mv {{ tf2_custom_dest }}/rayshud.disabled {{ tf2_custom_dest }}/rayshud"
-        removes: "{{ tf2_custom_dest }}/rayshud.disabled"
-        creates: "{{ tf2_custom_dest }}/rayshud"
-      when: tf2_dir.stat.exists
-      ignore_errors: true
+      ansible.builtin.shell: |
+        mv "{{ tf2_hud_storage }}/rayshud" "$HOME/.steam/steam/steamapps/common/Team Fortress 2/tf/custom/rayshud"
+      when:
+        - tf2_dir.stat.exists
+        - rayshud_storage.stat.exists | default(false)
+        - not (rayshud_active.stat.exists | default(false))
 
     - name: Clean up HUD zip files
       ansible.builtin.file:
