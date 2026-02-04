@@ -251,66 +251,13 @@
           exit 0
         fi
 
-        # Check if TF2 app section exists and has LaunchOptions
-        if grep -q '"440"' "$CONFIG_FILE"; then
-          # Use Python to safely modify VDF file
-          python3 << 'PYTHON'
-        import re
-        import sys
-
-        config_file = "{{ steam_userdata.files[0].path }}/config/localconfig.vdf"
-        launch_opts = '{{ tf2_launch_options }}'
-
-        with open(config_file, 'r') as f:
-            content = f.read()
-
-        # Pattern to find the 440 block and its LaunchOptions
-        # This handles the nested VDF structure
-        in_440_block = False
-        brace_depth = 0
-        lines = content.split('\n')
-        new_lines = []
-        found_launch_options = False
-        inserted = False
-
-        for i, line in enumerate(lines):
-            stripped = line.strip()
-
-            if '"440"' in stripped and not in_440_block:
-                in_440_block = True
-                brace_depth = 0
-                new_lines.append(line)
-                continue
-
-            if in_440_block:
-                if '{' in stripped:
-                    brace_depth += stripped.count('{')
-                if '}' in stripped:
-                    brace_depth -= stripped.count('}')
-
-                if '"LaunchOptions"' in stripped:
-                    # Replace existing LaunchOptions
-                    indent = len(line) - len(line.lstrip())
-                    new_lines.append(' ' * indent + f'"LaunchOptions"\t\t"{launch_opts}"')
-                    found_launch_options = True
-                    inserted = True
-                    continue
-
-                if brace_depth == 0 and '}' in stripped:
-                    # End of 440 block, insert LaunchOptions if not found
-                    if not found_launch_options and not inserted:
-                        indent = len(line) - len(line.lstrip()) + 1
-                        new_lines.append('\t\t\t\t\t\t\t"LaunchOptions"\t\t"' + launch_opts + '"')
-                        inserted = True
-                    in_440_block = False
-
-            new_lines.append(line)
-
-        with open(config_file, 'w') as f:
-            f.write('\n'.join(new_lines))
-
-        print(f"Set launch options for TF2: {launch_opts}")
-        PYTHON
+        # Simply replace any existing LaunchOptions line for TF2
+        # The LaunchOptions line follows the "440" app entry with LastPlayed/Playtime
+        if grep -q '"LaunchOptions"' "$CONFIG_FILE"; then
+          sed -i 's/"LaunchOptions".*/"LaunchOptions"\t\t"'"$LAUNCH_OPTS"'"/' "$CONFIG_FILE"
+          echo "Updated launch options: $LAUNCH_OPTS"
+        else
+          echo "No LaunchOptions found to update"
         fi
       args:
         executable: /bin/bash
@@ -318,7 +265,7 @@
         - tf2_dir.stat.exists
         - steam_userdata.files | length > 0
       register: launch_options_result
-      changed_when: "'Set launch options' in launch_options_result.stdout"
+      changed_when: "'Updated launch options' in launch_options_result.stdout"
 
     - name: Display deployment info
       ansible.builtin.debug:
