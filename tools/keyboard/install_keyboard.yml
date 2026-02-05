@@ -4,6 +4,9 @@
   gather_facts: true
 
   tasks:
+    # ============================================
+    # macOS - hidutil (kernel level, persisted via LaunchAgent)
+    # ============================================
     - name: Create LaunchAgents directory (macOS)
       ansible.builtin.file:
         path: ~/Library/LaunchAgents
@@ -30,81 +33,87 @@
       changed_when: false
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Remap Caps Lock to Ctrl (Debian)
-      ansible.builtin.lineinfile:
-        path: /etc/default/keyboard
-        regexp: '^XKBOPTIONS='
-        line: 'XKBOPTIONS="ctrl:nocaps"'
-      become: true
-      when: ansible_facts['os_family'] == "Debian"
-
-    - name: Apply keyboard configuration (Debian)
-      ansible.builtin.command: dpkg-reconfigure -f noninteractive keyboard-configuration
-      become: true
-      changed_when: false
-      when: ansible_facts['os_family'] == "Debian"
-
-    - name: Add keyboard remap to xprofile (Debian)
-      ansible.builtin.lineinfile:
-        path: ~/.xprofile
-        regexp: '^setxkbmap.*ctrl:nocaps'
-        line: 'setxkbmap -option ctrl:nocaps'
-        create: true
-        mode: '0644'
-      when: ansible_facts['os_family'] == "Debian"
-
-    - name: Create xorg.conf.d directory (Arch)
-      ansible.builtin.file:
-        path: /etc/X11/xorg.conf.d
-        state: directory
+    # ============================================
+    # Linux - keyd (kernel/evdev level - works everywhere)
+    # ============================================
+    - name: Install keyd (Arch)
+      community.general.pacman:
+        name: keyd
+        state: present
       become: true
       when: ansible_facts['os_family'] == "Archlinux"
 
-    - name: Remap Caps Lock to Ctrl for X11 (Arch)
-      ansible.builtin.copy:
-        dest: /etc/X11/xorg.conf.d/00-keyboard.conf
-        content: |
-          Section "InputClass"
-              Identifier "system-keyboard"
-              MatchIsKeyboard "on"
-              Option "XkbLayout" "us"
-              Option "XkbOptions" "ctrl:nocaps"
-          EndSection
-        mode: '0644'
-      become: true
-      when: ansible_facts['os_family'] == "Archlinux"
-
-    - name: Remap Caps Lock to Ctrl for Wayland (Arch)
-      ansible.builtin.lineinfile:
-        path: /etc/environment
-        regexp: '^XKB_DEFAULT_OPTIONS='
-        line: 'XKB_DEFAULT_OPTIONS=ctrl:nocaps'
-        create: true
-      become: true
-      when: ansible_facts['os_family'] == "Archlinux"
-
-    - name: Set keyboard layout in vconsole.conf (Arch)
-      ansible.builtin.lineinfile:
-        path: /etc/vconsole.conf
-        regexp: '^KEYMAP='
-        line: 'KEYMAP=us'
-        create: true
-      become: true
-      when: ansible_facts['os_family'] == "Archlinux"
-
-    - name: Add keyboard remap to xprofile (Arch)
-      ansible.builtin.lineinfile:
-        path: ~/.xprofile
-        regexp: '^setxkbmap.*ctrl:nocaps'
-        line: 'setxkbmap -option ctrl:nocaps'
-        create: true
-        mode: '0644'
-      when: ansible_facts['os_family'] == "Archlinux"
-
-    - name: Apply keyboard remap for current session (Arch)
-      ansible.builtin.command: setxkbmap -option ctrl:nocaps
-      environment:
-        DISPLAY: ":0"
+    - name: Check if keyd is available in apt (Debian)
+      ansible.builtin.shell: apt-cache show keyd 2>/dev/null
+      register: keyd_apt_check
       changed_when: false
       failed_when: false
-      when: ansible_facts['os_family'] == "Archlinux"
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install keyd from apt if available (Debian)
+      ansible.builtin.apt:
+        name: keyd
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == "Debian" and keyd_apt_check.rc == 0
+
+    - name: Install keyd build dependencies (Debian - if not in apt)
+      ansible.builtin.apt:
+        name:
+          - build-essential
+          - git
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == "Debian" and keyd_apt_check.rc != 0
+
+    - name: Clone keyd repository (Debian - if not in apt)
+      ansible.builtin.git:
+        repo: https://github.com/rvaiya/keyd.git
+        dest: /tmp/keyd
+        version: master
+      when: ansible_facts['os_family'] == "Debian" and keyd_apt_check.rc != 0
+
+    - name: Build and install keyd (Debian - if not in apt)
+      ansible.builtin.shell: |
+        cd /tmp/keyd
+        make
+        make install
+      args:
+        creates: /usr/local/bin/keyd
+      become: true
+      when: ansible_facts['os_family'] == "Debian" and keyd_apt_check.rc != 0
+
+    - name: Create keyd config directory
+      ansible.builtin.file:
+        path: /etc/keyd
+        state: directory
+        mode: '0755'
+      become: true
+      when: ansible_facts['os_family'] in ["Archlinux", "Debian"]
+
+    - name: Configure keyd to remap Caps Lock to Ctrl
+      ansible.builtin.copy:
+        dest: /etc/keyd/default.conf
+        content: |
+          [ids]
+          *
+
+          [main]
+          capslock = leftcontrol
+        mode: '0644'
+      become: true
+      register: keyd_config
+      when: ansible_facts['os_family'] in ["Archlinux", "Debian"]
+
+    - name: Enable keyd service
+      ansible.builtin.systemd:
+        name: keyd
+        enabled: true
+        state: started
+      become: true
+      when: ansible_facts['os_family'] in ["Archlinux", "Debian"]
+
+    - name: Reload keyd if config changed
+      ansible.builtin.command: keyd reload
+      become: true
+      when: ansible_facts['os_family'] in ["Archlinux", "Debian"] and keyd_config.changed
