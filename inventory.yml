@@ -42,6 +42,49 @@ all:
           theme_color: onedark
           theme_font: monaspace
           theme_style: slant
+          # DRG maxed settings for high-end gaming PC
+          # Specs: Ryzen 9 7900X, RTX 4070 Ti, 32GB RAM, 4K display
+          drg_resolution_x: 3840
+          drg_resolution_y: 2160
+          drg_shading_quality: 3  # Max quality
+          drg_ragdoll_quality: 2  # Max ragdolls
+          # DX12 via Proton: True=VKD3D-proton, False=DXVK (both end up as Vulkan)
+          drg_dx12: "True"
+          drg_dlss_mode: "Auto"  # Works via Proton with nvidia drivers
+          drg_dlss_sharpness: "0.500000"
+          drg_reflex_mode: "Disabled"
+          drg_fov: 100
+          drg_mouse_sensitivity: "600.000000"
+          drg_modio_user_id: "76561198027565406"
+          # DRG mods - mod.io IDs
+          # Browse mods at: https://mod.io/g/drg
+          drg_mods:
+            # === ENABLED: Core dependencies & QoL ===
+            "1034237": "True"   # DRGLib - Required dependency for many mods
+            "1582325": "True"   # Miracle Mod Manager - Mod management framework
+            "1792770": "True"   # Mod Hub - Press H to open mod settings UI
+            # === ENABLED: Visibility improvements ===
+            "1179441": "True"   # Brighter Objects - Better resource visibility
+            "1585858": "True"   # Steeve and Bot Better Visibility
+            "1751567": "True"   # Glowing Equipment - Equipment glows in dark
+            "1831206": "True"   # Better Explosion Range Indicator - C4 range
+            # === ENABLED: HUD/UI improvements ===
+            "1769472": "True"   # rancor's Rig HUD - Extra HUD info while drilling
+            "1863656": "True"   # Combined Resources - Team resource totals
+            "2553961": "True"   # Alternate Player List UI - Better player list
+            "2613099": "True"   # Ammo percentage indicator
+            # === ENABLED: Movement/Controls ===
+            "2152235": "True"   # Sprint by Default, Hold to Walk
+            # === DISABLED: Optional/situational ===
+            "1138833": "False"  # Hazard Persistence Enjoyer - Default hazard
+            "1145532": "False"  # MOTD + Stat Track - Chat messages
+            "1399744": "False"  # Retrograde Mod Spawner - Framework
+            "1605951": "False"  # SimpleMissionTimer - Speedrun timer
+            "1634437": "False"  # Weapon Heat Crosshair
+            "1645602": "False"  # Custom Killfeed
+            "1956173": "False"  # SimpleQOL - Tweaks/keybinds
+            "2369777": "False"  # Show more promotion levels
+            "2585212": "False"  # Hold to Jump / Bhop
     with_login_tools:
       hosts:
         macbookair:

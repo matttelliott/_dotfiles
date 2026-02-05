@@ -1,0 +1,104 @@
+---
+- name: Install Deep Rock Galactic config
+  hosts: with_games
+  gather_facts: true
+
+  vars:
+    drg_app_id: "548430"
+    drg_cfg_src: "{{ playbook_dir }}"
+    # Proton compatdata path for DRG configs
+    drg_cfg_dest_linux: "~/.steam/steam/steamapps/compatdata/548430/pfx/drive_c/users/steamuser/AppData/Local/FSD/Saved/Config/WindowsNoEditor"
+    steam_login_file_linux: "~/.steam/steam/config/loginusers.vdf"
+
+  tasks:
+    - name: Check Steam login file exists
+      ansible.builtin.stat:
+        path: "{{ steam_login_file_linux }}"
+      register: steam_login_stat
+
+    - name: Read Steam login file
+      ansible.builtin.slurp:
+        src: "{{ steam_login_file_linux }}"
+      register: steam_login_content
+      when: steam_login_stat.stat.exists
+
+    - name: Check if Steam user is logged in
+      ansible.builtin.set_fact:
+        steam_logged_in: "{{ steam_login_stat.stat.exists and ('MostRecent' in (steam_login_content.content | b64decode)) }}"
+
+    - name: Fail if Steam not logged in
+      ansible.builtin.fail:
+        msg: "Steam must be installed and logged in. Open Steam and log in first."
+      when: not steam_logged_in
+
+    - name: Check if DRG compatdata exists
+      ansible.builtin.stat:
+        path: "{{ drg_cfg_dest_linux | dirname | dirname | dirname | dirname | dirname }}"
+      register: drg_compatdata
+
+    - name: Install DRG via Steam
+      ansible.builtin.command: steam "steam://install/{{ drg_app_id }}"
+      when: not drg_compatdata.stat.exists
+      changed_when: true
+
+    - name: Wait for DRG installation
+      ansible.builtin.pause:
+        prompt: |
+          Steam should now be prompting to install Deep Rock Galactic.
+          You MUST launch DRG at least once to create the config directory.
+          Press ENTER after first launch completes (or Ctrl+C to skip)
+      when: not drg_compatdata.stat.exists
+
+    - name: Re-check DRG config directory
+      ansible.builtin.stat:
+        path: "{{ drg_cfg_dest_linux }}"
+      register: drg_cfg_dir
+
+    - name: Create DRG config directory if needed
+      ansible.builtin.file:
+        path: "{{ drg_cfg_dest_linux }}"
+        state: directory
+        mode: "0755"
+      when: drg_compatdata.stat.exists or drg_cfg_dir.stat.exists | default(false)
+
+    - name: Deploy GameUserSettings.ini from template
+      ansible.builtin.template:
+        src: "{{ drg_cfg_src }}/GameUserSettings.ini.j2"
+        dest: "{{ drg_cfg_dest_linux }}/GameUserSettings.ini"
+        mode: "0644"
+      when: drg_cfg_dir.stat.exists | default(false)
+
+    - name: Copy Engine.ini
+      ansible.builtin.copy:
+        src: "{{ drg_cfg_src }}/cfg/Engine.ini"
+        dest: "{{ drg_cfg_dest_linux }}/Engine.ini"
+        mode: "0644"
+      when: drg_cfg_dir.stat.exists | default(false)
+
+    - name: Copy Input.ini
+      ansible.builtin.copy:
+        src: "{{ drg_cfg_src }}/cfg/Input.ini"
+        dest: "{{ drg_cfg_dest_linux }}/Input.ini"
+        mode: "0644"
+      when: drg_cfg_dir.stat.exists | default(false)
+
+    - name: Display deployment info
+      ansible.builtin.debug:
+        msg: |
+          DRG configs deployed to: {{ drg_cfg_dest_linux }}
+
+          Resolution: {{ drg_resolution_x | default(1920) }}x{{ drg_resolution_y | default(1080) }}
+          FOV: {{ drg_fov | default(100) }}
+          DX12: {{ drg_dx12 | default('False') }}
+          DLSS: {{ drg_dlss_mode | default('Auto') }}
+
+          Mods: {{ (drg_mods | default({})).keys() | list | length }} configured
+      when: drg_cfg_dir.stat.exists | default(false)
+
+    - name: Warn if DRG not installed
+      ansible.builtin.debug:
+        msg: |
+          DRG config directory not found.
+          Install DRG and launch it once to create the config directory,
+          then re-run this playbook.
+      when: not (drg_cfg_dir.stat.exists | default(false))

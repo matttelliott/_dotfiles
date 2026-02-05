@@ -1,0 +1,142 @@
+{# Deep Rock Galactic GameUserSettings.ini template
+
+   Hardware-specific vars (set per-host in inventory.yml):
+     drg_resolution_x/y    - Screen resolution (default: 1920x1080)
+     drg_shading_quality   - 0-3, higher=better (default: 3)
+     drg_ragdoll_quality   - 0-2 (default: 2)
+     drg_dx12              - True/False, via Proton becomes VKD3D/DXVK (default: False)
+     drg_dlss_mode         - Off/Auto/Quality/Balanced/Performance/Ultra (default: Auto)
+     drg_fsr_mode/fsr2_mode - AMD upscaling modes
+
+   Portable vars (same everywhere):
+     drg_fov               - Field of view (default: 100)
+     drg_mouse_sensitivity - Mouse sens (default: 600)
+     drg_mods              - Dict of mod_id: True/False
+     drg_modio_user_id     - Steam ID for mod.io
+#}
+[ScalabilityGroups]
+sg.ShadingQuality={{ drg_shading_quality | default(3) }}
+
+[/Script/FSD.FSDGameUserSettings]
+useToggleTerrainScanner=False
+bJukeboxStreamerMode=False
+CurrentUserSetSaveSlotName=
+NamedBoolSettings=()
+ModdingUISettings=(SortField=0,SortAscending=True,ServerFilters=(),bShowSandboxLabel=True)
+ColorVisionDeficiency=(Type=NormalVision,Severity=0.300000)
+ServerSearchRegion=1
+ServerSearchPasswordRequired=False
+volumeCharacterVoice=100.000000
+volumeMissionControl=100.000000
+volumeMaster=100.000000
+volumeSFX=100.000000
+volumeMusic=100.000000
+CurrentAudioOutputDeviceId=
+UseDefaultAudioOutputDevice=True
+Sharpening={{ drg_sharpening | default('0.000000') }}
+AntiAliasingType={{ drg_aa_type | default(1) }}
+TemporalAAUpsamplingEnabled=False
+volumeVoice=100.000000
+UpscalingType={{ drg_upscaling_type | default(0) }}
+AmdFsrMode={{ drg_fsr_mode | default(1) }}
+AmdFsr2Mode={{ drg_fsr2_mode | default(2) }}
+AmdFsrSharpness={{ drg_fsr_sharpness | default('0.200000') }}
+AmdFsr2Sharpness={{ drg_fsr2_sharpness | default('0.200000') }}
+NvidiaDlssMode={{ drg_dlss_mode | default('Auto') }}
+NvidiaDlssSharpness={{ drg_dlss_sharpness | default('0.500000') }}
+FSDResolutionScale=1.000000
+ReflexMode={{ drg_reflex_mode | default('Disabled') }}
+WeaponSpwayScale=1.000000
+RagdollQuality={{ drg_ragdoll_quality | default(2) }}
+FrameGenerationMode={{ drg_frame_gen | default('Off') }}
+ChatFontSize=14
+bUseVoiceChat=True
+bUsePushToTalk=True
+LocalGameServerName=
+LocalGameServerNameFiltered=
+AppearOffline=False
+AutoRefreshServerlist=True
+MouseXSensitivity={{ drg_mouse_sensitivity | default('600.000000') }}
+MouseYSensitivity={{ drg_mouse_sensitivity | default('600.000000') }}
+UseSeperateSensetivity=False
+InvertMouse=False
+InvertScroolWheel=False
+UseHoldToRun=False
+UseToggleLaserpointer=False
+FOV={{ drg_fov | default(100) }}.000000
+HeadbobbingScale={{ drg_headbob | default(100) }}.000000
+CameraShakeScale={{ drg_camera_shake | default(100) }}.000000
+ChatFadeTime=10.000000
+UseStreamerProgram=False
+SoundOnChatMessage=True
+PhotosensitiveMode=False
+TinnitusProtection=False
+OverlayIntensityScale=1.000000
+ShowUIAnimations=True
+UseProfanityFilter=True
+ForceFeedbackScale=1.000000
+InvertFlightControls=False
+EnableDx12ByDefault={{ drg_dx12 | default('False') }}
+HDRColorGamma=1.200000
+ConsoleGraphicsMode=Fidelity
+StaticResoultionScale=1.000000
+UseManuelGrahpicsMode=False
+HUDElements=(OnScreenHelp=(Mode=Visible,Version=0),EnemyHealth=(Mode=Visible,Version=1),RadarDepth=(Mode=Visible,Version=1),PlayerHealthShield=(Mode=Visible,Version=1),PlayerNameClassIcon=(Mode=Visible,Version=1),PlayerItems=(Mode=Visible,Version=1),PlayerResources=(Mode=Visible,Version=1),WeaponInfo=(Mode=Visible,Version=1),Grenades=(Mode=Visible,Version=1),FlashLight=(Mode=Visible,Version=1),Flares=(Mode=Visible,Version=1),Crosshair=(Mode=Visible,Version=1),Objectives=(Mode=Visible,Version=1),TeamDisplay=(Mode=Visible,Version=1),SentryGunDisplay=(Mode=Visible,Version=1),VersionNumber=(Mode=Visible,Version=1))
+CharacterOptions=(GrapplingHookAutoSwitch=False,ZiplineGunAutoSwitch=False,HoldToBreakImmobilization=False,HoldToFire=False)
+DownedTurnDirection_Controller=1.000000
+DownedTurnDirection_Mouse=-1.000000
+UIDPIScale=90.000000
+CheckCursorOutOfBounds=False
+LastNiagaraShaderVerions=0
+CurrentInputSource=MouseAndKeyboard
+SwapControllerThumbsticks=False
+bTutorialHintsEnabled=True
+bShowSubtitles=False
+bShowFPS={{ drg_show_fps | default('False') }}
+ShowNetInfoLevel=0
+bCanShowBlood=True
+PreventLatejoinCharacterDuplication=False
+TranslatorDebugModeEnabled=False
+ControllerSettings=(AimInnerDeadZone=25.000000,AimSensitivity=100.000000,AimOuterAcceleration=400.000000,Turn180Mode=Off,bPreviousItemEnabled=False,bChatEnabled=False)
+bUseDynamicResolution=False
+ResolutionSizeX={{ drg_resolution_x | default(1920) }}
+ResolutionSizeY={{ drg_resolution_y | default(1080) }}
+LastUserConfirmedResolutionSizeX={{ drg_resolution_x | default(1920) }}
+LastUserConfirmedResolutionSizeY={{ drg_resolution_y | default(1080) }}
+PreferredFullscreenMode={{ drg_fullscreen_mode | default(1) }}
+AudioQualityLevel=0
+LastConfirmedAudioQualityLevel=0
+DesiredScreenWidth={{ drg_resolution_x | default(1920) }}
+DesiredScreenHeight={{ drg_resolution_y | default(1080) }}
+LastUserConfirmedDesiredScreenWidth={{ drg_resolution_x | default(1920) }}
+LastUserConfirmedDesiredScreenHeight={{ drg_resolution_y | default(1080) }}
+LastRecommendedScreenWidth=-1.000000
+LastRecommendedScreenHeight=-1.000000
+LastCPUBenchmarkResult=-1.000000
+LastGPUBenchmarkResult=-1.000000
+LastGPUBenchmarkMultiplier=1.000000
+bUseHDRDisplayOutput=False
+HDRDisplayOutputNits=1000
+{% for diff_id in drg_difficulty_levels | default(['23BC341D4FE59EB73881DE81F9E10BE0', '81763A8F48DCCC3B3F7D01ADB76EED11', '9EDE2C694900B0C474188F877BCA3047', 'D35A033A49BD443DA2B84589C89C050D', '6BFF8CDB477D78681AAC2582BA22A8F6']) %}
+SelectedDifficultyLevels={{ diff_id }}
+{% endfor %}
+{% for diff_id in drg_difficulty_levels | default(['23BC341D4FE59EB73881DE81F9E10BE0', '81763A8F48DCCC3B3F7D01ADB76EED11', '9EDE2C694900B0C474188F877BCA3047', 'D35A033A49BD443DA2B84589C89C050D', '6BFF8CDB477D78681AAC2582BA22A8F6']) %}
+DifficultyLevelsAddedByDefault={{ diff_id }}
+{% endfor %}
+
+[D3DRHIPreference]
+bUseD3D12InGame={{ drg_dx12 | default('False') }}
+
+[/Script/Engine.GameUserSettings]
+bUseDesiredScreenHeight=False
+
+[/Script/FSD.UserGeneratedContent]
+CurrentModioUserId={{ drg_modio_user_id | default('') }}
+{% for mod_id, enabled in (drg_mods | default({})).items() %}
+{{ mod_id }}={{ enabled }}
+{% endfor %}
+CurrentBranchName=
+
+[ShaderPipelineCache.CacheFile]
+LastOpened=FSD
+

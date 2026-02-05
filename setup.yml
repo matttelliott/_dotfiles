@@ -301,6 +301,8 @@
   import_playbook: tools/steam/install_steam.yml
 - name: Install Team Fortress 2
   import_playbook: tools/tf2/install_tf2.yml
+- name: Install Deep Rock Galactic
+  import_playbook: tools/drg/install_drg.yml
 - name: Allow sleep after setup (macOS)
   hosts: macs
   gather_facts: false
