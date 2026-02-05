@@ -299,6 +299,8 @@
   import_playbook: tools/gpu/install_gpu.yml
 - name: Install Steam
   import_playbook: tools/steam/install_steam.yml
+- name: Install Whisky
+  import_playbook: tools/whisky/install_whisky.yml
 - name: Install Team Fortress 2
   import_playbook: tools/tf2/install_tf2.yml
 - name: Install Deep Rock Galactic

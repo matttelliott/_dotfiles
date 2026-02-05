@@ -1,0 +1,12 @@
+---
+# Whisky - Wine wrapper for macOS (runs Windows apps/games)
+# https://getwhisky.app
+- name: Install Whisky
+  hosts: macs
+  gather_facts: true
+
+  tasks:
+    - name: Install Whisky via Homebrew
+      community.general.homebrew_cask:
+        name: whisky
+        state: present
