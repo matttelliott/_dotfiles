@@ -72,8 +72,8 @@
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Install WezTerm config
-      ansible.builtin.copy:
-        src: wezterm.lua
+      ansible.builtin.template:
+        src: wezterm.lua.j2
         dest: ~/.wezterm.lua
 
     - name: Create ~/.local/bin directory
