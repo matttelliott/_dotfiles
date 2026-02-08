@@ -3,152 +3,134 @@ description: Discover, evaluate, and selectively adopt new tools, features, and 
 argument-hint: <tool or domain, e.g. "nvim", "tmux keybindings", "frontend debugging">
 ---
 
-# CRITICAL RULES — READ BEFORE DOING ANYTHING
+# MANDATORY BEHAVIOR
 
-1. You MUST evaluate features ONE AT A TIME. Never install more than one feature at a time. Never offer to install multiple features at once. Never ask "which ones do you want?" — you walk through them sequentially.
-2. You MUST NOT modify the dotfiles repo during trial. Only modify live config files. The repo is only touched when the user accepts a feature.
-3. You MUST present a changeset and get confirmation BEFORE installing anything.
-4. You MUST fully clean up rejected features — uninstall packages, delete created files, restore modified configs.
-5. You MUST show existing features BEFORE suggesting new ones.
-
-If you violate any of these rules, you have failed. Re-read them after every phase.
+- Every suggestion must be a SINGLE, SPECIFIC, CONCRETE feature — not a category, not a group.
+  - GOOD: "oil.nvim — file explorer that works like a buffer"
+  - BAD: "File Management Plugins" or "Linting Improvements"
+- You MUST use `AskUserQuestion` to let the user choose which feature to evaluate. Do not just list features and ask in prose.
+- You MUST evaluate ONE feature at a time. Install it, let the user test it, get their verdict, then move on.
+- You MUST show a changeset and get confirmation BEFORE installing anything.
+- You MUST NOT touch the dotfiles repo until the user accepts a feature.
 
 ---
 
-If no arguments provided, show usage:
+If no arguments provided, show usage and stop:
 ```
 Usage: /find-features <tool or domain>
 Examples:
   /find-features nvim
   /find-features tmux keybindings
-  /find-features frontend debugging
   /find-features fzf
 ```
 
-## Phase 1: Parse Input
+---
 
-Determine what to explore from: `$ARGUMENTS`
+## Step 1: Understand the scope
 
-- **Tool name** (e.g., `nvim`, `tmux`, `fzf`): Map to `tools/<tool>/` directory
-- **Domain** (e.g., `frontend debugging`): Scan `tools/` to find relevant tools
-- **Tool + topic** (e.g., `nvim lint`): Focus on that tool filtered by topic
+Parse `$ARGUMENTS` to determine which `tools/<tool>/` directories are relevant.
 
-## Phase 2: Scan Current Config
+## Step 2: Read current config
 
-Read the files in `tools/<tool>/` in this repo:
-- Ansible playbooks (`install_*.yml`) — packages and plugins installed
-- Shell config (`*.zsh`) — aliases, functions, env vars
-- Tool configs (`init.lua`, `tmux.conf.j2`, `starship.toml`, etc.) — plugins, keybindings, settings
+Read the relevant files in `tools/<tool>/` — playbooks, shell config, tool configs. Understand what's already installed.
 
-## Phase 3: Show Existing Features
+## Step 3: Show what's already configured
 
-Present what's already configured before suggesting anything new:
+Before suggesting anything new, show a table of existing features relevant to the query:
 
-| Feature | What it does | Key bindings / Commands | Usage example |
-|---------|-------------|------------------------|---------------|
+| Feature | What it does | Keybinding / Command |
+|---------|-------------|---------------------|
 
-## Phase 4: Research
+This helps the user know what they already have.
 
-WebSearch for new features, plugins, community recommendations. Use Context7 for official docs. Filter out everything already configured.
+## Step 4: Research
 
-## Phase 5: Present Suggestion List
+WebSearch for new features, plugins, and recommendations. Use Context7 for official docs if useful. Filter out everything already configured.
 
-Show 5-10 NEW suggestions:
+## Step 5: Let the user pick a feature
 
-| # | Feature | What it does | Effort |
-|---|---------|-------------|--------|
-| 1 | ... | ... | One-liner / Moderate / Significant |
+Show 5-10 suggestions as a numbered list. Each must be a single concrete feature with a one-sentence description.
 
-After showing this list, use `AskUserQuestion` to ask which SINGLE feature they want to evaluate FIRST. Include a "None — I'm done" option.
+Then call `AskUserQuestion` with the features as options (use the feature name as the label, the description as the description). Single select. Include a "Done — no more features" option.
 
-DO NOT offer to install multiple. DO NOT ask "which ones do you want." Ask which ONE to try FIRST.
+If the user picks "Done", go to Step 8.
 
-## Phase 6: Evaluate the Chosen Feature
+## Step 6: Evaluate the chosen feature
 
-This phase handles exactly ONE feature. Follow these steps in order:
+### 6a: Show the changeset
 
-### Step 1: Show the changeset
-
-BEFORE touching anything, show what will change:
+Print exactly what will be installed/modified/created. Example:
 
 ```
-Changeset for: [Feature Name]
-─────────────────────────────
-Packages to install:   [list or "none"]
-Files to modify:       [list with what changes]
-Files to create:       [list or "none"]
+Changeset for: oil.nvim
+───────────────────────
+Packages to install:  none
+Files to modify:      ~/.config/nvim/init.lua (add plugin spec)
+Files to create:      none
 ```
 
-Ask for confirmation to proceed.
+Use `AskUserQuestion` to confirm: "Install this?" with options "Yes" and "Skip this feature".
 
-### Step 2: Apply changes
+If skipped, go back to Step 5 with remaining features.
+
+### 6b: Install it
 
 - Install packages if needed
-- Modify LIVE config files only (NOT the dotfiles repo!)
-- Reload configs where possible (tmux source-file, etc.)
+- Modify LIVE config files (NOT the dotfiles repo)
+- Reload where possible
+- Track everything you changed (packages, files modified, files created)
 
-Track every change:
-- Packages installed (exact install command for reversal)
-- Files modified (note original source in dotfiles repo)
-- Files created (full paths)
-- Directories created (full paths)
+### 6c: Guide the user
 
-### Step 3: User tests it
+Tell the user:
+1. What the feature does
+2. Exactly how to try it (specific commands, keybindings, or actions)
+3. What to look for
 
-Tell the user how to use the feature. Then ask:
+Then call `AskUserQuestion` with exactly these options:
+- **Accept** — "Keep it and add to dotfiles repo"
+- **Tweak** — "Adjust the configuration"
+- **Reject** — "Remove it completely"
 
-Use `AskUserQuestion` with three options:
-- **Accept** — keep it, port to dotfiles repo
-- **Tweak** — adjust the configuration
-- **Reject** — remove it completely
+### 6d: Handle the verdict
 
-### Step 4a: If Accept
+**If Accept:**
+- Port the config into `tools/<tool>/` in the dotfiles repo
+- Update ansible playbooks if new packages were added
+- Follow existing repo patterns (OS detection, `become: yes`, 2-space YAML)
+- Tell user what was added, remind them it's unstaged
 
-Port the final config into the dotfiles repo (`tools/<tool>/`):
-- Add to existing config files, ansible playbooks, etc.
-- Follow existing repo patterns (OS detection, `become: yes`, `creates:`, 2-space YAML)
-- Live installation stays in place
+**If Tweak:**
+- Ask what to change
+- Apply changes to live config
+- Go back to 6c
 
-Tell user what was added. Remind them changes are unstaged.
+**If Reject:**
+- Uninstall any packages that were installed
+- Delete any files that were created
+- Restore any modified files from the dotfiles repo (`tools/<tool>/`)
+- For `.j2` templates, run the ansible playbook instead
+- Confirm cleanup is complete
 
-### Step 4b: If Tweak
+## Step 7: Next feature
 
-Ask what to change. Apply to live config. Update changeset tracking. Go back to Step 3.
+Go back to Step 5. Show the remaining features (mark evaluated ones as accepted/rejected). Let the user pick the next one or choose "Done".
 
-### Step 4c: If Reject
-
-Reverse ALL changes:
-1. Uninstall packages (`brew uninstall`, `npm uninstall -g`, etc.)
-2. Delete created files and directories
-3. Restore modified files from dotfiles repo (copy from `tools/<tool>/` or run the tool's ansible playbook for `.j2` templates)
-4. Verify cleanup is complete
-
-## Phase 7: Next Feature
-
-After the feature is accepted or rejected, show the suggestion list again with the evaluated feature marked. Use `AskUserQuestion` to ask which feature to evaluate NEXT. Include "Done" option.
-
-If "Done" or all features evaluated, go to Phase 8.
-Otherwise, go back to Phase 6 with the next chosen feature.
-
-## Phase 8: Summary
+## Step 8: Summary
 
 ```
-Feature Discovery Summary
-═════════════════════════
-Accepted:
-  - [feature]: added to tools/<tool>/...
-
-Rejected (cleaned up):
-  - [feature]: removed
-
-Skipped:
-  - [feature]: not evaluated
+Session Summary
+═══════════════
+Accepted:  [list what was kept]
+Rejected:  [list what was removed]
+Skipped:   [list what wasn't tried]
 ```
 
-If anything was accepted, remind user to review with `git diff` and commit when ready.
+If anything was accepted, remind user to `git diff` and commit.
 
-## Additional Rules
+---
 
-- **Nerd Font characters** — Do NOT edit files containing Powerline glyphs directly. Use escape sequences per CLAUDE.md.
-- **Clean rejection** — After reject, `git status` in dotfiles repo must be clean and the tool must be gone from the system.
-- **User stops anytime** — Always offer "Done" as an option.
+## Additional rules
+
+- **Nerd Font characters** — use escape sequences, never edit glyphs directly (see CLAUDE.md)
+- **Clean rejection** — `git status` must be clean and the tool gone from the system after reject
