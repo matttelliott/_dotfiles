@@ -170,14 +170,11 @@ Reverse ALL changes from the changeset:
 
 Tell the user what was cleaned up.
 
-## Phase 7: Another Feature or Done?
+## Phase 7: Next Feature
 
-After accepting or rejecting, ask the user:
+After accepting or rejecting, show the remaining suggestions list (with the evaluated one marked as accepted/rejected) and ask which feature to evaluate next. Include a "Done" option to stop.
 
-- **Try another** — Go back to Phase 5 and pick the next feature from the remaining suggestions
-- **Done** — Go to Phase 8
-
-The user evaluates one feature at a time. Never batch. Never auto-proceed to the next feature.
+Repeat Phase 6 for the next chosen feature. Continue until the user says "Done" or all features have been evaluated.
 
 ## Phase 8: Wrap Up
 
