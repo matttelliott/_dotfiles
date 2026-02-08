@@ -1,0 +1,25 @@
+---
+- name: Install Krita
+  hosts: with_gui_tools
+  gather_facts: true
+
+  tasks:
+    - name: Install Krita via Homebrew (macOS)
+      ansible.builtin.shell: /opt/homebrew/bin/brew install --cask krita
+      args:
+        creates: /Applications/krita.app
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install Krita via apt (Debian)
+      ansible.builtin.apt:
+        name: krita
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install Krita via pacman (Arch)
+      community.general.pacman:
+        name: krita
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == "Archlinux"

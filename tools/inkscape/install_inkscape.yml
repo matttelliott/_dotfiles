@@ -1,0 +1,25 @@
+---
+- name: Install Inkscape
+  hosts: with_gui_tools
+  gather_facts: true
+
+  tasks:
+    - name: Install Inkscape via Homebrew (macOS)
+      ansible.builtin.shell: /opt/homebrew/bin/brew install --cask inkscape
+      args:
+        creates: /Applications/Inkscape.app
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install Inkscape via apt (Debian)
+      ansible.builtin.apt:
+        name: inkscape
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install Inkscape via pacman (Arch)
+      community.general.pacman:
+        name: inkscape
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == "Archlinux"

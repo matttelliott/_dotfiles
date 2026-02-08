@@ -193,6 +193,12 @@
   import_playbook: tools/ffmpeg/install_ffmpeg.yml
 - name: Install ImageMagick
   import_playbook: tools/imagemagick/install_imagemagick.yml
+- name: Install GIMP
+  import_playbook: tools/gimp/install_gimp.yml
+- name: Install Krita
+  import_playbook: tools/krita/install_krita.yml
+- name: Install Inkscape
+  import_playbook: tools/inkscape/install_inkscape.yml
 - name: Install pandoc
   import_playbook: tools/pandoc/install_pandoc.yml
 - name: Install asciiquarium

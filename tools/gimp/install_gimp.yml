@@ -1,0 +1,25 @@
+---
+- name: Install GIMP
+  hosts: with_gui_tools
+  gather_facts: true
+
+  tasks:
+    - name: Install GIMP via Homebrew (macOS)
+      ansible.builtin.shell: /opt/homebrew/bin/brew install --cask gimp
+      args:
+        creates: /Applications/GIMP.app
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install GIMP via apt (Debian)
+      ansible.builtin.apt:
+        name: gimp
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install GIMP via pacman (Arch)
+      community.general.pacman:
+        name: gimp
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == "Archlinux"
