@@ -197,7 +197,7 @@ If any features were accepted, remind the user:
 
 ## Important Rules
 
-- **ONE AT A TIME** — Never trial multiple features simultaneously. The user picks one, evaluates it fully (accept/reject), then optionally picks another.
+- **ONE AT A TIME** — Present the full list of suggestions, but evaluate them sequentially. Install one, let the user test it, accept/reject, then move to the next. Never install multiple features at once.
 - **NEVER modify the dotfiles repo during trial** — only modify live configs. The repo is only touched on acceptance.
 - **Track every change** — packages, files, directories. Cleanup depends on accurate tracking.
 - **Respect Nerd Font characters** — Do NOT edit files containing Powerline glyphs directly. Use escape sequences per CLAUDE.md instructions.
