@@ -3,7 +3,18 @@ return {
   'sindrets/diffview.nvim',
   cmd = { 'DiffviewOpen', 'DiffviewFileHistory' },
   keys = {
-    { '<leader>gd', '<cmd>DiffviewOpen<cr>', desc = '[G]it [D]iff view' },
+    {
+      '<leader>gd',
+      function()
+        local lib = require 'diffview.lib'
+        if lib.get_current_view() then
+          vim.cmd 'DiffviewClose'
+        else
+          vim.cmd 'DiffviewOpen'
+        end
+      end,
+      desc = '[G]it [D]iff toggle',
+    },
     { '<leader>gh', '<cmd>DiffviewFileHistory %<cr>', desc = '[G]it file [H]istory' },
     { '<leader>gH', '<cmd>DiffviewFileHistory<cr>', desc = '[G]it repo [H]istory' },
     { '<leader>gp', '<cmd>DiffviewOpen origin/main...HEAD<cr>', desc = '[G]it [P]R review vs origin/main' },
