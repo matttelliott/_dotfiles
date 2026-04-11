@@ -50,6 +50,8 @@
   import_playbook: tools/1password_cli/install_1password_cli.yml
 - name: Install SSH
   import_playbook: tools/ssh/install_ssh.yml
+- name: Install GPG
+  import_playbook: tools/gpg/install_gpg.yml
 - name: Install git
   import_playbook: tools/git/install_git.yml
 - name: Install keyboard

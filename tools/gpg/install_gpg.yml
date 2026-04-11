@@ -1,0 +1,50 @@
+---
+- name: Install GPG
+  hosts: with_login_tools
+  gather_facts: true
+
+  tasks:
+    - name: Install gnupg and pinentry-mac via Homebrew (macOS)
+      ansible.builtin.shell: /opt/homebrew/bin/brew install gnupg pinentry-mac
+      args:
+        creates: /opt/homebrew/bin/gpg
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install gnupg via apt (Debian)
+      ansible.builtin.apt:
+        name: gnupg
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install gnupg via pacman (Arch)
+      community.general.pacman:
+        name: gnupg
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == "Archlinux"
+
+    - name: Create gnupg directory
+      ansible.builtin.file:
+        path: ~/.gnupg
+        state: directory
+        mode: "0700"
+
+    - name: Configure gpg-agent (macOS)
+      ansible.builtin.copy:
+        content: |
+          default-cache-ttl 34560000
+          max-cache-ttl 34560000
+          pinentry-program /opt/homebrew/bin/pinentry-mac
+        dest: ~/.gnupg/gpg-agent.conf
+        mode: "0600"
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Configure gpg-agent (Linux)
+      ansible.builtin.copy:
+        content: |
+          default-cache-ttl 34560000
+          max-cache-ttl 34560000
+        dest: ~/.gnupg/gpg-agent.conf
+        mode: "0600"
+      when: ansible_facts['os_family'] != "Darwin"
