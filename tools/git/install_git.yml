@@ -24,6 +24,16 @@
         dest: ~/.gitconfig
       when: ansible_facts['os_family'] == "Darwin" and 'with_login_tools' in group_names
 
+    - name: Write allowed_signers for SSH commit signing
+      ansible.builtin.copy:
+        dest: ~/.ssh/allowed_signers
+        content: "{{ git_user_email }} {{ git_signing_key }}\n"
+        mode: "0644"
+      when:
+        - "'with_login_tools' in group_names"
+        - git_signing_key is defined
+        - git_signing_key | length > 0
+
     - name: Install gitconfig (Linux with login)
       ansible.builtin.template:
         src: gitconfig.debian.j2

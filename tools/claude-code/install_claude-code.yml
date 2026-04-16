@@ -7,3 +7,19 @@
     - name: Install Claude Code via native installer
       ansible.builtin.shell: curl -fsSL https://claude.ai/install.sh | bash
 
+    - name: Create zsh config directory
+      ansible.builtin.file:
+        path: ~/.config/zsh
+        state: directory
+
+    - name: Install claude-code aliases
+      ansible.builtin.copy:
+        src: claude-code.zsh
+        dest: ~/.config/zsh/claude-code.zsh
+
+    - name: Source claude-code aliases in zshrc
+      ansible.builtin.lineinfile:
+        path: ~/.zshrc
+        line: 'source ~/.config/zsh/claude-code.zsh'
+        create: true
+

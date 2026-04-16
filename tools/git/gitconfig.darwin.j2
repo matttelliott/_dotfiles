@@ -2,7 +2,11 @@
 {% include 'gitconfig.personal.j2' %}
 {% if git_signing_key %}
 [user]
-	signingkey = {{ git_signing_key }}
+	signingkey = ~/.ssh/id_rsa.pub
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	allowedSignersFile = ~/.ssh/allowed_signers
 [commit]
 	gpgsign = true
 {% endif %}
