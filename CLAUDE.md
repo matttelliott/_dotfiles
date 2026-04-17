@@ -141,14 +141,14 @@ Package managers (Homebrew, apt, pacman) provide stable versions by default.
 
 ### Current Implementation
 
-| Tool | Version Strategy | Method |
-|------|-----------------|--------|
-| Node.js | LTS | `nvm install --lts`, `nvm alias default lts/*` |
-| Rust | Stable | rustup defaults to stable toolchain |
-| Neovim | Latest stable | GitHub releases (NOT apt - apt versions are outdated) |
-| Go | Current stable | Pinned version (Go has no LTS) |
-| All Homebrew | Stable | Formulae provide stable versions |
-| All apt/pacman | Stable | Repos provide stable versions |
+| Tool           | Version Strategy | Method                                                |
+| -------------- | ---------------- | ----------------------------------------------------- |
+| Node.js        | LTS              | `nvm install --lts`, `nvm alias default lts/*`        |
+| Rust           | Stable           | rustup defaults to stable toolchain                   |
+| Neovim         | Latest stable    | GitHub releases (NOT apt - apt versions are outdated) |
+| Go             | Current stable   | Pinned version (Go has no LTS)                        |
+| All Homebrew   | Stable           | Formulae provide stable versions                      |
+| All apt/pacman | Stable           | Repos provide stable versions                         |
 
 ## Claude Code Configuration
 
@@ -178,12 +178,8 @@ Claude Code configuration follows a three-layer architecture, each with distinct
 │   └── gsd/              # GSD namespace (from portable)
 ├── agents/               # User-level subagents
 │   └── gsd-*.md          # GSD agents (from portable)
-├── hooks/                # Hook scripts
-│   └── *.js              # GSD hooks (from portable)
-└── get-shit-done/        # GSD portable config
-    ├── workflows/
-    ├── templates/
-    └── references/
+└── hooks/                # Hook scripts
+   └── *.js              # GSD hooks (from portable)
 ```
 
 ### When to Use Each Layer
@@ -250,15 +246,19 @@ Theme playbooks modify 9 config files (tmux, starship, neovim, wezterm, lazygit,
 **Before committing theme changes:**
 
 1. **Run in check mode first:**
+
    ```bash
    ansible-playbook themes/_color.yml -e color=dracula --check --diff
    ```
+
    Review the diff output - should show only hex color changes, not character corruption.
 
 2. **Verify special characters not corrupted:**
+
    ```bash
    git diff themes/ | grep -E '\\u[0-9A-Fa-f]{4}|nr2char'
    ```
+
    You should see escape sequences like `\uE0B0` or `nr2char(0xe0b0)`, NOT boxes, question marks, or empty strings where characters used to be.
 
 3. **Visual validation after applying theme:**
