@@ -903,6 +903,33 @@ require('lazy').setup({
   { 'navarasu/onedark.nvim', priority = 1000 },
   { 'maxmx03/solarized.nvim', priority = 1000 },
 
+  -- Give markdown H1-H6 distinct per-level colors on every colorscheme.
+  -- Without this: dracula links all to fg (plain text), gruvbox links all to Title (same color).
+  {
+    'nvim-lua/plenary.nvim',
+    priority = 999,
+    config = function()
+      local palettes = {
+        dracula = { '#bd93f9', '#ff79c6', '#8be9fd', '#50fa7b', '#f1fa8c', '#ffb86c' },
+        gruvbox = { '#fb4934', '#fe8019', '#fabd2f', '#b8bb26', '#8ec07c', '#83a598' },
+        ['tokyonight-night'] = { '#7aa2f7', '#bb9af7', '#7dcfff', '#9ece6a', '#e0af68', '#f7768e' },
+        nord = { '#88c0d0', '#81a1c1', '#8fbcbb', '#a3be8c', '#ebcb8b', '#d08770' },
+        catppuccin = { '#cba6f7', '#f5c2e7', '#89dceb', '#a6e3a1', '#f9e2af', '#fab387' },
+        onedark = { '#c678dd', '#e06c75', '#56b6c2', '#98c379', '#e5c07b', '#d19a66' },
+        solarized = { '#268bd2', '#d33682', '#2aa198', '#859900', '#b58900', '#cb4b16' },
+      }
+      local fallback = { '#c678dd', '#e06c75', '#56b6c2', '#98c379', '#e5c07b', '#d19a66' }
+      local function fix_headings()
+        local p = palettes[vim.g.colors_name] or fallback
+        for i, fg in ipairs(p) do
+          vim.api.nvim_set_hl(0, '@markup.heading.' .. i .. '.markdown', { fg = fg, bold = true })
+        end
+      end
+      vim.api.nvim_create_autocmd('ColorScheme', { callback = fix_headings })
+      fix_headings()
+    end,
+  },
+
   { -- You can easily change to a different colorscheme.
     -- Change the name of the colorscheme plugin below, and then
     -- change the command in the config to whatever the name of that colorscheme is.

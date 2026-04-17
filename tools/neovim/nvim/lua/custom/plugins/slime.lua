@@ -12,25 +12,25 @@ return {
     vim.g.slime_no_mappings = 0
   end,
   keys = {
-    { '<leader>rr', ':%SlimeSend<CR>', mode = 'n', desc = '[R]EPL send buffer' },
+    { '<leader>rr', ':%SlimeSend<CR>', mode = 'n', desc = '[R]EPL send buffe[r]' },
     { '<leader>rb', ':%SlimeSend<CR>', mode = 'n', desc = '[R]EPL send [b]uffer' },
     {
-      '<leader>rl',
+      '<leader>rL',
       function()
         local loc = string.format('%s:%d:%d', vim.fn.expand '%:p', vim.fn.line '.', vim.fn.col '.')
         vim.fn['slime#send'](loc)
       end,
       mode = 'n',
-      desc = '[R]EPL send [l]ocation (file:line:col)',
+      desc = '[R]EPL send [L]ocation (file:line:col)',
     },
     {
-      '<leader>rL',
+      '<leader>rl',
       function()
         local loc = string.format('%s:%d:%d', vim.fn.expand '%:p', vim.fn.line '.', vim.fn.col '.')
         vim.fn['slime#send'](loc .. '\r')
       end,
       mode = 'n',
-      desc = '[R]EPL send [L]ocation and submit',
+      desc = '[R]EPL send [l]ocation and submit',
     },
     { '<leader>rp', '<Plug>SlimeParagraphSend', mode = 'n', desc = '[R]EPL send [p]aragraph' },
     { '<leader>rc', '<Plug>SlimeConfig', mode = 'n', desc = '[R]EPL [c]onfigure target' },
