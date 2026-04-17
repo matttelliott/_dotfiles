@@ -104,29 +104,35 @@ themesetting () {
 		return 0
 	fi
 
-	# Handle defaults selection
-	if [[ "$selection" == "DEFAULTS"* ]]; then
-		echo "Applying machine defaults: $default_color / $default_font / $default_style"
-		ansible-playbook "$themes_dir/apply_defaults.yml" --connection=local --limit "$(hostname -s)"
-		echo ""
-		echo "Reload: tmux source ~/.tmux.conf"
-		return
-	fi
+	# Ansible needs to run from the project root so ansible.cfg is loaded
+	# (popup inherits the pane's cwd, which is usually not $DOTFILES).
+	(
+		cd "$DOTFILES" || return 1
 
-	local type=$(echo "$selection" | cut -d: -f1)
-	local name=$(echo "$selection" | cut -d: -f2 | xargs)
-	case "$type" in
-		(color) echo "Applying $name color theme..."
-			ansible-playbook "$themes_dir/_color.yml" -i "localhost," --connection=local -e "color=$name"
-			echo ""
-			echo "Reload: tmux source ~/.tmux.conf" ;;
-		(font) echo "Applying $name font..."
-			ansible-playbook "$themes_dir/_font.yml" -i "localhost," --connection=local -e "font=$name" ;;
-		(style) echo "Applying $name style..."
-			ansible-playbook "$themes_dir/_style.yml" -i "localhost," --connection=local -e "style=$name"
+		# Handle defaults selection
+		if [[ "$selection" == "DEFAULTS"* ]]; then
+			echo "Applying machine defaults: $default_color / $default_font / $default_style"
+			ansible-playbook "$themes_dir/apply_defaults.yml" --connection=local --limit "$(hostname -s)"
 			echo ""
 			echo "Reload: tmux source ~/.tmux.conf"
-	esac
+			return
+		fi
+
+		local type=$(echo "$selection" | cut -d: -f1)
+		local name=$(echo "$selection" | cut -d: -f2 | xargs)
+		case "$type" in
+			(color) echo "Applying $name color theme..."
+				ansible-playbook "$themes_dir/_color.yml" --connection=local --limit "$(hostname -s)" -e "color=$name"
+				echo ""
+				echo "Reload: tmux source ~/.tmux.conf" ;;
+			(font) echo "Applying $name font..."
+				ansible-playbook "$themes_dir/_font.yml" --connection=local --limit "$(hostname -s)" -e "font=$name" ;;
+			(style) echo "Applying $name style..."
+				ansible-playbook "$themes_dir/_style.yml" --connection=local --limit "$(hostname -s)" -e "style=$name"
+				echo ""
+				echo "Reload: tmux source ~/.tmux.conf"
+		esac
+	)
 }
 
 # Quick idea capture - syncs encrypted via SOPS

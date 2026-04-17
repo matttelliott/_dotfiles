@@ -578,3 +578,34 @@
         regexp: 'selectedLineBgColor:\n\s+- "#[0-9a-fA-F]{6}"'
         replace: 'selectedLineBgColor:\n      - "{{ c.bg_hl }}"'
 
+    # ===================
+    # CLAUDE CODE STATUSLINE
+    # ===================
+    - name: Check if Claude Code statusline exists
+      ansible.builtin.stat:
+        path: ~/.claude/statusline.sh
+      register: claude_statusline
+
+    - name: Update Claude Code statusline colors
+      ansible.builtin.replace:
+        path: ~/.claude/statusline.sh
+        regexp: '^{{ item.var }}="#[0-9a-fA-F]{6}"$'
+        replace: '{{ item.var }}="{{ c[item.color] }}"'
+      loop:
+        - { var: BG,          color: bg }
+        - { var: BG_HL,       color: bg_hl }
+        - { var: FG,          color: fg }
+        - { var: FG_DIM,      color: fg_dim }
+        - { var: ACCENT,      color: accent }
+        - { var: ACCENT_DARK, color: accent_dark }
+        - { var: GREEN,       color: green }
+        - { var: RED,         color: red }
+      when: claude_statusline.stat.exists
+
+    - name: Update Claude Code statusline theme comment
+      ansible.builtin.replace:
+        path: ~/.claude/statusline.sh
+        regexp: '^# Claude Code statusline - .+ theme$'
+        replace: '# Claude Code statusline - {{ c.name }} theme'
+      when: claude_statusline.stat.exists
+

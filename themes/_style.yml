@@ -16,14 +16,16 @@
   gather_facts: true
   vars:
     # All known separator styles - add new styles here
+    # right_bytes/left_bytes are pre-escaped for re.sub replacement context
+    # (each `\\` becomes a literal `\` in the output file).
     styles:
-      angle:  { right: "\uE0B0", left: "\uE0B2", right_code: "0xe0b0", left_code: "0xe0b2" }
-      round:  { right: "\uE0B4", left: "\uE0B6", right_code: "0xe0b4", left_code: "0xe0b6" }
-      slant:  { right: "\uE0BC", left: "\uE0BE", right_code: "0xe0bc", left_code: "0xe0be" }
-      pixels: { right: "\uE0C4", left: "\uE0C6", right_code: "0xe0c4", left_code: "0xe0c6" }
-      flames: { right: "\uE0C0", left: "\uE0C2", right_code: "0xe0c0", left_code: "0xe0c2" }
-      ice:    { right: "\uE0C8", left: "\uE0CA", right_code: "0xe0c8", left_code: "0xe0ca" }
-      none:   { right: " ",      left: " ",      right_code: "none",   left_code: "none" }
+      angle:  { right: "\uE0B0", left: "\uE0B2", right_code: "0xe0b0", left_code: "0xe0b2", right_bytes: '\\xee\\x82\\xb0', left_bytes: '\\xee\\x82\\xb2' }
+      round:  { right: "\uE0B4", left: "\uE0B6", right_code: "0xe0b4", left_code: "0xe0b6", right_bytes: '\\xee\\x82\\xb4', left_bytes: '\\xee\\x82\\xb6' }
+      slant:  { right: "\uE0BC", left: "\uE0BE", right_code: "0xe0bc", left_code: "0xe0be", right_bytes: '\\xee\\x82\\xbc', left_bytes: '\\xee\\x82\\xbe' }
+      pixels: { right: "\uE0C4", left: "\uE0C6", right_code: "0xe0c4", left_code: "0xe0c6", right_bytes: '\\xee\\x83\\x84', left_bytes: '\\xee\\x83\\x86' }
+      flames: { right: "\uE0C0", left: "\uE0C2", right_code: "0xe0c0", left_code: "0xe0c2", right_bytes: '\\xee\\x83\\x80', left_bytes: '\\xee\\x83\\x82' }
+      ice:    { right: "\uE0C8", left: "\uE0CA", right_code: "0xe0c8", left_code: "0xe0ca", right_bytes: '\\xee\\x83\\x88', left_bytes: '\\xee\\x83\\x8a' }
+      none:   { right: " ",      left: " ",      right_code: "none",   left_code: "none",   right_bytes: 'none',           left_bytes: 'none' }
     target: "{{ styles[style] }}"
   tasks:
     - name: Validate style parameter
@@ -201,4 +203,34 @@
         regexp: "(local arrow_left = )' '"
         replace: "\\1vim.fn.nr2char({{ target.left_code }})"
       when: style != 'none'
+
+    # ===================
+    # CLAUDE CODE STATUSLINE
+    # Uses `printf '\xNN\xNN\xNN'` for portability across bash 3.2 (macOS).
+    # ===================
+    - name: Check if Claude Code statusline exists
+      ansible.builtin.stat:
+        path: ~/.claude/statusline.sh
+      register: claude_statusline
+
+    - name: Replace right separator bytes in Claude Code statusline
+      ansible.builtin.replace:
+        path: ~/.claude/statusline.sh
+        regexp: "SEP=\\$\\(printf '(\\\\x[0-9a-fA-F]{2}){3}'\\)"
+        replace: "SEP=$(printf '{{ target.right_bytes }}')"
+      when: claude_statusline.stat.exists and style != 'none'
+
+    - name: Replace right separator with space in Claude Code statusline (none style)
+      ansible.builtin.replace:
+        path: ~/.claude/statusline.sh
+        regexp: "SEP=\\$\\(printf '(\\\\x[0-9a-fA-F]{2}){3}'\\)"
+        replace: "SEP=' '"
+      when: claude_statusline.stat.exists and style == 'none'
+
+    - name: Restore right separator bytes in Claude Code statusline (from none)
+      ansible.builtin.replace:
+        path: ~/.claude/statusline.sh
+        regexp: "SEP=' '"
+        replace: "SEP=$(printf '{{ target.right_bytes }}')"
+      when: claude_statusline.stat.exists and style != 'none'
 
