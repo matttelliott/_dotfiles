@@ -206,7 +206,7 @@ Hosts are added to groups to control which tools are installed:
 - **wireguard** - VPN tunnel
 
 ### Browsers
-Chrome, Chromium, Firefox, Brave, Arc, Edge, Opera, Vivaldi, LibreWolf, Waterfox, Zen, Orion, Min, Tor
+Chrome, Chromium, Firefox, Brave, Arc, Opera, Vivaldi, LibreWolf, Waterfox, Zen, Orion, Min, Tor
 
 ## Shell Aliases
 

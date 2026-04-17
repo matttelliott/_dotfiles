@@ -291,8 +291,6 @@
   import_playbook: tools/brave/install_brave.yml
 - name: Install Arc
   import_playbook: tools/arc/install_arc.yml
-- name: Install Edge
-  import_playbook: tools/edge/install_edge.yml
 - name: Install Tor
   import_playbook: tools/tor/install_tor.yml
 - name: Install LibreWolf
