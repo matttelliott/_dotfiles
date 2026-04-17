@@ -21,9 +21,10 @@ if [ -z "$command" ]; then
 fi
 
 # Split on shell separators and inspect every sub-command.
+# Includes ( ) ` so $(git ...), `git ...`, and (git ...) cannot bypass.
 # bash 3.2 (macOS) has no mapfile; use while-read with a heredoc.
 segments_raw=$(printf '%s' "$command" \
-  | tr ';&|\n' '\n' \
+  | tr ';&|()`{}<>\n' '\n' \
   | sed -E 's/^[[:space:]]*//; s/[[:space:]]*$//' \
   | grep -v '^$')
 
@@ -33,7 +34,12 @@ while IFS= read -r seg; do
 
   # Strip leading env-var assignments and common wrappers.
   s=$(printf '%s' "$seg" | sed -E 's/^([A-Za-z_][A-Za-z0-9_]*=[^ ]* +)+//')
-  s=$(printf '%s' "$s" | sed -E 's/^(sudo|command|exec|nohup|time|builtin) +//')
+  # Strip wrappers repeatedly (e.g. `sudo env git ...`).
+  while :; do
+    prev="$s"
+    s=$(printf '%s' "$s" | sed -E 's/^(sudo|command|exec|nohup|time|builtin|env|xargs|eval) +//')
+    [ "$s" = "$prev" ] && break
+  done
 
   case "$s" in
     git|git\ *|*/git|*/git\ *)
