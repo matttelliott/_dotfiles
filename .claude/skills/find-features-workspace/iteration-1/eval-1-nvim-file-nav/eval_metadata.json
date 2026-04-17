@@ -1,0 +1,14 @@
+{
+  "eval_id": 1,
+  "eval_name": "nvim-file-nav",
+  "prompt": "I want to be able to jump back to recently-edited files in nvim without leaving home row. Currently I'm doing :e with tab-completion which is annoying.",
+  "assertions": [
+    {"id": "session_started", "check": "with_skill/outputs/session.json exists and has a non-empty session_id, intent matches the user's phrasing"},
+    {"id": "suggestions_registered", "check": "session.json.suggestions has at least 3 entries, each with id/type/title/rationale"},
+    {"id": "covers_three_types", "check": "suggestion types include all of: existing, addon, new"},
+    {"id": "spots_existing_fzf", "check": "at least one suggestion references that fzf is already in tools/fzf/ but not wired into nvim, OR explains the gap between current state and desired outcome"},
+    {"id": "concrete_nvim_plugin", "check": "at least one suggestion names a specific, real nvim plugin that solves the stated problem (e.g. telescope.nvim, harpoon, fzf-lua, oil.nvim, mini.pick)"},
+    {"id": "stopped_before_phase3", "check": "session.json.trials is empty — Claude did not try to install anything"},
+    {"id": "suggestions_md_readable", "check": "suggestions.md is present, grouped by type, each entry has a one-line rationale"}
+  ]
+}

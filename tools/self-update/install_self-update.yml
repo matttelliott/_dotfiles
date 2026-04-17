@@ -1,18 +1,49 @@
 ---
-- name: Install dotfiles self-update cron
+- name: Install dotfiles self-update
   hosts: all
   gather_facts: true
 
   tasks:
+    - name: Ensure log directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_facts['env']['HOME'] }}/.cache"
+        state: directory
+        mode: "0755"
+
     - name: Deploy self-update script
       ansible.builtin.copy:
         src: self-update.sh
-        dest: ~/_dotfiles/tools/self-update/self-update.sh
+        dest: "{{ ansible_facts['env']['HOME'] }}/_dotfiles/tools/self-update/self-update.sh"
         mode: "0755"
 
-    - name: Set up cron job to self-update every 2 hours
+    - name: Remove legacy cron entry on macOS
+      ansible.builtin.cron:
+        name: "dotfiles self-update"
+        state: absent
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install launchd agent on macOS
+      ansible.builtin.template:
+        src: com.local.dotfiles-selfupdate.plist.j2
+        dest: "{{ ansible_facts['env']['HOME'] }}/Library/LaunchAgents/com.local.dotfiles-selfupdate.plist"
+        mode: "0644"
+      when: ansible_facts['os_family'] == "Darwin"
+      register: selfupdate_plist
+
+    - name: Reload launchd agent on macOS
+      ansible.builtin.shell: |
+        set -e
+        launchctl bootout "gui/$(id -u)/com.local.dotfiles-selfupdate" 2>/dev/null || true
+        launchctl bootstrap "gui/$(id -u)" "{{ ansible_facts['env']['HOME'] }}/Library/LaunchAgents/com.local.dotfiles-selfupdate.plist"
+      when:
+        - ansible_facts['os_family'] == "Darwin"
+        - selfupdate_plist.changed
+      changed_when: true
+
+    - name: Set up cron job on Linux to self-update every 2 hours
       ansible.builtin.cron:
         name: "dotfiles self-update"
         minute: "0"
         hour: "*/2"
-        job: "~/_dotfiles/tools/self-update/self-update.sh >> /tmp/dotfiles-update.log 2>&1"
+        job: "{{ ansible_facts['env']['HOME'] }}/_dotfiles/tools/self-update/self-update.sh >> {{ ansible_facts['env']['HOME'] }}/.cache/dotfiles-selfupdate.log 2>&1"
+      when: ansible_facts['os_family'] != "Darwin"

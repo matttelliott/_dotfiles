@@ -1,0 +1,11 @@
+{
+  "expectations": [
+    {"text": "session_started", "passed": true, "evidence": "session_id=20260417T214534Z, intent matches"},
+    {"text": "suggestions_registered", "passed": true, "evidence": "8 suggestions, all fields present"},
+    {"text": "covers_three_types", "passed": true, "evidence": "1 existing, 5 addon, 2 new"},
+    {"text": "recognizes_existing_tmux", "passed": true, "evidence": "Suggestion 1 calls out the already-configured prefix + Ctrl-h/j/k/l resize bindings in tmux.conf.j2"},
+    {"text": "names_session_restore_plugin", "passed": true, "evidence": "Suggestion 3 names tmux-resurrect + tmux-continuum explicitly"},
+    {"text": "stopped_before_phase3", "passed": true, "evidence": "trials: []"},
+    {"text": "mentions_tpm_or_plugin_mgmt", "passed": true, "evidence": "Suggestion 2 is specifically 'add tpm' as a prerequisite"}
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "session_id": "20260417T214534Z",
+  "intent": "I want to be able to jump back to recently-edited files in nvim without leaving home row. Currently I'm doing :e with tab-completion which is annoying.",
+  "created_at": "2026-04-17T21:45:34+00:00",
+  "suggestions": [
+    {
+      "id": "sugg-1",
+      "type": "existing",
+      "title": "Use the already-configured <leader>s. mapping for recent files (telescope oldfiles)",
+      "tool": "neovim",
+      "rationale": "Your telescope config in init.lua already binds <leader>s. to telescope.builtin.oldfiles, which is exactly 'jump to recently edited files'. You just may not know it's there. Only downside: the '.' key is a small reach from home row.",
+      "references": [
+        "https://github.com/nvim-telescope/telescope.nvim"
+      ]
+    },
+    {
+      "id": "sugg-2",
+      "type": "existing",
+      "title": "Use <leader><leader> for the open-buffers picker (already bound)",
+      "tool": "neovim",
+      "rationale": "<leader><leader> is already bound to telescope buffers in your config. For files you've opened this session it's the fastest path - two presses of the space bar, fully home-row. Complements oldfiles (which covers previous sessions).",
+      "references": []
+    },
+    {
+      "id": "sugg-3",
+      "type": "addon",
+      "title": "Add a home-row binding <leader>j for telescope oldfiles",
+      "tool": "neovim",
+      "rationale": "You're currently using :e + tab. Adding a dedicated keymap in lua/custom/plugins/keymaps.lua like <leader>j -> Telescope oldfiles gives you a one-letter, fully home-row (space + j) jump to recent files. Reuses telescope you already have installed; no new plugin required.",
+      "references": []
+    },
+    {
+      "id": "sugg-4",
+      "type": "addon",
+      "title": "Add harpoon.nvim for pinned quick-jump between frequently-edited files",
+      "tool": "neovim",
+      "rationale": "Harpoon is ThePrimeagen's plugin for exactly this complaint. You 'mark' a handful of files you're working on, then jump back with <leader>h/j/k/l (or 1/2/3/4). Much faster than oldfiles when you're context-switching between the same 2-5 files repeatedly. Pure home-row bindings. Pairs with telescope - doesn't replace it.",
+      "references": [
+        "https://github.com/ThePrimeagen/harpoon/tree/harpoon2"
+      ]
+    },
+    {
+      "id": "sugg-5",
+      "type": "addon",
+      "title": "Add telescope-frecency.nvim for frequency+recency-ranked file picker",
+      "tool": "neovim",
+      "rationale": "Your current telescope oldfiles is ordered purely by recency. Frecency weighs frequency too, so files you hit often float to the top even if you opened something else more recently. Slots into the existing telescope setup as an extension - minimal config change.",
+      "references": [
+        "https://github.com/nvim-telescope/telescope-frecency.nvim"
+      ]
+    },
+    {
+      "id": "sugg-6",
+      "type": "new",
+      "title": "Install zoxide + telescope-zoxide for jumping to recent directories (then open any file)",
+      "tool": "zoxide",
+      "rationale": "Different angle on the same problem: zoxide tracks directories you visit and 'z <fragment>' jumps you there instantly. Combined with telescope-zoxide inside nvim, you can jump to a recent project dir and then fuzzy-find a file - fully home-row. Useful if 'recent files' for you often means 'recent project'.",
+      "references": [
+        "https://github.com/ajeetdsouza/zoxide",
+        "https://github.com/jvgrootveld/telescope-zoxide"
+      ]
+    }
+  ],
+  "selected": [],
+  "trials": []
+}

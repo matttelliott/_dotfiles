@@ -1,0 +1,14 @@
+{
+  "eval_id": 2,
+  "eval_name": "tmux-power-up",
+  "prompt": "tmux feels really basic. I want to feel like my tmux is a cockpit — session restoration, easier pane resizing, maybe a status bar with git info.",
+  "assertions": [
+    {"id": "session_started", "check": "with_skill/outputs/session.json exists with session_id + intent"},
+    {"id": "suggestions_registered", "check": "session.json.suggestions has at least 3 entries with id/type/title/rationale"},
+    {"id": "covers_three_types", "check": "types include all of: existing, addon, new"},
+    {"id": "recognizes_existing_tmux", "check": "at least one suggestion acknowledges tools/tmux/ already exists and builds on it (addon or existing type rather than proposing a new tools/tmux)"},
+    {"id": "names_session_restore_plugin", "check": "at least one suggestion names a concrete session-restoration solution (tmux-resurrect, tmux-continuum, or equivalent)"},
+    {"id": "stopped_before_phase3", "check": "session.json.trials is empty"},
+    {"id": "mentions_tpm_or_plugin_mgmt", "check": "suggestions or notes address how plugins are loaded (tpm or equivalent) since tmux needs a plugin manager"}
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "session_id": "20260417T214534Z",
+  "intent": "tmux feels really basic. I want to feel like my tmux is a cockpit \u2014 session restoration, easier pane resizing, maybe a status bar with git info.",
+  "created_at": "2026-04-17T21:45:34+00:00",
+  "suggestions": [
+    {
+      "id": "sugg-1",
+      "type": "existing",
+      "title": "Surface tmux's built-in pane-resize hotkeys you already have",
+      "tool": "tmux",
+      "rationale": "Your tmux.conf.j2 already defines `prefix + Ctrl-h/j/k/l` as repeatable resize bindings (`bind -r`). Hold Ctrl after the prefix and tap h/j/k/l to nudge panes 5 cells at a time. No plugin needed \u2014 worth demoing before adding anything new.",
+      "references": []
+    },
+    {
+      "id": "sugg-2",
+      "type": "addon",
+      "title": "Add tpm (Tmux Plugin Manager) so the other addons become trivial",
+      "tool": "tmux",
+      "rationale": "Session restoration, smart pane resize, and a git-aware status bar all ship as tpm plugins. tpm is the standard loader and unlocks the rest of this list with a single `prefix + I` to install. No existing tpm presence in your tmux.conf.j2.",
+      "references": [
+        "https://github.com/tmux-plugins/tpm"
+      ]
+    },
+    {
+      "id": "sugg-3",
+      "type": "addon",
+      "title": "tmux-resurrect + tmux-continuum for automatic session restoration",
+      "tool": "tmux",
+      "rationale": "resurrect snapshots windows/panes/working directories on demand (`prefix + Ctrl-s` / `Ctrl-r`); continuum adds periodic auto-save and auto-restore on tmux start. This is the canonical 'cockpit that survives a reboot' setup.",
+      "references": [
+        "https://github.com/tmux-plugins/tmux-resurrect",
+        "https://github.com/tmux-plugins/tmux-continuum"
+      ]
+    },
+    {
+      "id": "sugg-4",
+      "type": "addon",
+      "title": "jaclu/tmux-menus for a discoverable popup menu of resize/layout actions",
+      "tool": "tmux",
+      "rationale": "Instead of memorizing resize bindings, `prefix + \\` opens a popup with pane resize, split, kill, layout, and window-move actions. Very 'cockpit HUD' for anyone who prefers discovery over muscle memory.",
+      "references": [
+        "https://github.com/jaclu/tmux-menus"
+      ]
+    },
+    {
+      "id": "sugg-5",
+      "type": "addon",
+      "title": "Embed git branch + dirty state in your existing tmux statusline",
+      "tool": "tmux",
+      "rationale": "Your status-left already has hostname and session segments. We can add a git segment driven by a small shell script (branch + dirty-dot) called from a `#(...)` block \u2014 no extra plugin, keeps your TokyoNight powerline theme intact. We'll use the chr(0xE0A0) Python approach from your tmux README to avoid LLM-corrupting the Nerd Font glyphs.",
+      "references": []
+    },
+    {
+      "id": "sugg-6",
+      "type": "addon",
+      "title": "tmux-plugins/tmux-pain-control for saner, symmetric pane management",
+      "tool": "tmux",
+      "rationale": "Adds `prefix + H/J/K/L` (shifted) for larger 5-cell resizes and `prefix + |` / `-` for intuitive vertical/horizontal splits that keep cwd. Complements your existing vim-style nav without conflicting.",
+      "references": [
+        "https://github.com/tmux-plugins/tmux-pain-control"
+      ]
+    },
+    {
+      "id": "sugg-7",
+      "type": "new",
+      "title": "Add `sesh` as a fuzzy session switcher/creator backed by fzf",
+      "tool": null,
+      "rationale": "You already have fzf and tmux installed but no fast session launcher. `sesh` (joshmedeski) lists tmux sessions, zoxide dirs, and git repos in an fzf popup \u2014 pick one and it attaches or creates it. Makes prefix+s feel like a spacecraft comms panel.",
+      "references": [
+        "https://github.com/joshmedeski/sesh"
+      ]
+    },
+    {
+      "id": "sugg-8",
+      "type": "new",
+      "title": "Add `tmuxinator` for declarative project layouts",
+      "tool": null,
+      "rationale": "Define a YAML per project (windows, panes, start commands) and spin up the whole cockpit with `mux start myproject`. Pairs well with resurrect but targets a different need \u2014 boot a known-good layout rather than resume whatever was there.",
+      "references": [
+        "https://github.com/tmuxinator/tmuxinator"
+      ]
+    }
+  ],
+  "selected": [],
+  "trials": []
+}

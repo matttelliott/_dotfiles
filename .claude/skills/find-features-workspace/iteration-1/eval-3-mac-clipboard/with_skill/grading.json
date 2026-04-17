@@ -1,0 +1,10 @@
+{
+  "expectations": [
+    {"text": "session_started", "passed": true, "evidence": "session_id=20260417T214501Z, intent matches"},
+    {"text": "suggestions_registered", "passed": true, "evidence": "7 suggestions, all fields present"},
+    {"text": "darwin_scoped", "passed": true, "evidence": "suggestions explicitly mac-targeted: Maccy (macOS), Raycast (macOS), Clipy (macOS). CopyQ flagged as cross-platform bonus, not pretense."},
+    {"text": "names_real_clipboard_tool", "passed": true, "evidence": "Maccy, Raycast, CopyQ, Clipy all named"},
+    {"text": "checks_existing", "passed": true, "evidence": "Suggestion 6 surfaces 1Password Quick Access as an existing tool angle, and fzf/tmux addons leverage what's already installed"},
+    {"text": "stopped_before_phase3", "passed": true, "evidence": "trials: []"}
+  ]
+}

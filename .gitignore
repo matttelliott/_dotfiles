@@ -7,6 +7,7 @@ wol_mac_addresses.yml
 
 # Claude Code personal overrides (team hooks are in .claude/settings.json)
 .claude/settings.local.json
+prompt.md
 
 # Age private keys
 *.age.key

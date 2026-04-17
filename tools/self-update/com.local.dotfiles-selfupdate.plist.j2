@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.local.dotfiles-selfupdate</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>{{ ansible_facts['env']['HOME'] }}/_dotfiles/tools/self-update/self-update.sh</string>
+    </array>
+    <key>StartInterval</key>
+    <integer>7200</integer>
+    <key>StandardOutPath</key>
+    <string>{{ ansible_facts['env']['HOME'] }}/.cache/dotfiles-selfupdate.log</string>
+    <key>StandardErrorPath</key>
+    <string>{{ ansible_facts['env']['HOME'] }}/.cache/dotfiles-selfupdate.log</string>
+</dict>
+</plist>

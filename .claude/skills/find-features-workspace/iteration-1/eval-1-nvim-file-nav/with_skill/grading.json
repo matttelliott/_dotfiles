@@ -1,0 +1,11 @@
+{
+  "expectations": [
+    {"text": "session_started: session.json exists with session_id + intent", "passed": true, "evidence": "session_id=20260417T214534Z, intent matches prompt verbatim"},
+    {"text": "suggestions_registered: >=3 entries with id/type/title/rationale", "passed": true, "evidence": "6 suggestions, all fields present"},
+    {"text": "covers_three_types: existing/addon/new all present", "passed": true, "evidence": "2 existing, 3 addon, 1 new"},
+    {"text": "spots_existing_fzf: explains gap from current state", "passed": true, "evidence": "Suggestions 1 & 2 explicitly cite already-bound <leader>s. and <leader><leader> in telescope config"},
+    {"text": "concrete_nvim_plugin: names a real plugin", "passed": true, "evidence": "Names harpoon, telescope-frecency, zoxide+telescope-zoxide"},
+    {"text": "stopped_before_phase3: no trials", "passed": true, "evidence": "trials: []"},
+    {"text": "suggestions_md_readable: grouped with rationales", "passed": true, "evidence": "file exists, markdown well-formed"}
+  ]
+}

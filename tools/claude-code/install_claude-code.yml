@@ -35,6 +35,24 @@
         mode: "0755"
         force: false
 
+    - name: Ensure ~/.claude/skills exists
+      ansible.builtin.file:
+        path: ~/.claude/skills
+        state: directory
+        mode: "0755"
+
+    - name: Remove existing skill-creator skill
+      ansible.builtin.file:
+        path: ~/.claude/skills/skill-creator
+        state: absent
+
+    - name: Install skill-creator skill
+      ansible.builtin.copy:
+        src: skills/skill-creator/
+        dest: ~/.claude/skills/skill-creator/
+        mode: preserve
+        directory_mode: "0755"
+
     - name: Ensure ~/.claude/hooks exists
       ansible.builtin.file:
         path: ~/.claude/hooks

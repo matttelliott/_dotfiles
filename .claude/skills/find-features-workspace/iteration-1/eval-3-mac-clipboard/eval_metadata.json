@@ -1,0 +1,13 @@
+{
+  "eval_id": 3,
+  "eval_name": "mac-clipboard",
+  "prompt": "give me a nicer way to browse my clipboard history on mac",
+  "assertions": [
+    {"id": "session_started", "check": "session.json exists with session_id + intent"},
+    {"id": "suggestions_registered", "check": "session.json.suggestions has at least 2 entries (the space is smaller here; 2 is fine)"},
+    {"id": "darwin_scoped", "check": "suggestions explicitly acknowledge this is mac-only or the tool is a mac app — no generic linux/apt suggestions pretending to be cross-platform"},
+    {"id": "names_real_clipboard_tool", "check": "at least one suggestion names a real macOS clipboard manager (maccy, raycast, alfred clipboard, pastebot, copyclip, clipy, flycut, etc.)"},
+    {"id": "checks_existing", "check": "suggestions or notes confirm whether the repo already has a clipboard manager installed (via tools/*) — not just list brand new options blindly"},
+    {"id": "stopped_before_phase3", "check": "session.json.trials is empty"}
+  ]
+}

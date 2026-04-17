@@ -1,0 +1,23 @@
+{
+  "skill_name": "find-features",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I want to be able to jump back to recently-edited files in nvim without leaving home row. Currently I'm doing :e with tab-completion which is annoying.",
+      "expected_output": "Skill runs scan_tools, notices fzf exists in tools/ but isn't wired into nvim, suggests at least telescope.nvim, harpoon, and an fzf-lua integration. Groups by type (existing/addon/new). Asks which to try before installing anything.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "tmux feels really basic. I want to feel like my tmux is a cockpit — session restoration, easier pane resizing, maybe a status bar with git info.",
+      "expected_output": "Multiple suggestions covering tpm + tmux-resurrect + tmux-continuum, custom status bar mods to existing tmux.conf.j2, and possibly a brand-new tool suggestion like zellij for comparison. Install plan for tpm uses git_clone not brew. On approval, promote writes a proper templated config that matches repo conventions.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "give me a nicer way to browse my clipboard history on mac",
+      "expected_output": "Suggestions include maccy, clipboard-manager alternatives, and notes whether any existing tool covers this. Install via brew cask if GUI. On reject, uninstall cleanly removes it via brew. Promote writes a darwin-only playbook (no debian/arch since it's mac-specific).",
+      "files": []
+    }
+  ]
+}

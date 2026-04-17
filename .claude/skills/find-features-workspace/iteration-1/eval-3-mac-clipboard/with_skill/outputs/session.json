@@ -1,0 +1,85 @@
+{
+  "session_id": "20260417T214501Z",
+  "intent": "give me a nicer way to browse my clipboard history on mac",
+  "created_at": "2026-04-17T21:45:01+00:00",
+  "suggestions": [
+    {
+      "id": "sugg-1",
+      "type": "new",
+      "title": "Install Maccy \u2014 lightweight open-source clipboard manager for macOS",
+      "tool": "maccy",
+      "rationale": "Maccy is a tiny, open-source, keyboard-driven clipboard history app tailored to macOS. Installable via Homebrew Cask, lives in the menu bar, global hotkey (default Cmd+Shift+C) pops a fuzzy-searchable list of recent clips. Default pick for a 'nicer clipboard history' with no fuss \u2014 fits this repo's pattern of a new tools/<name>/ dir with a cask install.",
+      "references": [
+        "https://maccy.app",
+        "https://github.com/p0deje/Maccy"
+      ]
+    },
+    {
+      "id": "sugg-2",
+      "type": "new",
+      "title": "Install Raycast (includes best-in-class Clipboard History)",
+      "tool": "raycast",
+      "rationale": "Raycast's Clipboard History command is arguably the best on macOS \u2014 supports text, images, and files with rich previews, pinning, and fuzzy search. If you're open to replacing Spotlight/Alfred too, this is two-for-one. Homebrew Cask install. Heavier than Maccy but far more capable and extensible.",
+      "references": [
+        "https://www.raycast.com",
+        "https://manual.raycast.com/clipboard-history"
+      ]
+    },
+    {
+      "id": "sugg-3",
+      "type": "new",
+      "title": "Install CopyQ \u2014 cross-platform, scriptable clipboard manager",
+      "tool": "copyq",
+      "rationale": "CopyQ is GPL and cross-platform, so one playbook could cover macOS plus your debian/arch hosts. Supports tabs, tags, rich content, and a scripting engine for clipboard transforms. UI is dated but the most powerful of the options.",
+      "references": [
+        "https://hluk.github.io/CopyQ/",
+        "https://github.com/hluk/CopyQ"
+      ]
+    },
+    {
+      "id": "sugg-4",
+      "type": "addon",
+      "title": "Add an fzf-based clipboard history picker wired into zsh",
+      "tool": "fzf",
+      "rationale": "You already have fzf installed (tools/fzf/). A small background pbpaste poller maintains a ring of recent clips in a file, and a zsh widget bound to e.g. Ctrl+Y fuzzy-picks one back onto the clipboard via pbcopy. Terminal-native, no GUI dependency, plays to the fzf-first workflow you already use. Only covers terminal usage, not GUI apps.",
+      "references": [
+        "https://github.com/junegunn/fzf"
+      ]
+    },
+    {
+      "id": "sugg-5",
+      "type": "addon",
+      "title": "Add TPM + tmux-yank (+ extrakto) for tmux-native clipboard & buffer picking",
+      "tool": "tmux",
+      "rationale": "Your tmux config has no plugin manager or yank integration yet. tmux-yank syncs tmux copy-mode selections with the macOS system clipboard via pbcopy. extrakto adds a fuzzy picker over visible pane output, which in practice acts like 'browse things I might want to copy'. Complements (doesn't replace) a system-wide manager.",
+      "references": [
+        "https://github.com/tmux-plugins/tpm",
+        "https://github.com/tmux-plugins/tmux-yank",
+        "https://github.com/laktak/extrakto"
+      ]
+    },
+    {
+      "id": "sugg-6",
+      "type": "existing",
+      "title": "Use 1Password Quick Access (Cmd+Shift+Space) for credential pastes",
+      "tool": "1password",
+      "rationale": "1Password is already in tools/1password/. Its Quick Access popover (Cmd+Shift+Space) lets you search and copy credentials/notes with one shortcut, and it auto-clears the clipboard. Not a general clipboard history, but if most of what you paste is secrets, this may solve 70% of the pain with zero new tools \u2014 a settings tweak only.",
+      "references": [
+        "https://support.1password.com/quick-access/"
+      ]
+    },
+    {
+      "id": "sugg-7",
+      "type": "new",
+      "title": "Install Clipy \u2014 free, minimal clipboard history with snippets",
+      "tool": "clipy",
+      "rationale": "Clipy is a free, open-source, long-running fork of ClipMenu. Menu bar icon, configurable hotkey, and \u2014 unlike Maccy \u2014 a built-in snippet manager for reusable templates. Good middle ground if you paste the same phrases often.",
+      "references": [
+        "https://clipy-app.com",
+        "https://github.com/Clipy/Clipy"
+      ]
+    }
+  ],
+  "selected": [],
+  "trials": []
+}
