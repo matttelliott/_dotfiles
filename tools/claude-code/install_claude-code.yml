@@ -28,6 +28,11 @@
         path: ~/.claude
         state: directory
 
+    - name: Install global CLAUDE.md
+      ansible.builtin.copy:
+        src: CLAUDE.md
+        dest: ~/.claude/CLAUDE.md
+
     - name: Install Claude Code statusline script
       ansible.builtin.copy:
         src: statusline.sh
