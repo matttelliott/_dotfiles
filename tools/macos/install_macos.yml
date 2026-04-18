@@ -72,6 +72,18 @@
       ansible.builtin.command: defaults write com.apple.dock autohide -bool true
       changed_when: false
 
+    - name: Remove all persistent app icons from Dock
+      ansible.builtin.command: defaults write com.apple.dock persistent-apps -array
+      changed_when: false
+
+    - name: Remove all persistent folder/file icons from Dock
+      ansible.builtin.command: defaults write com.apple.dock persistent-others -array
+      changed_when: false
+
+    - name: Hide recent applications in Dock
+      ansible.builtin.command: defaults write com.apple.dock show-recents -bool false
+      changed_when: false
+
     - name: Show hidden files in Finder
       ansible.builtin.command: defaults write com.apple.finder AppleShowAllFiles -bool true
       changed_when: false
