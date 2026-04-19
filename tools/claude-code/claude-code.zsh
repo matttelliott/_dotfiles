@@ -95,6 +95,15 @@ ccs() {
   esac
 }
 
+# CCW / CCS: inverse of ccw / ccs. Run from inside a ccw-created worktree
+# to remove the worktree + branch and close the enclosing tmux target.
+#   CCW   Kill the current tmux WINDOW (and all subprocesses in it).
+#   CCS   Kill the current tmux SESSION (and all subprocesses in it).
+# The worktree path is detected from the current shell; must live under
+# <main-repo>/.claude/worktrees (or CCW_WORKTREE_DIR).
+CCW() { _ccw_self_destruct window ; }
+CCS() { _ccw_self_destruct session ; }
+
 _ccw_help() {
   cat <<'EOF'
 ccw [name] [claude-args...]   New worktree as tmux WINDOW in current session.
@@ -317,4 +326,41 @@ _ccw_archive() {
   git -C "$root" worktree prune 2>/dev/null || true
   git -C "$root" branch -D "$branch" 2>/dev/null || true
   echo "archived: $name"
+}
+
+_ccw_self_destruct() {
+  local mode="$1"
+  local cur_toplevel main_root wt_root name branch wtdir
+  cur_toplevel=$(git rev-parse --show-toplevel 2>/dev/null) || {
+    echo "CCW/CCS: not in a git repo" >&2; return 1
+  }
+  main_root=$(_ccw_repo_root) || { echo "CCW/CCS: not in a git repo" >&2; return 1; }
+  wt_root=$(_ccw_wt_root "$main_root")
+
+  case "$cur_toplevel" in
+    "$wt_root"/*) ;;
+    *) echo "CCW/CCS: not inside a ccw worktree ($cur_toplevel)" >&2; return 1 ;;
+  esac
+
+  name=$(basename "$cur_toplevel")
+  wtdir="$cur_toplevel"
+  branch="$(_ccw_branch "$name")"
+
+  # Move out of the worktree so git can remove it from under us.
+  cd "$main_root" || return 1
+
+  git -C "$main_root" worktree remove --force "$wtdir" 2>/dev/null \
+    || git -C "$main_root" worktree remove "$wtdir" 2>/dev/null \
+    || rm -rf "$wtdir"
+  git -C "$main_root" worktree prune 2>/dev/null || true
+  git -C "$main_root" branch -D "$branch" 2>/dev/null || true
+  echo "removed: $name"
+
+  if command -v tmux >/dev/null 2>&1 && [ -n "${TMUX:-}" ]; then
+    if [ "$mode" = "session" ]; then
+      tmux kill-session
+    else
+      tmux kill-window
+    fi
+  fi
 }
