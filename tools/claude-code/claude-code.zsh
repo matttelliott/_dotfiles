@@ -358,8 +358,14 @@ _ccw_confirm_clean() {
       return 0
       ;;
     c|C|create|pr)
-      (cd "$wtdir" && claude --dangerously-skip-permissions /create-pr)
-      return 1
+      if ! (cd "$wtdir" && claude -p --dangerously-skip-permissions /create-pr); then
+        echo "CCW/CCS: /create-pr failed; aborting" >&2
+        return 1
+      fi
+      # Re-check cleanliness. If /create-pr worked, uncommitted/unpushed are
+      # gone and this returns 0 immediately; otherwise the user is re-prompted.
+      _ccw_confirm_clean "$wtdir"
+      return $?
       ;;
     *)
       echo "CCW/CCS: aborted." >&2
