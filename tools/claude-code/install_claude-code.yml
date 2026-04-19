@@ -108,6 +108,18 @@
         mode: preserve
         directory_mode: "0755"
 
+    - name: Remove existing create-pr skill
+      ansible.builtin.file:
+        path: ~/.claude/skills/create-pr
+        state: absent
+
+    - name: Install create-pr skill
+      ansible.builtin.copy:
+        src: skills/create-pr/
+        dest: ~/.claude/skills/create-pr/
+        mode: preserve
+        directory_mode: "0755"
+
     - name: Ensure ~/.claude/hooks exists
       ansible.builtin.file:
         path: ~/.claude/hooks
