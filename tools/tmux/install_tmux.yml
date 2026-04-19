@@ -30,6 +30,17 @@
         dest: ~/.tmux.conf
       register: tmux_config
 
+    - name: Create tmux config directory
+      ansible.builtin.file:
+        path: ~/.config/tmux
+        state: directory
+
+    - name: Install tmux session picker script
+      ansible.builtin.copy:
+        src: session-picker.sh
+        dest: ~/.config/tmux/session-picker.sh
+        mode: '0755'
+
     - name: Reload tmux config
       ansible.builtin.shell: PATH="/opt/homebrew/bin:$PATH" tmux source-file ~/.tmux.conf
       when: tmux_config.changed and lookup('env', 'TMUX') != ''

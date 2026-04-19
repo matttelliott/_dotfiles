@@ -95,8 +95,8 @@ bind C-c command-prompt -p "Session name:" "new-session -s '%%'"
 # Mouse Support
 set -g mouse on
 
-# Session switcher (explicit default to prevent stray bindings from persisting)
-bind s choose-tree -ZsO name
+# Session switcher (custom left-anchored fzf picker with live preview)
+bind s display-popup -x 0 -y 0 -w 100% -h 100% -E '~/.config/tmux/session-picker.sh'
 
 # Click session name to switch sessions
 bind-key -T root MouseUp1StatusLeft choose-tree -sO name
