@@ -16,6 +16,36 @@
         dest: "{{ ansible_facts['env']['HOME'] }}/_dotfiles/tools/self-update/self-update.sh"
         mode: "0755"
 
+    - name: Deploy changelog script
+      ansible.builtin.copy:
+        src: changelog.sh
+        dest: "{{ ansible_facts['env']['HOME'] }}/_dotfiles/tools/self-update/changelog.sh"
+        mode: "0755"
+
+    - name: Deploy changelog AI prompt
+      ansible.builtin.copy:
+        src: changelog-prompt.txt
+        dest: "{{ ansible_facts['env']['HOME'] }}/_dotfiles/tools/self-update/changelog-prompt.txt"
+        mode: "0644"
+
+    - name: Create zsh config directory
+      ansible.builtin.file:
+        path: "{{ ansible_facts['env']['HOME'] }}/.config/zsh"
+        state: directory
+        mode: "0755"
+
+    - name: Install shell hook that shows pending changelog on first new shell
+      ansible.builtin.copy:
+        src: self-update.zsh
+        dest: "{{ ansible_facts['env']['HOME'] }}/.config/zsh/self-update.zsh"
+        mode: "0644"
+
+    - name: Source shell hook from zshrc
+      ansible.builtin.lineinfile:
+        path: "{{ ansible_facts['env']['HOME'] }}/.zshrc"
+        line: "source ~/.config/zsh/self-update.zsh"
+        create: true
+
     - name: Remove legacy cron entry on macOS
       ansible.builtin.cron:
         name: "dotfiles self-update"

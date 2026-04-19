@@ -115,7 +115,11 @@ See <repo>/.worktreeinclude to copy gitignored files into each worktree.
 EOF
 }
 
-_ccw_repo_root() { git rev-parse --show-toplevel 2>/dev/null; }
+_ccw_repo_root() {
+  # Always return the *main* worktree, even when invoked from a linked one,
+  # so ccw/ccs create siblings under the main repo instead of nesting.
+  git worktree list --porcelain 2>/dev/null | awk '/^worktree / { print $2; exit }'
+}
 _ccw_wt_root()   { echo "${CCW_WORKTREE_DIR:-$1/.claude/worktrees}"; }
 _ccw_project()   { basename "$1"; }
 _ccw_branch()    { echo "${CCW_BRANCH_PREFIX:-claude/}$1"; }
