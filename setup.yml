@@ -313,6 +313,12 @@
   import_playbook: tools/drg/install_drg.yml
 - name: Install dotfiles self-update
   import_playbook: tools/self-update/install_self-update.yml
+# Re-apply per-host theme last so it overwrites any defaults baked into tool
+# install templates (tmux.conf, starship.toml, init.lua, etc.). The cron
+# self-update reruns setup.yml, so without this step every run reverts the
+# host to the template defaults.
+- name: Apply per-host theme
+  import_playbook: themes/apply_defaults.yml
 - name: Allow sleep after setup (macOS)
   hosts: macs
   gather_facts: false
