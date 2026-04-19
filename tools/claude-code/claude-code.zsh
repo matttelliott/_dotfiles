@@ -328,6 +328,52 @@ _ccw_archive() {
   echo "archived: $name"
 }
 
+_ccw_confirm_clean() {
+  # Returns 0 if the worktree is safe to destroy (clean, or user opted to
+  # discard). Returns non-zero if the caller should abort.
+  local wtdir="$1"
+  local uncommitted unpushed ans
+  uncommitted=$(git -C "$wtdir" status --porcelain 2>/dev/null)
+  unpushed=$(git -C "$wtdir" log --oneline HEAD --not --remotes 2>/dev/null)
+
+  [ -z "$uncommitted" ] && [ -z "$unpushed" ] && return 0
+
+  {
+    echo "CCW/CCS: this worktree has unsaved work:"
+    [ -n "$uncommitted" ] && echo "  - uncommitted changes"
+    [ -n "$unpushed" ] && echo "  - unpushed commits"
+    echo ""
+    echo "  [c] create a PR — launches claude with /create-pr"
+    echo "  [k] kill the worktree anyway (discards unsaved work)"
+    printf "[c/k]> "
+  } >&2
+
+  if ! read -r ans < /dev/tty; then
+    echo "CCW/CCS: no tty available; aborting" >&2
+    return 1
+  fi
+
+  case "$ans" in
+    k|K|kill)
+      return 0
+      ;;
+    c|C|create|pr)
+      if ! (cd "$wtdir" && claude -p --dangerously-skip-permissions /create-pr); then
+        echo "CCW/CCS: /create-pr failed; aborting" >&2
+        return 1
+      fi
+      # Re-check cleanliness. If /create-pr worked, uncommitted/unpushed are
+      # gone and this returns 0 immediately; otherwise the user is re-prompted.
+      _ccw_confirm_clean "$wtdir"
+      return $?
+      ;;
+    *)
+      echo "CCW/CCS: aborted." >&2
+      return 1
+      ;;
+  esac
+}
+
 _ccw_self_destruct() {
   local mode="$1"
   local cur_toplevel main_root wt_root name branch wtdir
@@ -345,6 +391,8 @@ _ccw_self_destruct() {
   name=$(basename "$cur_toplevel")
   wtdir="$cur_toplevel"
   branch="$(_ccw_branch "$name")"
+
+  _ccw_confirm_clean "$wtdir" || return 1
 
   # Move out of the worktree so git can remove it from under us.
   cd "$main_root" || return 1

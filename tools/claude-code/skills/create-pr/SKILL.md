@@ -55,9 +55,10 @@ Returns JSON with:
 
 **Bail-out cases:**
 - `branch == base` — refuse; PRs must come from a feature branch
-- `existing_pr_url` is set — print it and stop, don't create a duplicate
-- `has_commits_ahead` is false **and** `dirty` is false — nothing to PR; tell
-  the user and stop
+- `existing_pr_url` is set **and** `dirty` is false **and** `needs_push` is
+  false — nothing to add; print the URL and stop
+- `existing_pr_url` is null **and** `has_commits_ahead` is false **and**
+  `dirty` is false — nothing to PR; tell the user and stop
 
 **If `dirty`:** draft a conventional commit message from `dirty_status` and
 `git diff HEAD`, then commit. Format: `type(scope): subject` on a single
@@ -75,9 +76,35 @@ failing. Prefer to let signing happen normally.
 
 Re-run preflight after committing if you need fresh diff data.
 
+**If `existing_pr_url` is set and there are new commits or dirty changes:**
+commit any dirty work (as above), then push the branch and report the
+existing URL — do NOT draft a new title/body or create a duplicate PR.
+
+```bash
+cd <repo>
+git push
+```
+
+After the push, post a short comment summarising what this push added
+(1–3 sentences; list commit subjects if there are several) so the PR's
+activity log reflects the update:
+
+```bash
+python3 -m scripts.pr_comment --forge <forge> --body "<summary>"
+```
+
+The script returns `{success, supported, error}`. If `supported` is false
+(e.g. older `tea`), silently skip — it's a courtesy, not a requirement.
+If `success` is false but `supported` is true, surface the error.
+
+Then print the `existing_pr_url` and stop. Skip Phases 3–4 entirely.
+
 ---
 
 ## Phase 3 — Draft title and body
+
+(Skip this phase if `existing_pr_url` is already set — you're updating, not
+creating.)
 
 Using the preflight output (`diff_stat`, `commit_log`, `diff`), draft:
 
