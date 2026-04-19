@@ -166,6 +166,7 @@ selected=$(build_list | fzf \
   --delimiter='|' \
   --with-nth=2 \
   --no-sort \
+  --cycle \
   --preview "$SCRIPT --preview {1}" \
   --preview-window='right:75%:border-left' \
   --bind 'j:down,k:up,h:first,l:last' \

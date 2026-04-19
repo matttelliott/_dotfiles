@@ -69,6 +69,9 @@ setw -g aggressive-resize on
 
 # Window and Pane Management
 set-option -g allow-rename off
+# When the last window of a session closes, switch to another session
+# instead of detaching back to the bare terminal.
+set -g detach-on-destroy next
 
 # Pane Navigation (vim-style)
 bind h select-pane -L
