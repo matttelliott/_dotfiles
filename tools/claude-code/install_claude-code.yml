@@ -92,6 +92,20 @@
       register: claude_statusline_wire
       changed_when: "'CHANGED' in claude_statusline_wire.stdout"
 
+    - name: Disable auto-memory in ~/.claude/settings.json
+      ansible.builtin.shell: |
+        set -e
+        settings="$HOME/.claude/settings.json"
+        current=$(jq -r '.autoMemoryEnabled' "$settings")
+        if [ "$current" != "false" ]; then
+          tmp=$(mktemp)
+          jq '.autoMemoryEnabled = false' "$settings" > "$tmp"
+          mv "$tmp" "$settings"
+          echo CHANGED
+        fi
+      register: claude_automemory_wire
+      changed_when: "'CHANGED' in claude_automemory_wire.stdout"
+
     - name: Wire git-blocker PreToolUse hook into ~/.claude/settings.json
       ansible.builtin.shell: |
         set -e

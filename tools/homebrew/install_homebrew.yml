@@ -25,3 +25,14 @@
         NONINTERACTIVE: "1"
       become: true
       when: not homebrew_check.stat.exists
+
+    # Ensure homebrew PATH is available for non-interactive ssh (e.g. mosh-server lookup).
+    # The homebrew installer only writes to ~/.zprofile, which login shells source — ssh
+    # non-interactive invocations source only ~/.zshenv.
+    - name: Add Homebrew to ~/.zshenv for non-interactive shells
+      ansible.builtin.blockinfile:
+        path: ~/.zshenv
+        create: true
+        marker: "# {mark} HOMEBREW PATH"
+        block: |
+          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
