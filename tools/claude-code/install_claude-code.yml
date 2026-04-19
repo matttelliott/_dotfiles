@@ -131,6 +131,12 @@
         dest: ~/.claude/hooks/git-blocker.sh
         mode: "0755"
 
+    - name: Install Claude Code hosts-blocker PreToolUse hook
+      ansible.builtin.copy:
+        src: hosts-blocker.sh
+        dest: ~/.claude/hooks/hosts-blocker.sh
+        mode: "0755"
+
     - name: Ensure ~/.claude/settings.json exists
       ansible.builtin.copy:
         content: "{}\n"
@@ -167,3 +173,32 @@
         fi
       register: claude_automemory_wire
       changed_when: "'CHANGED' in claude_automemory_wire.stdout"
+
+    - name: Wire hosts-blocker PreToolUse hook into ~/.claude/settings.json
+      ansible.builtin.shell: |
+        set -eo pipefail
+        settings="$HOME/.claude/settings.json"
+        target_cmd="$HOME/.claude/hooks/hosts-blocker.sh"
+        matcher="Edit|Write|MultiEdit|Bash"
+        has_entry=$(jq --arg cmd "$target_cmd" --arg m "$matcher" -r '
+          (.hooks.PreToolUse // [])
+          | map(select(
+              (.matcher == $m)
+              and ((.hooks // []) | map(.command) | any(. == $cmd))
+            ))
+          | length
+        ' "$settings")
+        if [ "$has_entry" = "0" ]; then
+          tmp=$(mktemp)
+          jq --arg cmd "$target_cmd" --arg m "$matcher" '
+            .hooks = (.hooks // {})
+            | .hooks.PreToolUse = ((.hooks.PreToolUse // []) + [{
+                "matcher": $m,
+                "hooks": [{"type": "command", "command": $cmd}]
+              }])
+          ' "$settings" > "$tmp"
+          mv "$tmp" "$settings"
+          echo CHANGED
+        fi
+      register: claude_hostsblocker_wire
+      changed_when: "'CHANGED' in claude_hostsblocker_wire.stdout"
