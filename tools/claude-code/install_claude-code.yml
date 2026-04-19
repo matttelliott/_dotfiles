@@ -1,4 +1,44 @@
 ---
+- name: Disable Claude Code git-blocker PreToolUse hook
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Check if ~/.claude/settings.json exists
+      ansible.builtin.stat:
+        path: ~/.claude/settings.json
+      register: claude_settings_stat
+
+    - name: Remove git-blocker entry from ~/.claude/settings.json
+      ansible.builtin.shell: |
+        set -eo pipefail
+        settings="$HOME/.claude/settings.json"
+        has_entry=$(jq -r '
+          (.hooks.PreToolUse // [])
+          | map(select(
+              (.matcher == "Bash")
+              and ((.hooks // []) | map(.command) | any(contains("git-blocker.sh")))
+            ))
+          | length
+        ' "$settings")
+        if [ "$has_entry" != "0" ]; then
+          tmp=$(mktemp)
+          jq '
+            if .hooks.PreToolUse then
+              .hooks.PreToolUse |= map(select(
+                (.matcher != "Bash")
+                or ((.hooks // []) | map(.command) | any(contains("git-blocker.sh")) | not)
+              ))
+              | if (.hooks.PreToolUse | length) == 0 then del(.hooks.PreToolUse) else . end
+            else . end
+          ' "$settings" > "$tmp"
+          mv "$tmp" "$settings"
+          echo CHANGED
+        fi
+      register: claude_gitblocker_unwire
+      changed_when: "'CHANGED' in claude_gitblocker_unwire.stdout"
+      when: claude_settings_stat.stat.exists
+
 - name: Install Claude Code
   hosts: with_ai_tools:&with_login_tools
   gather_facts: true
@@ -105,34 +145,3 @@
         fi
       register: claude_automemory_wire
       changed_when: "'CHANGED' in claude_automemory_wire.stdout"
-
-    - name: Wire git-blocker PreToolUse hook into ~/.claude/settings.json
-      ansible.builtin.shell: |
-        set -e
-        settings="$HOME/.claude/settings.json"
-        target_cmd="bash \"$HOME/.claude/hooks/git-blocker.sh\""
-        # Idempotent: only write if the Bash PreToolUse entry is missing/different.
-        current=$(jq -r '
-          (.hooks.PreToolUse // [])
-          | map(select(.matcher == "Bash"))
-          | first
-          | (.hooks // []) | map(.command) | .[]? // ""
-        ' "$settings" 2>/dev/null | grep -F "git-blocker.sh" || true)
-        if [ -z "$current" ]; then
-          tmp=$(mktemp)
-          jq --arg cmd "$target_cmd" '
-            .hooks = (.hooks // {})
-            | .hooks.PreToolUse = (.hooks.PreToolUse // [])
-            | .hooks.PreToolUse = (
-                (.hooks.PreToolUse | map(select(.matcher != "Bash")))
-                + [{
-                    "matcher": "Bash",
-                    "hooks": [{"type": "command", "command": $cmd}]
-                  }]
-              )
-          ' "$settings" > "$tmp"
-          mv "$tmp" "$settings"
-          echo CHANGED
-        fi
-      register: claude_gitblocker_wire
-      changed_when: "'CHANGED' in claude_gitblocker_wire.stdout"
