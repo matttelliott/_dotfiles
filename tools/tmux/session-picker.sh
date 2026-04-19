@@ -173,7 +173,9 @@ selected=$(build_list | fzf \
   --bind "esc:transform:if [ \"\$FZF_INPUT_STATE\" = \"enabled\" ]; then echo 'hide-input+disable-search+clear-query'; else echo abort; fi" \
   --bind "ctrl-x:execute-silent(case {1} in *:*) tmux kill-window -t {1} ;; *) tmux kill-session -t {1} ;; esac)+reload($SCRIPT --list)" \
   --bind "ctrl-n:execute(printf '\nnew session name: ' > /dev/tty; read -r n < /dev/tty; [ -n \"\$n\" ] && tmux new-session -ds \"\$n\" -c \"\$HOME\" 2>/dev/null)+reload($SCRIPT --list)" \
-  --footer=$' enter switch\n j/k up/down\n / search\n ctrl-x kill\n ctrl-n new\n esc back/cancel ' \
+  --bind "ctrl-r:execute(tgt={1}; case \"\$tgt\" in *:*) kind=window;; *) kind=session;; esac; printf '\nrename %s \"%s\" to: ' \"\$kind\" \"\$tgt\" > /dev/tty; read -r n < /dev/tty; [ -n \"\$n\" ] && if [ \"\$kind\" = window ]; then tmux rename-window -t \"\$tgt\" \"\$n\" 2>/dev/null; else tmux rename-session -t \"\$tgt\" \"\$n\" 2>/dev/null; fi)+reload($SCRIPT --list)" \
+  --bind "ctrl-w:execute(sess={1}; sess=\${sess%%:*}; printf '\nnew window name (blank for default): ' > /dev/tty; read -r n < /dev/tty; if [ -n \"\$n\" ]; then tmux new-window -t \"\$sess\" -n \"\$n\" 2>/dev/null; else tmux new-window -t \"\$sess\" 2>/dev/null; fi)+reload($SCRIPT --list)" \
+  --footer=$' enter switch\n j/k up/down\n / search\n ctrl-n new session\n ctrl-w new window\n ctrl-r rename\n ctrl-x kill\n esc back/cancel ' \
   --footer-border=top \
   --color='footer:italic:dim') || exit 0
 
