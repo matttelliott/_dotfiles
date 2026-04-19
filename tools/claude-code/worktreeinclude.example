@@ -1,0 +1,21 @@
+# .worktreeinclude — copy this to your repo root as `.worktreeinclude`.
+#
+# One path per line (relative to the repo root). Lines starting with # are comments.
+# Paths are copied into each new worktree created by `CC w <name>` so gitignored
+# files (secrets, local configs, caches) are available in the worktree.
+#
+# Matches the semantics of Claude Code Desktop's .worktreeinclude file.
+
+# Environment / secrets
+.env
+.env.local
+.envrc
+
+# Editor local settings
+.vscode/settings.json
+.idea/workspace.xml
+
+# Caches / installed deps that would be slow to rebuild
+# node_modules
+# .venv
+# target

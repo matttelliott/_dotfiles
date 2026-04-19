@@ -63,6 +63,11 @@
         line: 'source ~/.config/zsh/claude-code.zsh'
         create: true
 
+    - name: Install .worktreeinclude example
+      ansible.builtin.copy:
+        src: worktreeinclude.example
+        dest: ~/.config/claude-code/worktreeinclude.example
+
     - name: Ensure ~/.claude exists
       ansible.builtin.file:
         path: ~/.claude

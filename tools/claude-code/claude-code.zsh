@@ -1,1 +1,316 @@
 alias cc='claude --dangerously-skip-permissions'
+
+# CC: fzf-driven discovery over `claude --help`.
+# Surfaces every option and subcommand the CLI exposes, with drill-down into
+# subcommand help. This is a *discovery* tool, not a convenience wrapper —
+# use `cc` for daily runs.
+#
+# Usage:
+#   CC                  Browse top-level options + subcommands.
+#   CC <subcommand>     Browse `claude <subcommand> --help`.
+#
+# In the picker:
+#   Enter      Print the selected line (paste into your terminal).
+#   Ctrl-Y     Copy the first token (flag or subcommand name) to clipboard.
+#   Ctrl-D     If the selection is a subcommand, drill into its help.
+#   Ctrl-O     Open the upstream docs in a browser.
+#   Esc        Quit.
+
+CC() {
+  local sub="${1:-}" help_text lines
+  if [ -n "$sub" ]; then
+    help_text=$(claude "$sub" --help 2>&1) || {
+      echo "no help for: claude $sub" >&2
+      return 1
+    }
+  else
+    help_text=$(claude --help 2>&1) || {
+      echo "no help output from claude" >&2
+      return 1
+    }
+  fi
+
+  if ! command -v fzf >/dev/null 2>&1; then
+    printf '%s\n' "$help_text"
+    return 0
+  fi
+
+  # Two-space-indented lines starting with - (options) or a lowercase letter (commands).
+  lines=$(printf '%s\n' "$help_text" | grep -E '^  (-|[a-z])')
+  if [ -z "$lines" ]; then
+    printf '%s\n' "$help_text"
+    return 0
+  fi
+
+  local header="Enter: print · Ctrl-Y: yank · Ctrl-D: drill subcommand · Ctrl-O: docs"
+  printf '%s\n' "$lines" | fzf \
+    --ansi \
+    --prompt "claude${sub:+ $sub} > " \
+    --header "$header" \
+    --preview 'printf "%s\n" {} | fold -s -w $FZF_PREVIEW_COLUMNS' \
+    --preview-window='up:5:wrap' \
+    --bind 'ctrl-y:execute-silent(printf "%s" {} | awk "{print \$1}" | tr -d ",\n" | cut -d"|" -f1 | (pbcopy 2>/dev/null || xclip -selection clipboard 2>/dev/null || wl-copy 2>/dev/null))+abort' \
+    --bind 'ctrl-d:execute(tok=$(printf "%s" {} | awk "{print \$1}" | tr -d "," | cut -d"|" -f1); case "$tok" in -*|prompt) printf "\n(not a subcommand)\n" > /dev/tty; sleep 1 ;; *) zsh -ic "CC $tok" < /dev/tty > /dev/tty 2>&1 ;; esac)' \
+    --bind 'ctrl-o:execute-silent(open "https://code.claude.com/docs/en/cli-reference" 2>/dev/null || xdg-open "https://code.claude.com/docs/en/cli-reference" 2>/dev/null)'
+}
+
+# ccw / ccs: Git-worktree + tmux launchers for Claude Code sessions.
+# Replicate Claude Code Desktop's parallel-session workflow from the CLI by
+# creating a worktree under <repo>/.claude/worktrees/<name>, copying paths
+# listed in <repo>/.worktreeinclude, then opening the worktree in tmux.
+#
+#   ccw [name] [claude-args...]   New worktree → new WINDOW in the current session.
+#   ccs [name] [claude-args...]   New worktree → new SESSION named <project>-<name>.
+#   ccw|ccs ls                    List this repo's worktrees.
+#   ccw|ccs rm <name>             Archive a worktree (also kills its tmux targets).
+#   ccw|ccs help                  Show help.
+#
+# Smart naming:
+#   - If [name] is omitted, auto-generates `wt<N>` with N = next unused suffix
+#     among existing worktree dirs in this repo.
+#   - ccw window name = <name>; collisions get -2, -3, ... appended.
+#   - ccs session name = <project>-<name>; collisions get -2, -3, ... appended.
+#   - The launched tmux target opens cd'd to the worktree root, and claude
+#     runs as a child of the shell so the shell stays after claude exits.
+#
+# Env:
+#   CCW_WORKTREE_DIR   override worktree root (default: <repo>/.claude/worktrees)
+#   CCW_BRANCH_PREFIX  branch name prefix (default: "claude/")
+
+ccw() {
+  case "${1:-}" in
+    ls|list)          _ccw_list ;;
+    rm|archive)       shift; _ccw_archive "$@" ;;
+    -h|--help|help)   _ccw_help ;;
+    *)                _ccw_spawn window "$@" ;;
+  esac
+}
+
+ccs() {
+  case "${1:-}" in
+    ls|list)          _ccw_list ;;
+    rm|archive)       shift; _ccw_archive "$@" ;;
+    -h|--help|help)   _ccw_help ;;
+    *)                _ccw_spawn session "$@" ;;
+  esac
+}
+
+_ccw_help() {
+  cat <<'EOF'
+ccw [name] [claude-args...]   New worktree as tmux WINDOW in current session.
+ccs [name] [claude-args...]   New worktree as its own tmux SESSION.
+
+Subcommands (same for ccw and ccs):
+  ls                 List worktrees in current repo.
+  rm <name>          Archive worktree + its tmux targets.
+
+If [name] is omitted, a name like "wt3" is auto-generated.
+The new shell starts in the worktree root; claude runs as a child.
+
+Env:
+  CCW_WORKTREE_DIR   override worktree root (default: <repo>/.claude/worktrees)
+  CCW_BRANCH_PREFIX  branch prefix (default: claude/)
+
+See <repo>/.worktreeinclude to copy gitignored files into each worktree.
+EOF
+}
+
+_ccw_repo_root() { git rev-parse --show-toplevel 2>/dev/null; }
+_ccw_wt_root()   { echo "${CCW_WORKTREE_DIR:-$1/.claude/worktrees}"; }
+_ccw_project()   { basename "$1"; }
+_ccw_branch()    { echo "${CCW_BRANCH_PREFIX:-claude/}$1"; }
+
+_ccw_next_name() {
+  # Highest numeric suffix of wt<N> among existing worktree dirs, + 1.
+  local root="$1" wt_root max=0 n
+  wt_root=$(_ccw_wt_root "$root")
+  if [ -d "$wt_root" ]; then
+    for n in $(ls -1 "$wt_root" 2>/dev/null | sed -nE 's/^wt([0-9]+)$/\1/p'); do
+      [ "$n" -gt "$max" ] && max="$n"
+    done
+  fi
+  echo "wt$((max + 1))"
+}
+
+_ccw_list() {
+  local root; root=$(_ccw_repo_root) || { echo "not in a git repo" >&2; return 1; }
+  git -C "$root" worktree list
+}
+
+_ccw_apply_worktreeinclude() {
+  local src="$1" dst="$2"
+  local inc="$src/.worktreeinclude"
+  [ -f "$inc" ] || return 0
+  local copied=0 pattern
+  while IFS= read -r pattern || [ -n "$pattern" ]; do
+    case "$pattern" in ''|'#'*) continue ;; esac
+    if [ -e "$src/$pattern" ]; then
+      mkdir -p "$dst/$(dirname "$pattern")"
+      cp -R "$src/$pattern" "$dst/$pattern"
+      copied=$((copied + 1))
+    fi
+  done < "$inc"
+  [ "$copied" -gt 0 ] && echo "ccw: copied $copied entries from .worktreeinclude"
+}
+
+_ccw_cmdstr() {
+  local out= arg
+  for arg in "$@"; do
+    out="${out} $(printf '%q' "$arg")"
+  done
+  printf '%s' "${out# }"
+}
+
+_ccw_ensure_ignored() {
+  # Ensure the worktree root is gitignored for this repo. Writes to
+  # .git/info/exclude (local-only, no commit) so the safeguard applies in
+  # every repo ccw touches without modifying tracked .gitignore files.
+  local root="$1" wt_root="$2"
+  local rel="${wt_root#$root/}"
+  [ "$rel" = "$wt_root" ] && return 0   # outside repo, nothing to ignore
+
+  local pattern="/${rel}/"
+  if git -C "$root" check-ignore -q "$wt_root/.__ccw_probe__" 2>/dev/null; then
+    return 0
+  fi
+
+  local exclude_file
+  if [ -d "$root/.git" ]; then
+    exclude_file="$root/.git/info/exclude"
+  elif [ -f "$root/.git" ]; then
+    local gitdir
+    gitdir=$(awk '/^gitdir: / {print $2; exit}' "$root/.git")
+    exclude_file="${gitdir%/worktrees/*}/info/exclude"
+  else
+    return 0
+  fi
+
+  mkdir -p "$(dirname "$exclude_file")"
+  if ! grep -qxF "$pattern" "$exclude_file" 2>/dev/null; then
+    {
+      [ -s "$exclude_file" ] && echo ""
+      echo "# Added by ccw: ignore Claude Code worktrees"
+      echo "$pattern"
+    } >> "$exclude_file"
+    echo "ccw: added '$pattern' to $exclude_file (local-only)"
+  fi
+}
+
+_ccw_spawn() {
+  local mode="$1"; shift
+  local root wt_root name wtdir branch
+  root=$(_ccw_repo_root) || { echo "not in a git repo" >&2; return 1; }
+  wt_root=$(_ccw_wt_root "$root")
+
+  if [ -n "${1:-}" ]; then
+    name="$1"; shift
+  else
+    name=$(_ccw_next_name "$root")
+  fi
+
+  wtdir="$wt_root/$name"
+  branch="$(_ccw_branch "$name")"
+
+  _ccw_ensure_ignored "$root" "$wt_root"
+
+  if [ ! -d "$wtdir" ]; then
+    mkdir -p "$(dirname "$wtdir")"
+    if git -C "$root" show-ref --verify --quiet "refs/heads/$branch"; then
+      git -C "$root" worktree add "$wtdir" "$branch" || return 1
+    else
+      git -C "$root" worktree add -b "$branch" "$wtdir" || return 1
+    fi
+    _ccw_apply_worktreeinclude "$root" "$wtdir"
+  fi
+
+  if [ "$mode" = "session" ]; then
+    _ccw_new_session "$root" "$wtdir" "$name" "$@"
+  else
+    _ccw_new_window "$root" "$wtdir" "$name" "$@"
+  fi
+}
+
+_ccw_new_window() {
+  local root="$1" wtdir="$2" name="$3"; shift 3
+  local project cmd_str sess wname i
+  project=$(_ccw_project "$root")
+  cmd_str=$(_ccw_cmdstr claude --dangerously-skip-permissions "$@")
+
+  if ! command -v tmux >/dev/null 2>&1; then
+    (cd "$wtdir" && eval "$cmd_str")
+    return
+  fi
+
+  if [ -n "${TMUX:-}" ]; then
+    sess=$(tmux display-message -p '#S')
+  else
+    sess="$project"
+    tmux has-session -t "=$sess" 2>/dev/null || tmux new-session -d -s "$sess" -c "$root"
+  fi
+
+  wname="$name"; i=2
+  while tmux list-windows -t "=$sess" -F '#{window_name}' 2>/dev/null | grep -qx "$wname"; do
+    wname="${name}-${i}"
+    i=$((i + 1))
+  done
+
+  tmux new-window -t "$sess" -n "$wname" -c "$wtdir"
+  tmux send-keys -t "$sess:$wname" "$cmd_str" Enter
+  if [ -n "${TMUX:-}" ]; then
+    tmux select-window -t "$sess:$wname"
+  else
+    tmux attach -t "$sess:$wname"
+  fi
+}
+
+_ccw_new_session() {
+  local root="$1" wtdir="$2" name="$3"; shift 3
+  local project cmd_str sess i
+  project=$(_ccw_project "$root")
+  cmd_str=$(_ccw_cmdstr claude --dangerously-skip-permissions "$@")
+
+  if ! command -v tmux >/dev/null 2>&1; then
+    (cd "$wtdir" && eval "$cmd_str")
+    return
+  fi
+
+  sess="${project}-${name}"; i=2
+  while tmux has-session -t "=$sess" 2>/dev/null; do
+    sess="${project}-${name}-${i}"
+    i=$((i + 1))
+  done
+
+  tmux new-session -d -s "$sess" -c "$wtdir"
+  tmux send-keys -t "$sess" "$cmd_str" Enter
+  if [ -n "${TMUX:-}" ]; then
+    tmux switch-client -t "$sess"
+  else
+    tmux attach -t "$sess"
+  fi
+}
+
+_ccw_archive() {
+  local name="${1:-}"
+  [ -z "$name" ] && { echo "usage: ccw rm <name>" >&2; return 1; }
+  local root wtdir project branch
+  root=$(_ccw_repo_root) || { echo "not in a git repo" >&2; return 1; }
+  wtdir="$(_ccw_wt_root "$root")/$name"
+  project=$(_ccw_project "$root")
+  branch="$(_ccw_branch "$name")"
+
+  if command -v tmux >/dev/null 2>&1; then
+    # Kill any window named $name in the project's umbrella session.
+    if tmux list-windows -t "=$project" -F '#{window_name}' 2>/dev/null | grep -qx "$name"; then
+      tmux kill-window -t "$project:$name" 2>/dev/null || true
+    fi
+    # Kill the dedicated per-worktree session, if any.
+    tmux kill-session -t "=${project}-${name}" 2>/dev/null || true
+  fi
+
+  git -C "$root" worktree remove --force "$wtdir" 2>/dev/null \
+    || git -C "$root" worktree remove "$wtdir" 2>/dev/null \
+    || rm -rf "$wtdir"
+  git -C "$root" worktree prune 2>/dev/null || true
+  git -C "$root" branch -D "$branch" 2>/dev/null || true
+  echo "archived: $name"
+}
