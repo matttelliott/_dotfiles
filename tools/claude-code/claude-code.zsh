@@ -76,6 +76,10 @@ CC() {
 # Env:
 #   CCW_WORKTREE_DIR   override worktree root (default: <repo>/.claude/worktrees)
 #   CCW_BRANCH_PREFIX  branch name prefix (default: "claude/")
+#
+# Branch selection:
+#   --branch              Pick an existing branch via fzf (attaches worktree to it).
+#   --branch=<name>       Attach worktree to <name> (local, or origin/<name>).
 
 ccw() {
   case "${1:-}" in
@@ -109,16 +113,21 @@ _ccw_help() {
 ccw [name] [claude-args...]   New worktree as tmux WINDOW in current session.
 ccs [name] [claude-args...]   New worktree as its own tmux SESSION.
 
+Branch selection (before [name]):
+  --branch                    Pick an existing branch via fzf.
+  --branch=<name>             Attach to branch <name> (local, or origin/<name>).
+
 Subcommands (same for ccw and ccs):
   ls                 List worktrees in current repo.
   rm <name>          Archive worktree + its tmux targets.
 
-If [name] is omitted, a name like "wt3" is auto-generated.
+If [name] is omitted, a name like "wt3" is auto-generated, or derived from
+the selected branch (slashes replaced with dashes) when --branch is used.
 The new shell starts in the worktree root; claude runs as a child.
 
 Env:
   CCW_WORKTREE_DIR   override worktree root (default: <repo>/.claude/worktrees)
-  CCW_BRANCH_PREFIX  branch prefix (default: claude/)
+  CCW_BRANCH_PREFIX  branch prefix for auto-created branches (default: claude/)
 
 See <repo>/.worktreeinclude to copy gitignored files into each worktree.
 EOF
@@ -209,20 +218,100 @@ _ccw_ensure_ignored() {
   fi
 }
 
+_ccw_prompt_name() {
+  # Prompt for a worktree name, defaulting to the next wt<N>. Prints the
+  # chosen name on stdout. Falls back to the default if there's no tty.
+  local root="$1" default name
+  default=$(_ccw_next_name "$root")
+  if [ ! -t 0 ] && [ ! -r /dev/tty ]; then
+    echo "$default"
+    return 0
+  fi
+  printf "ccw: worktree name [%s]> " "$default" >&2
+  if ! IFS= read -r name < /dev/tty 2>/dev/null; then
+    echo "" >&2
+    echo "$default"
+    return 0
+  fi
+  [ -z "$name" ] && name="$default"
+  echo "$name"
+}
+
+_ccw_pick_branch() {
+  # Interactive branch picker. Lists local branches and prints the selection
+  # on stdout. Returns non-zero on no selection / missing fzf.
+  local root="$1"
+  if ! command -v fzf >/dev/null 2>&1; then
+    echo "ccw: --branch (interactive) requires fzf; use --branch=<name> instead" >&2
+    return 1
+  fi
+  local branches
+  branches=$(git -C "$root" for-each-ref --format='%(refname:short)' refs/heads/ 2>/dev/null)
+  if [ -z "$branches" ]; then
+    echo "ccw: no local branches found" >&2
+    return 1
+  fi
+  printf '%s\n' "$branches" | fzf \
+    --prompt "branch > " \
+    --height 40% \
+    --reverse \
+    --header "pick a branch to attach a new worktree to"
+}
+
 _ccw_spawn() {
   local mode="$1"; shift
   local root wt_root name wtdir branch
+  local explicit_branch="" pick_branch=0
+  local -a rest
+  rest=()
+
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --branch)
+        pick_branch=1
+        shift
+        ;;
+      --branch=*)
+        explicit_branch="${1#--branch=}"
+        shift
+        ;;
+      --)
+        shift
+        while [ $# -gt 0 ]; do rest+=("$1"); shift; done
+        ;;
+      *)
+        rest+=("$1")
+        shift
+        ;;
+    esac
+  done
+  set -- "${rest[@]}"
+
   root=$(_ccw_repo_root) || { echo "not in a git repo" >&2; return 1; }
   wt_root=$(_ccw_wt_root "$root")
 
-  if [ -n "${1:-}" ]; then
-    name="$1"; shift
+  if [ "$pick_branch" = 1 ]; then
+    explicit_branch=$(_ccw_pick_branch "$root") || return 1
+    [ -z "$explicit_branch" ] && { echo "ccw: no branch selected" >&2; return 1; }
+  fi
+
+  if [ -n "$explicit_branch" ]; then
+    branch="$explicit_branch"
+    if [ -n "${1:-}" ]; then
+      name="$1"; shift
+    else
+      name="${branch//\//-}"
+    fi
   else
-    name=$(_ccw_next_name "$root")
+    if [ -n "${1:-}" ]; then
+      name="$1"; shift
+    else
+      name=$(_ccw_prompt_name "$root") || return 1
+    fi
+    branch="$(_ccw_branch "$name")"
   fi
 
   wtdir="$wt_root/$name"
-  branch="$(_ccw_branch "$name")"
 
   _ccw_ensure_ignored "$root" "$wt_root"
 
@@ -230,6 +319,12 @@ _ccw_spawn() {
     mkdir -p "$(dirname "$wtdir")"
     if git -C "$root" show-ref --verify --quiet "refs/heads/$branch"; then
       git -C "$root" worktree add "$wtdir" "$branch" || return 1
+    elif [ -n "$explicit_branch" ] \
+         && git -C "$root" show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+      git -C "$root" worktree add -b "$branch" "$wtdir" "origin/$branch" || return 1
+    elif [ -n "$explicit_branch" ]; then
+      echo "ccw: branch not found: $branch" >&2
+      return 1
     else
       git -C "$root" worktree add -b "$branch" "$wtdir" || return 1
     fi
