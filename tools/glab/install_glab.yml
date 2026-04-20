@@ -1,0 +1,37 @@
+---
+- name: Install GitLab CLI (glab)
+  hosts: with_login_tools
+  gather_facts: true
+
+  vars:
+    glab_version: "1.92.1"
+
+  tasks:
+    - name: Install glab via Homebrew (macOS)
+      ansible.builtin.shell: /opt/homebrew/bin/brew install glab
+      args:
+        creates: /opt/homebrew/bin/glab
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Check if glab is installed (Debian)
+      ansible.builtin.stat:
+        path: /usr/local/bin/glab
+      register: glab_check
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Download and install glab (Debian)
+      ansible.builtin.shell: |
+        curl -fsSLo /tmp/glab.tar.gz \
+          "https://gitlab.com/gitlab-org/cli/-/releases/v{{ glab_version }}/downloads/glab_{{ glab_version }}_linux_amd64.tar.gz"
+        tar xf /tmp/glab.tar.gz -C /tmp bin/glab
+        install /tmp/bin/glab /usr/local/bin/glab
+        rm -rf /tmp/glab.tar.gz /tmp/bin
+      become: true
+      when: ansible_facts['os_family'] == "Debian" and not glab_check.stat.exists
+
+    - name: Install glab via pacman (Arch)
+      community.general.pacman:
+        name: glab
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == "Archlinux"

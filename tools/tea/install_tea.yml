@@ -1,0 +1,36 @@
+---
+- name: Install Gitea/Forgejo CLI (tea)
+  hosts: with_login_tools
+  gather_facts: true
+
+  vars:
+    tea_version: "0.14.0"
+
+  tasks:
+    - name: Install tea via Homebrew (macOS)
+      ansible.builtin.shell: /opt/homebrew/bin/brew install tea
+      args:
+        creates: /opt/homebrew/bin/tea
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Check if tea is installed (Debian)
+      ansible.builtin.stat:
+        path: /usr/local/bin/tea
+      register: tea_check
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Download and install tea (Debian)
+      ansible.builtin.shell: |
+        curl -fsSLo /tmp/tea \
+          https://dl.gitea.com/tea/{{ tea_version }}/tea-{{ tea_version }}-linux-amd64
+        install /tmp/tea /usr/local/bin/tea
+        rm -f /tmp/tea
+      become: true
+      when: ansible_facts['os_family'] == "Debian" and not tea_check.stat.exists
+
+    - name: Install tea via pacman (Arch)
+      community.general.pacman:
+        name: tea
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == "Archlinux"
