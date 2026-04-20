@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
@@ -35,11 +36,45 @@ def run(cmd: list[str], cwd: str | None = None):
     return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
 
 
+def _in_linked_worktree(cwd: str) -> bool:
+    """True when cwd is a linked worktree (not the main one).
+
+    In linked worktrees the base branch is typically checked out elsewhere,
+    so CLIs that try to `git checkout <base>` as part of branch cleanup
+    will fail.
+    """
+    r1 = run(["git", "rev-parse", "--git-dir"], cwd)
+    r2 = run(["git", "rev-parse", "--git-common-dir"], cwd)
+    if r1.returncode != 0 or r2.returncode != 0:
+        return False
+    git_dir = os.path.realpath(os.path.join(cwd, r1.stdout.strip()))
+    common_dir = os.path.realpath(os.path.join(cwd, r2.stdout.strip()))
+    return git_dir != common_dir
+
+
+def _delete_remote_branch(cwd: str) -> tuple[bool, str]:
+    branch_r = run(["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd)
+    branch = branch_r.stdout.strip()
+    if not branch or branch == "HEAD":
+        return False, "could not resolve current branch name"
+    r = run(["git", "push", "origin", "--delete", branch], cwd)
+    if r.returncode != 0:
+        return False, ((r.stderr or r.stdout) or "git push --delete failed").strip()
+    return True, ""
+
+
 def merge_github(
     cwd: str, method: str, delete_branch: bool, auto: bool, admin: bool
 ) -> MergeResult:
+    # `gh pr merge --delete-branch` performs a local checkout of the base
+    # branch so it can delete the feature branch locally. In a linked
+    # worktree the base is held by another worktree and the checkout fails
+    # — even though the server-side merge has already completed. Split the
+    # request into a plain merge + explicit remote-branch delete.
+    skip_local_delete = delete_branch and _in_linked_worktree(cwd)
+
     cmd = ["gh", "pr", "merge", f"--{method}"]
-    if delete_branch:
+    if delete_branch and not skip_local_delete:
         cmd.append("--delete-branch")
     if auto:
         cmd.append("--auto")
@@ -57,6 +92,18 @@ def merge_github(
             already_merged=False,
             error=out.strip() or "gh pr merge failed",
         )
+
+    if skip_local_delete and not auto:
+        ok, err = _delete_remote_branch(cwd)
+        if not ok:
+            return MergeResult(
+                success=False,
+                method=method,
+                url=None,
+                already_merged=False,
+                error=f"merge succeeded but remote branch delete failed: {err}",
+            )
+
     m = re.search(r"(https://[^/]+/[^/]+/[^/]+/pull/\d+)", out)
     return MergeResult(
         success=True,
