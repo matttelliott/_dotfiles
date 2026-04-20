@@ -30,6 +30,29 @@
       community.general.pacman:
         update_cache: true
       become: true
+# TODO: remove this cleanup play once all managed machines have run setup.yml
+# at least once after 2026-04-20 (nvim-ai was removed from the repo then).
+- name: Remove nvim-ai (tool was removed from repo)
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Remove nvim-ai config, data, state, and cache directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - ~/.config/nvim-ai
+        - ~/.local/share/nvim-ai
+        - ~/.local/state/nvim-ai
+        - ~/.cache/nvim-ai
+        - ~/.config/zsh/nvim-ai.zsh
+
+    - name: Remove nvim-ai source line from zshrc
+      ansible.builtin.lineinfile:
+        path: ~/.zshrc
+        line: 'source ~/.config/zsh/nvim-ai.zsh'
+        state: absent
+
 - name: Configure macOS
   import_playbook: tools/macos/install_macos.yml
 - name: Configure Debian
@@ -153,8 +176,6 @@
   import_playbook: tools/tmux/install_tmux.yml
 - name: Install Neovim
   import_playbook: tools/neovim/install_neovim.yml
-- name: Install nvim-ai
-  import_playbook: tools/nvim-ai/install_nvim-ai.yml
 - name: Install sd
   import_playbook: tools/sd/install_sd.yml
 - name: Install fd

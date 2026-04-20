@@ -92,7 +92,7 @@ ansible-lint tools/*/install_*.yml
 | `with_login_tools` | Git signing, SSH, cloud CLIs    |
 | `with_gui_tools`   | GUI applications                |
 | `with_browsers`    | Browser suite                   |
-| `with_ai_tools`    | AI tools (Claude Code, nvim-ai) |
+| `with_ai_tools`    | AI tools (Claude Code)          |
 
 ## Ansible Patterns
 
