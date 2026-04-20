@@ -108,6 +108,63 @@ ccs() {
 CCW() { _ccw_self_destruct window ; }
 CCS() { _ccw_self_destruct session ; }
 
+# cct: Throwaway Claude Code session in a fresh /tmp directory.
+# Opens a new tmux WINDOW in the current session (like ccw), cd'd into
+# a freshly-created /tmp/cct.XXXXXX dir. No git, no worktree — for
+# one-shot experiments, scratch work, and non-repo tasks.
+#   cct [claude-args...]
+cct() {
+  local tmpdir cmd_str sess wname i
+  tmpdir=$(mktemp -d "/tmp/cct.XXXXXX") || return 1
+  cmd_str=$(_ccw_cmdstr claude --dangerously-skip-permissions "$@")
+
+  if ! command -v tmux >/dev/null 2>&1; then
+    (cd "$tmpdir" && eval "$cmd_str")
+    return
+  fi
+
+  if [ -n "${TMUX:-}" ]; then
+    sess=$(tmux display-message -p '#S')
+  else
+    sess="cct"
+    tmux has-session -t "=$sess" 2>/dev/null || tmux new-session -d -s "$sess" -c "$tmpdir"
+  fi
+
+  wname="cct"; i=2
+  while tmux list-windows -t "=$sess" -F '#{window_name}' 2>/dev/null | grep -qx "$wname"; do
+    wname="cct-${i}"
+    i=$((i + 1))
+  done
+
+  tmux new-window -t "$sess" -n "$wname" -c "$tmpdir"
+  tmux send-keys -t "$sess:$wname" "$cmd_str" Enter
+  if [ -n "${TMUX:-}" ]; then
+    tmux select-window -t "$sess:$wname"
+  else
+    tmux attach -t "$sess:$wname"
+  fi
+}
+
+# CCT: inverse of cct. Delete the current /tmp/cct.XXXXXX dir and kill the
+# enclosing tmux WINDOW (and all subprocesses in it). Must be invoked from
+# inside a dir created by cct.
+CCT() {
+  local cur
+  cur=$(pwd)
+  case "$cur" in
+    /tmp/cct.*|/private/tmp/cct.*) ;;
+    *) echo "CCT: not inside a /tmp/cct.* dir ($cur)" >&2; return 1 ;;
+  esac
+
+  cd /tmp || return 1
+  rm -rf "$cur"
+  echo "removed: $cur"
+
+  if command -v tmux >/dev/null 2>&1 && [ -n "${TMUX:-}" ]; then
+    tmux kill-window
+  fi
+}
+
 _ccw_help() {
   cat <<'EOF'
 ccw [name] [claude-args...]   New worktree as tmux WINDOW in current session.
