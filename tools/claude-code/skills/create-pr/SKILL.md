@@ -108,10 +108,16 @@ creating.)
 
 Using the preflight output (`diff_stat`, `commit_log`, `diff`), draft:
 
-**Title** — ≤72 chars, imperative mood, no trailing punctuation. Prefer
-summarizing the *intent* ("Add forge detection for GitLab") over the
-mechanics ("Update 3 files"). If there's a single commit ahead, the commit
-subject is often a reasonable title — tighten it if needed.
+**Title** — conventional-commit style: `type(scope): subject`. Types:
+`feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `style`, `perf`,
+`build`, `ci`. Scope is optional but encouraged when the change is
+confined to one area (e.g. `feat(auth): …`). Subject ≤72 chars,
+imperative mood, lowercase first word, no trailing punctuation. Prefer
+summarizing the *intent* ("feat(forge): add GitLab detection") over the
+mechanics ("chore: update 3 files"). If there's a single commit ahead
+with a well-formed conventional-commit subject, reuse it as the title —
+tighten it if needed. If the scope is unclear, omit it rather than
+inventing one.
 
 **Body** — brief markdown. Include:
 - A 1–3 sentence summary of the change and why.
