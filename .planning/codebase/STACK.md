@@ -140,7 +140,7 @@ The repository manages **101 tools** across these categories:
 
 **GUI Applications:**
 - Terminals: wezterm
-- Browsers: chrome, firefox, brave, librewolf, zen, etc.
+- Browsers: chrome, firefox, brave, librewolf, etc.
 - AI: claude-code, claude-desktop, chatgpt-desktop
 
 ---
