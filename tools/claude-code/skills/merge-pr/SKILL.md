@@ -11,18 +11,16 @@ GitLab (self-hosted included), Gitea, and Forgejo. Scripts handle forge
 detection, status lookup, and CLI dispatch; Claude handles the judgment
 calls (is it ready to merge? which merge method? bypass blockers?).
 
-All script invocations below assume you run them from the skill directory:
-
-```
-cd ~/.claude/skills/merge-pr
-```
+Run the scripts **from the repo root** (your current working directory) so
+their `git` calls hit the right repo. Invoke them by absolute path — do
+**not** `cd` into the skill directory.
 
 ---
 
 ## Phase 1 — Detect
 
 ```bash
-python3 -m scripts.forge_detect
+python3 ~/.claude/skills/merge-pr/scripts/forge_detect.py
 ```
 
 Returns JSON with `forge` (`github`/`gitlab`/`gitea`/`unknown`), `host`,
@@ -43,7 +41,7 @@ install it yourself — the required auth (`gh auth login`, `glab auth login`,
 ## Phase 2 — Status
 
 ```bash
-python3 -m scripts.pr_status --forge <forge>
+python3 ~/.claude/skills/merge-pr/scripts/pr_status.py --forge <forge>
 ```
 
 Returns JSON with:
@@ -79,7 +77,7 @@ When in doubt, surface the blockers and let the user decide. Prefer
 ## Phase 3 — Merge
 
 ```bash
-python3 -m scripts.pr_merge \
+python3 ~/.claude/skills/merge-pr/scripts/pr_merge.py \
   --forge <forge> \
   --method <squash|merge|rebase> \
   [--delete-branch] \

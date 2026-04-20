@@ -10,18 +10,16 @@ Open a pull request on the current repo's forge. Works with GitHub, GitLab
 pieces (forge detection, git plumbing, CLI dispatch); Claude handles the
 judgment calls (commit message, PR title, PR body).
 
-All script invocations below assume you run them from the skill directory:
-
-```
-cd .claude/skills/create-pr
-```
+Run the scripts **from the repo root** (your current working directory) so
+their `git` calls hit the right repo. Invoke them by absolute path — do
+**not** `cd` into the skill directory.
 
 ---
 
 ## Phase 1 — Detect
 
 ```bash
-python3 -m scripts.forge_detect
+python3 ~/.claude/skills/create-pr/scripts/forge_detect.py
 ```
 
 Returns JSON with `forge` (`github`/`gitlab`/`gitea`/`unknown`), `host`,
@@ -42,7 +40,7 @@ install it yourself — the required auth (`gh auth login`, `glab auth login`,
 ## Phase 2 — Preflight
 
 ```bash
-python3 -m scripts.pr_preflight --forge <forge>
+python3 ~/.claude/skills/create-pr/scripts/pr_preflight.py --forge <forge>
 ```
 
 Returns JSON with:
@@ -90,7 +88,7 @@ After the push, post a short comment summarising what this push added
 activity log reflects the update:
 
 ```bash
-python3 -m scripts.pr_comment --forge <forge> --body "<summary>"
+python3 ~/.claude/skills/create-pr/scripts/pr_comment.py --forge <forge> --body "<summary>"
 ```
 
 The script returns `{success, supported, error}`. If `supported` is false
@@ -137,7 +135,7 @@ the forge if they want changes.
 ## Phase 4 — Create
 
 ```bash
-python3 -m scripts.pr_create \
+python3 ~/.claude/skills/create-pr/scripts/pr_create.py \
   --forge <forge> \
   --title "<title>" \
   --body "<body>" \
