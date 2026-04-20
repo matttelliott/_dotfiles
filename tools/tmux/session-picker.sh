@@ -20,60 +20,90 @@ is_collapsed() {
   tmux show-options -gv "$PICKER_OPT" 2>/dev/null | grep -qFx "$1"
 }
 
+# 1-indexed line number where $1's session header row lands in the current list.
+line_of() {
+  local target="$1" line=1 s wcount
+  while IFS= read -r s; do
+    if [ "$s" = "$target" ]; then
+      printf '%s' "$line"
+      return
+    fi
+    line=$((line + 1))
+    if ! is_collapsed "$s"; then
+      wcount=$(tmux list-windows -t "$s" -F '#{window_index}' 2>/dev/null | wc -l | tr -d ' ')
+      line=$((line + wcount))
+    fi
+  done < <(tmux list-sessions -F '#{session_name}' | LC_ALL=C sort)
+  printf '1'
+}
+
 build_list() {
   # Format per line: target|display (fzf 0.60+ searches the displayed field)
+  # Tree marker encodes both collapse state and session status via color:
+  #   cyan  = current session       green = attached elsewhere       dim = detached
   local current_sess
   current_sess=$(tmux display-message -p '#S' 2>/dev/null || echo "")
   tmux list-sessions -F '#{session_name}' | LC_ALL=C sort | while read -r sess; do
     attached=$(tmux display -p -t "$sess" '#{session_attached}' 2>/dev/null || echo 0)
     if [ "$sess" = "$current_sess" ]; then
-      marker="${CYAN}▸${RESET}"
+      sess_color="${CYAN}${BOLD}"
+      tree_color="$CYAN"
     elif [ "$attached" != "0" ]; then
-      marker="${GREEN}●${RESET}"
+      sess_color="${GREEN}${BOLD}"
+      tree_color="$GREEN"
     else
-      marker=" "
+      sess_color="$BOLD"
+      tree_color="$DIM"
     fi
     if is_collapsed "$sess"; then
-      tree="${DIM}▸${RESET}"
+      glyph="▸"
       collapsed=1
     else
-      tree="${DIM}▾${RESET}"
+      glyph="▾"
       collapsed=0
     fi
     window_names=$(tmux list-windows -t "$sess" -F '#{window_name}' | paste -sd ' · ' -)
-    printf '%s|%s %s %s%s%s   %s%s%s\n' "$sess" "$marker" "$tree" "$BOLD" "$sess" "$RESET" "$DIM" "$window_names" "$RESET"
+    printf '%s|%s%s%s %s%s%s   %s%s%s\n' "$sess" "$tree_color" "$glyph" "$RESET" "$sess_color" "$sess" "$RESET" "$DIM" "$window_names" "$RESET"
     if [ "$collapsed" = "0" ]; then
       if [ "$sess" = "$current_sess" ]; then
-        tmux list-windows -t "$sess" -F "#{session_name}:#{window_index}|#{?#{window_active},   ${CYAN}▸${RESET} ,     }${DIM}#{session_name} · #{window_index}: #{window_name}${RESET}"
+        tmux list-windows -t "$sess" -F "#{session_name}:#{window_index}|  #{?#{window_active},${CYAN},${DIM}}#{session_name} · #{window_index}: #{window_name}${RESET}"
       else
-        tmux list-windows -t "$sess" -F "#{session_name}:#{window_index}|     ${DIM}#{session_name} · #{window_index}: #{window_name}${RESET}"
+        tmux list-windows -t "$sess" -F "#{session_name}:#{window_index}|  ${DIM}#{session_name} · #{window_index}: #{window_name}${RESET}"
       fi
     fi
   done
 }
 
-if [ "${1:-}" = "--collapse" ]; then
+# `h` handler: collapse $2's session, then emit fzf actions to reload the list
+# and place the cursor on the (now-collapsed) session header row.
+if [ "${1:-}" = "--h-action" ]; then
   sess="${2:-}"
   sess="${sess%%:*}"
   [ -z "$sess" ] && exit 0
-  is_collapsed "$sess" && exit 0
-  current=$(tmux show-options -gv "$PICKER_OPT" 2>/dev/null || true)
-  if [ -n "$current" ]; then
-    tmux set-option -g "$PICKER_OPT" "$(printf '%s\n%s' "$current" "$sess")"
-  else
-    tmux set-option -g "$PICKER_OPT" "$sess"
+  if ! is_collapsed "$sess"; then
+    current=$(tmux show-options -gv "$PICKER_OPT" 2>/dev/null || true)
+    if [ -n "$current" ]; then
+      tmux set-option -g "$PICKER_OPT" "$(printf '%s\n%s' "$current" "$sess")"
+    else
+      tmux set-option -g "$PICKER_OPT" "$sess"
+    fi
   fi
+  printf 'reload(%s --list)+pos(%s)' "$SCRIPT" "$(line_of "$sess")"
   exit 0
 fi
 
-if [ "${1:-}" = "--expand" ]; then
+# `l` handler: expand $2's session, then emit fzf actions to reload the list
+# and place the cursor on the session header row.
+if [ "${1:-}" = "--l-action" ]; then
   sess="${2:-}"
   sess="${sess%%:*}"
   [ -z "$sess" ] && exit 0
   current=$(tmux show-options -gv "$PICKER_OPT" 2>/dev/null || true)
-  [ -z "$current" ] && exit 0
-  new=$(printf '%s' "$current" | awk -v s="$sess" '$0 != s')
-  tmux set-option -g "$PICKER_OPT" "$new"
+  if [ -n "$current" ]; then
+    new=$(printf '%s' "$current" | awk -v s="$sess" '$0 != s')
+    tmux set-option -g "$PICKER_OPT" "$new"
+  fi
+  printf 'reload(%s --list)+pos(%s)' "$SCRIPT" "$(line_of "$sess")"
   exit 0
 fi
 
@@ -216,8 +246,8 @@ selected=$(build_list | fzf \
   --preview "$SCRIPT --preview {1}" \
   --preview-window='right:75%:border-left' \
   --bind 'j:down,k:up' \
-  --bind "h:execute-silent($SCRIPT --collapse {1})+reload($SCRIPT --list)" \
-  --bind "l:execute-silent($SCRIPT --expand {1})+reload($SCRIPT --list)" \
+  --bind "h:transform($SCRIPT --h-action {1})" \
+  --bind "l:transform($SCRIPT --l-action {1})" \
   --bind '/:show-input+enable-search' \
   --bind "esc:transform:if [ \"\$FZF_INPUT_STATE\" = \"enabled\" ]; then echo 'hide-input+disable-search+clear-query'; else echo abort; fi" \
   --bind "ctrl-x:execute-silent(case {1} in *:*) tmux kill-window -t {1} ;; *) tmux kill-session -t {1} ;; esac)+reload($SCRIPT --list)" \
