@@ -299,8 +299,6 @@
   import_playbook: tools/tor/install_tor.yml
 - name: Install LibreWolf
   import_playbook: tools/librewolf/install_librewolf.yml
-- name: Install Zen
-  import_playbook: tools/zen/install_zen.yml
 - name: Install Orion
   import_playbook: tools/orion/install_orion.yml
 - name: Install Mullvad

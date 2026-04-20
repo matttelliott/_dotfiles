@@ -213,7 +213,7 @@ _dotfiles/
 
 **Security:** ssh, age, sops, 1password, 1password_cli
 
-**Browsers:** chrome, firefox, brave, vivaldi, opera, arc, edge, tor, librewolf, zen, orion
+**Browsers:** chrome, firefox, brave, vivaldi, opera, arc, edge, tor, librewolf, orion
 
 **AI Tools:** claude-code, claude-desktop, chatgpt-desktop, codex, nvim-ai
 
