@@ -237,6 +237,10 @@
   import_playbook: tools/awscli/install_awscli.yml
 - name: Install gh
   import_playbook: tools/gh/install_gh.yml
+- name: Install glab
+  import_playbook: tools/glab/install_glab.yml
+- name: Install tea
+  import_playbook: tools/tea/install_tea.yml
 - name: Install gcloud
   import_playbook: tools/gcloud/install_gcloud.yml
 - name: Install kubectl
