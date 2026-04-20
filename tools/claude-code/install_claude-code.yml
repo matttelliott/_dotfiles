@@ -120,6 +120,18 @@
         mode: preserve
         directory_mode: "0755"
 
+    - name: Remove existing merge-pr skill
+      ansible.builtin.file:
+        path: ~/.claude/skills/merge-pr
+        state: absent
+
+    - name: Install merge-pr skill
+      ansible.builtin.copy:
+        src: skills/merge-pr/
+        dest: ~/.claude/skills/merge-pr/
+        mode: preserve
+        directory_mode: "0755"
+
     - name: Ensure ~/.claude/hooks exists
       ansible.builtin.file:
         path: ~/.claude/hooks
