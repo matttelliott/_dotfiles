@@ -421,6 +421,7 @@ _ccw_new_window() {
 
   tmux new-window -t "$sess" -n "$wname" -c "$wtdir"
   tmux send-keys -t "$sess:$wname" "$cmd_str" Enter
+  tmux split-window -h -d -t "$sess:$wname" -c "$wtdir"
   if [ -n "${TMUX:-}" ]; then
     tmux select-window -t "$sess:$wname"
   else
