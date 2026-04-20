@@ -203,7 +203,7 @@ _dotfiles/
 
 **Shell/Terminal:** zsh, tmux, starship, wezterm
 
-**Editor:** neovim, nvim-ai
+**Editor:** neovim
 
 **CLI Utilities:** fd, ripgrep, fzf, jq, bat, eza, htop, btop
 
@@ -215,7 +215,7 @@ _dotfiles/
 
 **Browsers:** chrome, firefox, brave, vivaldi, opera, arc, edge, tor, librewolf, orion
 
-**AI Tools:** claude-code, claude-desktop, chatgpt-desktop, codex, nvim-ai
+**AI Tools:** claude-code, claude-desktop, chatgpt-desktop, codex
 
 **System (OS-specific):** macos, debian, arch, sudoers, build-essential
 

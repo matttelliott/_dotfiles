@@ -120,7 +120,7 @@ The playbooks install and configure these development environments:
 The repository manages **101 tools** across these categories:
 
 **Development:**
-- Editors: neovim, nvim-ai
+- Editors: neovim
 - Languages: node, python, rust, go, lua
 - Version control: git, gh, lazygit
 
