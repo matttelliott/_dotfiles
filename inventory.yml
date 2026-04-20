@@ -1,8 +1,4 @@
 all:
-  vars:
-    theme_color: tokyonight
-    theme_font: dejavu
-    theme_style: angle
   children:
     macs:
       hosts:

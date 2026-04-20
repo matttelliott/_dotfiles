@@ -1,0 +1,8 @@
+---
+# Theme defaults applied to every host.
+# Override per-host in inventory.yml (or in localhost.yml for unlisted
+# machines). Loaded regardless of which inventory file ansible-playbook
+# uses, so bootstrap-generated localhost.yml inherits these too.
+theme_color: tokyonight
+theme_font: dejavu
+theme_style: angle
