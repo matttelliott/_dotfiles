@@ -1,0 +1,42 @@
+---
+- name: Install Syncthing
+  hosts: with_login_tools
+  gather_facts: true
+
+  tasks:
+    - name: Install Syncthing via Homebrew (macOS)
+      ansible.builtin.shell: /opt/homebrew/bin/brew install syncthing
+      args:
+        creates: /opt/homebrew/bin/syncthing
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Start Syncthing service (macOS)
+      ansible.builtin.shell: /opt/homebrew/bin/brew services start syncthing
+      register: brew_services_start
+      changed_when: "'Successfully started' in brew_services_start.stdout"
+      failed_when:
+        - brew_services_start.rc != 0
+        - "'already started' not in brew_services_start.stderr"
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: Install Syncthing via apt (Debian)
+      ansible.builtin.apt:
+        name: syncthing
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install Syncthing via pacman (Arch)
+      community.general.pacman:
+        name: syncthing
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == "Archlinux"
+
+    - name: Enable and start Syncthing user service (Linux)
+      ansible.builtin.systemd:
+        name: syncthing.service
+        enabled: true
+        state: started
+        scope: user
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
