@@ -24,16 +24,33 @@
       become: true
       when: ansible_facts['os_family'] == "Archlinux"
 
+    - name: Create tmux config directory
+      ansible.builtin.file:
+        path: ~/.config/tmux
+        state: directory
+
+    - name: Create tmux plugins directory
+      ansible.builtin.file:
+        path: ~/.config/tmux/plugins
+        state: directory
+
+    - name: Clone extrakto plugin
+      ansible.builtin.git:
+        repo: https://github.com/laktak/extrakto
+        dest: ~/.config/tmux/plugins/extrakto
+        version: master
+
+    - name: Install extrakto fzf wrapper
+      ansible.builtin.copy:
+        src: extrakto-fzf.sh
+        dest: ~/.config/tmux/extrakto-fzf.sh
+        mode: '0755'
+
     - name: Install tmux config
       ansible.builtin.template:
         src: tmux.conf.j2
         dest: ~/.tmux.conf
       register: tmux_config
-
-    - name: Create tmux config directory
-      ansible.builtin.file:
-        path: ~/.config/tmux
-        state: directory
 
     - name: Install tmux session picker script
       ansible.builtin.copy:
