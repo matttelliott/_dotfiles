@@ -448,6 +448,7 @@ _ccw_new_session() {
 
   tmux new-session -d -s "$sess" -c "$wtdir"
   tmux send-keys -t "$sess" "$cmd_str" Enter
+  tmux split-window -h -d -t "$sess" -c "$wtdir"
   if [ -n "${TMUX:-}" ]; then
     tmux switch-client -t "$sess"
   else
@@ -550,12 +551,37 @@ _ccw_self_destruct() {
   # Move out of the worktree so git can remove it from under us.
   cd "$main_root" || return 1
 
-  git -C "$main_root" worktree remove --force "$wtdir" 2>/dev/null \
-    || git -C "$main_root" worktree remove "$wtdir" 2>/dev/null \
-    || rm -rf "$wtdir"
-  git -C "$main_root" worktree prune 2>/dev/null || true
-  git -C "$main_root" branch -D "$branch" 2>/dev/null || true
-  echo "removed: $name"
+  # Kill sibling panes (e.g. the claude pane) first so no process keeps the
+  # worktree as its cwd or holds file handles inside it while we remove it.
+  if command -v tmux >/dev/null 2>&1 && [ -n "${TMUX:-}" ]; then
+    local cur_pane scope pid
+    cur_pane=$(tmux display-message -p '#{pane_id}')
+    if [ "$mode" = "session" ]; then
+      scope="-s"
+    else
+      scope=""
+    fi
+    while IFS= read -r pid; do
+      [ -n "$pid" ] && [ "$pid" != "$cur_pane" ] && tmux kill-pane -t "$pid" 2>/dev/null
+    done < <(tmux list-panes $scope -F '#{pane_id}' 2>/dev/null)
+  fi
+
+  # Remove the worktree. Show git errors so failures aren't silent.
+  if ! git -C "$main_root" worktree remove --force "$wtdir"; then
+    echo "CCW/CCS: 'git worktree remove --force' failed; falling back to rm -rf" >&2
+    rm -rf "$wtdir"
+  fi
+  git -C "$main_root" worktree prune
+  if git -C "$main_root" show-ref --verify --quiet "refs/heads/$branch"; then
+    git -C "$main_root" branch -D "$branch" \
+      || echo "CCW/CCS: failed to delete branch $branch" >&2
+  fi
+
+  if [ -e "$wtdir" ]; then
+    echo "CCW/CCS: WARNING worktree dir still exists: $wtdir" >&2
+  else
+    echo "removed: $name"
+  fi
 
   if command -v tmux >/dev/null 2>&1 && [ -n "${TMUX:-}" ]; then
     if [ "$mode" = "session" ]; then
