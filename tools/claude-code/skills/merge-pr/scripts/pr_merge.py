@@ -154,7 +154,16 @@ def merge_gitea(
 ) -> MergeResult:
     branch_r = run(["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd)
     branch = branch_r.stdout.strip()
-    lst = run(["tea", "pr", "list", "--output", "json", "--state", "open"], cwd)
+    # `tea pr list` omits head/base from its default fields — ask explicitly.
+    lst = run(
+        [
+            "tea", "pr", "list",
+            "--output", "json",
+            "--state", "open",
+            "--fields", "index,title,state,head,base,url,mergeable",
+        ],
+        cwd,
+    )
     if lst.returncode != 0:
         return MergeResult(
             success=False,
@@ -193,9 +202,9 @@ def merge_gitea(
             error=f"no open PR found for branch {branch}",
         )
 
+    # tea 0.14.x has no --delete flag on `pr merge`; delete the branch
+    # ourselves after a successful merge.
     cmd = ["tea", "pr", "merge", "--style", method, str(pr_num)]
-    if delete_branch:
-        cmd.append("--delete")
     r = run(cmd, cwd)
     out = (r.stdout or "") + "\n" + (r.stderr or "")
     if r.returncode != 0:
@@ -208,6 +217,18 @@ def merge_gitea(
             already_merged=False,
             error=out.strip() or "tea pr merge failed",
         )
+
+    if delete_branch:
+        ok, err = _delete_remote_branch(cwd)
+        if not ok:
+            return MergeResult(
+                success=False,
+                method=method,
+                url=pr_url,
+                already_merged=False,
+                error=f"merge succeeded but remote branch delete failed: {err}",
+            )
+
     return MergeResult(
         success=True,
         method=method,

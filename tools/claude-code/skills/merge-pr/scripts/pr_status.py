@@ -171,7 +171,16 @@ def status_gitlab(cwd: str) -> PRStatus:
 
 def status_gitea(cwd: str) -> PRStatus:
     branch = current_branch(cwd)
-    r = run(["tea", "pr", "list", "--output", "json", "--state", "open"], cwd)
+    # `tea pr list` omits head/base/url from its default fields — ask explicitly.
+    r = run(
+        [
+            "tea", "pr", "list",
+            "--output", "json",
+            "--state", "open",
+            "--fields", "index,title,state,head,base,url,mergeable",
+        ],
+        cwd,
+    )
     if r.returncode != 0:
         return PRStatus(exists=False, error=(r.stderr or r.stdout).strip())
     try:
