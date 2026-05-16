@@ -11,7 +11,7 @@
 
     - name: Remove git-blocker entry from ~/.claude/settings.json
       ansible.builtin.shell: |
-        set -eo pipefail
+        set -e
         settings="$HOME/.claude/settings.json"
         has_entry=$(jq -r '
           (.hooks.PreToolUse // [])
@@ -188,7 +188,7 @@
 
     - name: Wire hosts-blocker PreToolUse hook into ~/.claude/settings.json
       ansible.builtin.shell: |
-        set -eo pipefail
+        set -e
         settings="$HOME/.claude/settings.json"
         target_cmd="$HOME/.claude/hooks/hosts-blocker.sh"
         matcher="Edit|Write|MultiEdit|Bash"

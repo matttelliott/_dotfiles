@@ -1,0 +1,16 @@
+---
+all:
+  children:
+    debian:
+      hosts:
+        ropebreak-crawler-4gb:
+          ansible_host: 138.197.94.127
+          ansible_user: matt
+          ansible_ssh_timeout: 60
+          ansible_python_interpreter: /usr/bin/python3
+    with_login_tools:
+      hosts:
+        ropebreak-crawler-4gb:
+    with_ai_tools:
+      hosts:
+        ropebreak-crawler-4gb:
