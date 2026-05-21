@@ -122,7 +122,7 @@ CCS() { _ccw_self_destruct session; }
 cct() {
 	local tmpdir cmd_str sess wname i
 	tmpdir=$(mktemp -d "/tmp/cct.XXXXXX") || return 1
-	cmd_str=$(_ccw_cmdstr claude --dangerously-skip-permissions "$@")
+	cmd_str=$(_ccw_cmdstr claude "$@")
 
 	if ! command -v tmux >/dev/null 2>&1; then
 		(cd "$tmpdir" && eval "$cmd_str")
@@ -426,7 +426,7 @@ _ccw_new_window() {
 	shift 3
 	local project cmd_str sess wname i
 	project=$(_ccw_project "$root")
-	cmd_str=$(_ccw_cmdstr claude --dangerously-skip-permissions "$@")
+	cmd_str=$(_ccw_cmdstr claude "$@")
 
 	if ! command -v tmux >/dev/null 2>&1; then
 		(cd "$wtdir" && eval "$cmd_str")
@@ -462,7 +462,7 @@ _ccw_new_session() {
 	shift 3
 	local project cmd_str sess i
 	project=$(_ccw_project "$root")
-	cmd_str=$(_ccw_cmdstr claude --dangerously-skip-permissions "$@")
+	cmd_str=$(_ccw_cmdstr claude "$@")
 
 	if ! command -v tmux >/dev/null 2>&1; then
 		(cd "$wtdir" && eval "$cmd_str")
@@ -548,7 +548,7 @@ _ccw_confirm_clean() {
 		return 0
 		;;
 	c | C | create | pr)
-		if ! (cd "$wtdir" && claude -p --dangerously-skip-permissions /create-pr); then
+		if ! (cd "$wtdir" && claude -p /create-pr); then
 			echo "CCW/CCS: /create-pr failed; aborting" >&2
 			return 1
 		fi
