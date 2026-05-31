@@ -11,6 +11,30 @@
   hosts: macs
   gather_facts: false
   tasks:
+    # Shared multi-user Homebrew: any admin account must be able to write the
+    # single /opt/homebrew prefix. macOS's default umask strips group-write from
+    # files Homebrew creates, so without an inherited ACL only the installing
+    # account can manage it. Re-applied here so self-update reruns under any user
+    # keep the shared prefix writable.
+    - name: Check if Homebrew prefix is writable by current user
+      ansible.builtin.command: test -w /opt/homebrew
+      register: brew_writable
+      changed_when: false
+      failed_when: false
+
+    - name: Grant admin group an inherited write ACL on shared Homebrew
+      ansible.builtin.command: >-
+        chmod -R +a
+        "group:admin allow
+        list,search,add_file,add_subdirectory,delete_child,readattr,writeattr,readextattr,writeextattr,readsecurity,file_inherit,directory_inherit"
+        /opt/homebrew
+      become: true
+      when: brew_writable.rc != 0
+      changed_when: true
+      # Recursion fails on launched .app bundles in the Caskroom (macOS protects
+      # them); they don't need the ACL, so per-file errors are expected.
+      failed_when: false
+
     - name: Update Homebrew
       ansible.builtin.shell: /opt/homebrew/bin/brew update
       changed_when: false

@@ -166,6 +166,18 @@ if [[ "$OS" == "darwin" ]]; then
     NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/90fa3d5881cedc0d60c4a3cc5babdb867ef42e5a/install.sh)"
   fi
 
+  # Shared multi-user Homebrew: any admin account must be able to install/update.
+  # Homebrew uses a single prefix (/opt/homebrew) and macOS's default umask strips
+  # group-write, so only the account that first installed it can write. Grant the
+  # admin group an inherited ACL (file_inherit,directory_inherit) so every admin
+  # account can write to the shared prefix, including files created later.
+  if [ -d /opt/homebrew ] && [ ! -w /opt/homebrew ]; then
+    echo "Granting admin group write access to shared Homebrew..."
+    # Recursion fails on launched .app bundles in the Caskroom (macOS protects
+    # them) — those don't need the ACL, so tolerate per-file errors.
+    sudo chmod -R +a "group:admin allow list,search,add_file,add_subdirectory,delete_child,readattr,writeattr,readextattr,writeextattr,readsecurity,file_inherit,directory_inherit" /opt/homebrew 2>/dev/null || true
+  fi
+
   if [ ! -f /opt/homebrew/bin/ansible ]; then
     echo "Installing Ansible..."
     /opt/homebrew/bin/brew install ansible
