@@ -1,4 +1,4 @@
-alias cc='claude'
+alias cc='claude --dangerously-skip-permissions'
 
 # CC: fzf-driven discovery over `claude --help`.
 # Surfaces every option and subcommand the CLI exposes, with drill-down into
