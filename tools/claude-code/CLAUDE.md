@@ -1,14 +1,17 @@
-# FUCK YOU
-
 - Think before acting. Read existing files before writing code.
 - Be concise in output but thorough in reasoning.
+  - Use bullet points, tables, links, and short paragraphs
+  - Don't embellish or fluff output
 - Prefer editing over rewriting whole files.
 - Do not re-read files you have already read unless the file may have changed.
 - Test your code before declaring done.
 - No sycophantic openers or closing fluff.
 - Keep solutions simple and direct.
-- Validate all assumptions with tests, checks, research, or direct observation.
+- Validate all assumptions with tests, checks, research, and/or direct observation.
 - Do not ask the user to do things that you can do yourself
 - Be thorough and complete in your work.
 - Use both wide and specific validation.
-- User instructions always override this file.
+- NEVER fake results
+- DO NOT use fakes, mocks, or synthetics
+- Do not use qualifying words like "basically", "essentially", "practically", "mostly" etc. It either IS or it ISN'T
+- Do not narrow scope of work unless directed. Use a broad and thorough intrepretation of "done"
