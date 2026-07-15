@@ -1,5 +1,32 @@
 alias cc='claude --dangerously-skip-permissions'
 
+# gacmhk (Git All Commit Message HaiKu): `gacm` with an AI-authored message.
+# Stages everything, then has the claude haiku model write the commit message:
+# a conventional-commit subject line,
+# a blank line, an actual haiku (three lines, exactly 5-7-5 syllables) about the
+# change, a blank line, then a signature line (model name + version + one emoji).
+# Extends `gacm` (git add . && git commit -m).
+gacmhk() {
+	git add . || return 1
+	if git diff --cached --quiet; then
+		echo "gacmhk: nothing staged to commit" >&2
+		return 1
+	fi
+	local context msg
+	context=$(
+		git diff --cached --stat
+		echo '---'
+		git diff --cached | head -c 12000
+	)
+	msg=$(printf '%s\n' "$context" | claude -p --model haiku \
+		"Write a git commit message for this staged diff, in exactly this format: line 1 is a conventional-commit subject (e.g. 'feat: ...', 'fix: ...', 'refactor: ...'), imperative mood, at most 72 characters. Then one blank line. Then a haiku about the change: three lines with exactly 5, 7, and 5 syllables respectively — count the syllables and revise until exact. Then one blank line. Then a final signature line: your own model name and version number followed by a single space and exactly one emoji of your choice — pick any emoji you like, invented freely to suit the commit, just as you invented the haiku. Output only the subject, the haiku, and the signature separated by blank lines: no preamble, no quotes, no code fences, no labels." 2>/dev/null)
+	if [ -z "$msg" ]; then
+		echo "gacmhk: haiku generation failed (is claude authed?)" >&2
+		return 1
+	fi
+	git commit -m "$msg"
+}
+
 # CC: fzf-driven discovery over `claude --help`.
 # Surfaces every option and subcommand the CLI exposes, with drill-down into
 # subcommand help. This is a *discovery* tool, not a convenience wrapper —
