@@ -1,25 +1,36 @@
 alias cc='claude --dangerously-skip-permissions'
 
 # gacmhk (Git All Commit Message HaiKu): `gacm` with an AI-authored message.
-# Stages everything, then has the claude haiku model write the commit message:
-# a conventional-commit subject line,
-# a blank line, an actual haiku (three lines, exactly 5-7-5 syllables) about the
-# change, a blank line, then a signature line (model name + version + one emoji).
-# Extends `gacm` (git add . && git commit -m).
+# Stages everything, then has the claude haiku model write the commit message as
+# six lines (subject, three haiku lines, emoji, signature). The shell reassembles
+# them with exact spacing — subject / blank / haiku / emoji / blank / signature
+# — so the layout never depends on the model's whitespace. Extends
+# `gacm` (git add . && git commit -m).
 gacmhk() {
 	git add . || return 1
 	if git diff --cached --quiet; then
 		echo "gacmhk: nothing staged to commit" >&2
 		return 1
 	fi
-	local context msg
+	local context raw msg
 	context=$(
 		git diff --cached --stat
 		echo '---'
 		git diff --cached | head -c 12000
 	)
-	msg=$(printf '%s\n' "$context" | claude -p --model haiku \
-		"Write a git commit message for this staged diff, in exactly this format: line 1 is a conventional-commit subject (e.g. 'feat: ...', 'fix: ...', 'refactor: ...'), imperative mood, at most 72 characters. Then one blank line. Then a haiku about the change: three lines with exactly 5, 7, and 5 syllables respectively — count the syllables and revise until exact. Then one blank line. Then a final signature line: your own model name and version number followed by a single space and exactly one emoji of your choice — pick any emoji you like, invented freely to suit the commit, just as you invented the haiku. Output only the subject, the haiku, and the signature separated by blank lines: no preamble, no quotes, no code fences, no labels." 2>/dev/null)
+	raw=$(printf '%s\n' "$context" | claude -p --model haiku \
+		"Write a git commit message for this staged diff as exactly six lines, one item per line, in this order and nothing else: (1) a conventional-commit subject (e.g. 'feat: ...', 'fix: ...', 'refactor: ...'), imperative mood, at most 72 characters; (2,3,4) a haiku about the change with exactly 5, 7, and 5 syllables respectively — count syllables and revise until exact; (5) a single emoji of your choice that suits the commit, invented freely just as you invented the haiku, and nothing else on that line; (6) your own model name and version number, with no emoji. Output only those six lines with no blank lines, no preamble, no quotes, no code fences, and no labels." 2>/dev/null)
+	# Reassemble deterministically from the six non-blank lines so spacing is
+	# always exact (one blank line before the signature) regardless of what the
+	# model emits. Fall back to the raw output if it didn't return six lines.
+	local -a lines
+	lines=("${(@f)$(printf '%s\n' "$raw" | sed '/^[[:space:]]*$/d')}")
+	if [ ${#lines[@]} -ge 6 ]; then
+		msg=$(printf '%s\n\n%s\n%s\n%s\n%s\n\n%s\n' \
+			"$lines[1]" "$lines[2]" "$lines[3]" "$lines[4]" "$lines[5]" "$lines[6]")
+	else
+		msg=$raw
+	fi
 	if [ -z "$msg" ]; then
 		echo "gacmhk: haiku generation failed (is claude authed?)" >&2
 		return 1
