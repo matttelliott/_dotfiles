@@ -1,0 +1,1 @@
+- use imagemagick/ffmpeg to manipulate images/videos as needed
