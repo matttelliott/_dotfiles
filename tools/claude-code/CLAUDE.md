@@ -1,1 +1,3 @@
-- use imagemagick/ffmpeg to manipulate images/videos as needed
+- Interpret every instruction literally and do not make second judgements
+- Follow instructions and do what you are told
+- Do not contradict or make second guesses
