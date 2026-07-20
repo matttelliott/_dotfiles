@@ -111,41 +111,22 @@
         state: directory
         mode: "0755"
 
+    # Skill sources were removed from this repo in ef3b85e (remove-old-skills).
+    # These tasks purge any copies left on managed hosts.
     - name: Remove existing skill-creator skill
       ansible.builtin.file:
         path: ~/.claude/skills/skill-creator
         state: absent
-
-    - name: Install skill-creator skill
-      ansible.builtin.copy:
-        src: skills/skill-creator/
-        dest: ~/.claude/skills/skill-creator/
-        mode: preserve
-        directory_mode: "0755"
 
     - name: Remove existing create-pr skill
       ansible.builtin.file:
         path: ~/.claude/skills/create-pr
         state: absent
 
-    - name: Install create-pr skill
-      ansible.builtin.copy:
-        src: skills/create-pr/
-        dest: ~/.claude/skills/create-pr/
-        mode: preserve
-        directory_mode: "0755"
-
     - name: Remove existing merge-pr skill
       ansible.builtin.file:
         path: ~/.claude/skills/merge-pr
         state: absent
-
-    - name: Install merge-pr skill
-      ansible.builtin.copy:
-        src: skills/merge-pr/
-        dest: ~/.claude/skills/merge-pr/
-        mode: preserve
-        directory_mode: "0755"
 
     - name: Ensure ~/.claude/hooks exists
       ansible.builtin.file:
