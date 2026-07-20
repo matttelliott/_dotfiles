@@ -1,44 +1,4 @@
 ---
-- name: Disable Claude Code git-blocker PreToolUse hook
-  hosts: all
-  gather_facts: false
-
-  tasks:
-    - name: Check if ~/.claude/settings.json exists
-      ansible.builtin.stat:
-        path: ~/.claude/settings.json
-      register: claude_settings_stat
-
-    - name: Remove git-blocker entry from ~/.claude/settings.json
-      ansible.builtin.shell: |
-        set -e
-        settings="$HOME/.claude/settings.json"
-        has_entry=$(jq -r '
-          (.hooks.PreToolUse // [])
-          | map(select(
-              (.matcher == "Bash")
-              and ((.hooks // []) | map(.command) | any(contains("git-blocker.sh")))
-            ))
-          | length
-        ' "$settings")
-        if [ "$has_entry" != "0" ]; then
-          tmp=$(mktemp)
-          jq '
-            if .hooks.PreToolUse then
-              .hooks.PreToolUse |= map(select(
-                (.matcher != "Bash")
-                or ((.hooks // []) | map(.command) | any(contains("git-blocker.sh")) | not)
-              ))
-              | if (.hooks.PreToolUse | length) == 0 then del(.hooks.PreToolUse) else . end
-            else . end
-          ' "$settings" > "$tmp"
-          mv "$tmp" "$settings"
-          echo CHANGED
-        fi
-      register: claude_gitblocker_unwire
-      changed_when: "'CHANGED' in claude_gitblocker_unwire.stdout"
-      when: claude_settings_stat.stat.exists
-
 - name: Install Claude Code
   hosts: with_ai_tools:&with_login_tools
   gather_facts: true
@@ -60,7 +20,7 @@
     - name: Source claude-code aliases in zshrc
       ansible.builtin.lineinfile:
         path: ~/.zshrc
-        line: 'source ~/.config/zsh/claude-code.zsh'
+        line: "source ~/.config/zsh/claude-code.zsh"
         create: true
 
     - name: Ensure ~/.config/claude-code exists
@@ -128,28 +88,46 @@
         path: ~/.claude/skills/merge-pr
         state: absent
 
-    - name: Ensure ~/.claude/hooks exists
+    # Hook sources (git-blocker, hosts-blocker) were removed from this repo.
+    # These tasks purge any copies left on managed hosts.
+    - name: Remove existing PreToolUse hook scripts
       ansible.builtin.file:
-        path: ~/.claude/hooks
-        state: directory
-
-    - name: Install Claude Code git-blocker PreToolUse hook
-      ansible.builtin.copy:
-        src: git-blocker.sh
-        dest: ~/.claude/hooks/git-blocker.sh
-        mode: "0755"
-
-    - name: Install Claude Code hosts-blocker PreToolUse hook
-      ansible.builtin.copy:
-        src: hosts-blocker.sh
-        dest: ~/.claude/hooks/hosts-blocker.sh
-        mode: "0755"
+        path: "~/.claude/hooks/{{ item }}"
+        state: absent
+      loop:
+        - git-blocker.sh
+        - hosts-blocker.sh
 
     - name: Ensure ~/.claude/settings.json exists
       ansible.builtin.copy:
         content: "{}\n"
         dest: ~/.claude/settings.json
         force: false
+
+    - name: Remove blocker hook entries from ~/.claude/settings.json
+      ansible.builtin.shell: |
+        set -e
+        settings="$HOME/.claude/settings.json"
+        has_entry=$(jq -r '
+          (.hooks.PreToolUse // [])
+          | map(select((.hooks // []) | map(.command) | any(
+              contains("git-blocker.sh") or contains("hosts-blocker.sh")
+            )))
+          | length
+        ' "$settings")
+        if [ "$has_entry" != "0" ]; then
+          tmp=$(mktemp)
+          jq '
+            .hooks.PreToolUse |= map(select((.hooks // []) | map(.command) | any(
+              contains("git-blocker.sh") or contains("hosts-blocker.sh")
+            ) | not))
+            | if (.hooks.PreToolUse | length) == 0 then del(.hooks.PreToolUse) else . end
+          ' "$settings" > "$tmp"
+          mv "$tmp" "$settings"
+          echo CHANGED
+        fi
+      register: claude_blocker_unwire
+      changed_when: "'CHANGED' in claude_blocker_unwire.stdout"
 
     - name: Wire statusline into ~/.claude/settings.json
       ansible.builtin.shell: |
@@ -181,32 +159,3 @@
         fi
       register: claude_automemory_wire
       changed_when: "'CHANGED' in claude_automemory_wire.stdout"
-
-    - name: Wire hosts-blocker PreToolUse hook into ~/.claude/settings.json
-      ansible.builtin.shell: |
-        set -e
-        settings="$HOME/.claude/settings.json"
-        target_cmd="$HOME/.claude/hooks/hosts-blocker.sh"
-        matcher="Edit|Write|MultiEdit|Bash"
-        has_entry=$(jq --arg cmd "$target_cmd" --arg m "$matcher" -r '
-          (.hooks.PreToolUse // [])
-          | map(select(
-              (.matcher == $m)
-              and ((.hooks // []) | map(.command) | any(. == $cmd))
-            ))
-          | length
-        ' "$settings")
-        if [ "$has_entry" = "0" ]; then
-          tmp=$(mktemp)
-          jq --arg cmd "$target_cmd" --arg m "$matcher" '
-            .hooks = (.hooks // {})
-            | .hooks.PreToolUse = ((.hooks.PreToolUse // []) + [{
-                "matcher": $m,
-                "hooks": [{"type": "command", "command": $cmd}]
-              }])
-          ' "$settings" > "$tmp"
-          mv "$tmp" "$settings"
-          echo CHANGED
-        fi
-      register: claude_hostsblocker_wire
-      changed_when: "'CHANGED' in claude_hostsblocker_wire.stdout"
