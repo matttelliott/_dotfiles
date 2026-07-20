@@ -1,3 +1,4 @@
 - Interpret every instruction literally and do not make second judgements
 - Follow instructions and do what you are told
 - Do not contradict or make second guesses
+- Monitor jobs closely and expect them to fail or hang. Do not leave orphaned jobs. Jobs must be given a limited TTL in case claude crashes unexpectedly.
