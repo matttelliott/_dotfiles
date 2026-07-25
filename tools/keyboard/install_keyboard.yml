@@ -113,7 +113,16 @@
       become: true
       when: ansible_facts['os_family'] in ["Archlinux", "Debian"]
 
-    - name: Reload keyd if config changed
-      ansible.builtin.command: keyd reload
+    # Restart the service (rather than `keyd reload`) to apply config changes:
+    # the reload subcommand is invoked via the daemon binary, which Debian ships
+    # as `keyd.rvaiya` (renamed to avoid a package conflict) so a literal
+    # `keyd reload` is not on PATH. Restarting works on every distro and is
+    # best-effort (failed_when: false) since headless hosts with no input
+    # devices may not keep the daemon running.
+    - name: Restart keyd to apply config change
+      ansible.builtin.systemd:
+        name: keyd
+        state: restarted
       become: true
+      failed_when: false
       when: ansible_facts['os_family'] in ["Archlinux", "Debian"] and keyd_config.changed

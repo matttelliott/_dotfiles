@@ -70,6 +70,39 @@
         - selfupdate_plist.changed
       changed_when: true
 
+    # A fresh Debian/Ubuntu image ships without cron, so the `crontab`
+    # executable the cron module requires is missing. Install and start it
+    # (cronie on Arch) before defining the job.
+    - name: Ensure cron is installed (Debian/Ubuntu)
+      ansible.builtin.apt:
+        name: cron
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Ensure cronie is installed (Arch)
+      community.general.pacman:
+        name: cronie
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == "Archlinux"
+
+    - name: Ensure cron service is enabled and running (Debian/Ubuntu)
+      ansible.builtin.systemd:
+        name: cron
+        enabled: true
+        state: started
+      become: true
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Ensure cronie service is enabled and running (Arch)
+      ansible.builtin.systemd:
+        name: cronie
+        enabled: true
+        state: started
+      become: true
+      when: ansible_facts['os_family'] == "Archlinux"
+
     - name: Set up cron job on Linux to self-update every 2 hours
       ansible.builtin.cron:
         name: "dotfiles self-update"
