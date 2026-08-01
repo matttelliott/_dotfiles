@@ -7,10 +7,11 @@
       args:
         creates: /opt/homebrew/bin/dust
       when: ansible_facts['os_family'] == "Darwin"
-    - name: Install dust via cargo (Debian)
-      ansible.builtin.shell: ~/.cargo/bin/cargo install du-dust
-      args:
-        creates: ~/.cargo/bin/dust
+    - name: Install dust via apt (Debian)
+      ansible.builtin.apt:
+        name: du-dust
+        state: present
+      become: true
       when: ansible_facts['os_family'] == "Debian"
     - name: Install dust via pacman (Arch)
       community.general.pacman:

@@ -3,6 +3,14 @@
   hosts: all
   gather_facts: true
 
+  vars:
+    # stylua is not packaged in apt; use the upstream prebuilt binary rather
+    # than compiling it with cargo (which took minutes on small hosts).
+    # Checksum from the release asset:
+    # https://github.com/JohnnyMorganz/StyLua/releases/download/v2.5.2/stylua-linux-x86_64.zip
+    stylua_version: "2.5.2"
+    stylua_checksum: "sha256:bcb0d855e91f102f28a370e850f8566b3b44b79e6274d806ea5246837c0fd5ab"
+
   tasks:
     - name: Install Lua via Homebrew
       ansible.builtin.shell: /opt/homebrew/bin/brew install lua
@@ -30,10 +38,23 @@
         creates: /opt/homebrew/bin/stylua
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install stylua via cargo (Debian)
-      ansible.builtin.shell: ~/.cargo/bin/cargo install stylua
-      args:
-        creates: ~/.cargo/bin/stylua
+    - name: Download stylua release with checksum verification (Debian)
+      ansible.builtin.get_url:
+        url: >-
+          https://github.com/JohnnyMorganz/StyLua/releases/download/v{{ stylua_version }}/stylua-linux-x86_64.zip
+        dest: /tmp/stylua-{{ stylua_version }}.zip
+        checksum: "{{ stylua_checksum }}"
+        mode: "0644"
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install stylua binary (Debian)
+      ansible.builtin.unarchive:
+        src: /tmp/stylua-{{ stylua_version }}.zip
+        dest: /usr/local/bin
+        remote_src: true
+        mode: "0755"
+        creates: /usr/local/bin/stylua
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install stylua via pacman (Arch)

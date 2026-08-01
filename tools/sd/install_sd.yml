@@ -10,10 +10,11 @@
         creates: /opt/homebrew/bin/sd
       when: ansible_facts['os_family'] == "Darwin"
 
-    - name: Install sd via cargo (Debian)
-      ansible.builtin.shell: ~/.cargo/bin/cargo install sd
-      args:
-        creates: ~/.cargo/bin/sd
+    - name: Install sd via apt (Debian)
+      ansible.builtin.apt:
+        name: sd
+        state: present
+      become: true
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install sd via pacman (Arch)

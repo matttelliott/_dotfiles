@@ -28,14 +28,27 @@
         state: present
       become: true
       when: ansible_facts['os_family'] == "Archlinux"
-    - name: Remove existing neovim config
-      ansible.builtin.file:
-        path: ~/.config/nvim
-        state: absent
+    # The nvim config is many small files. ansible.builtin.copy transfers them
+    # one per SSH round trip, which measured at ~100s. rsync sends them in a
+    # single stream and skips unchanged files on reruns.
+    - name: Ensure rsync is present (Debian)
+      ansible.builtin.apt:
+        name: rsync
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == "Debian"
+    - name: Ensure rsync is present (Arch)
+      community.general.pacman:
+        name: rsync
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == "Archlinux"
     - name: Install neovim config
-      ansible.builtin.copy:
+      ansible.posix.synchronize:
         src: nvim/
         dest: ~/.config/nvim/
+        delete: true
+        recursive: true
     - name: Create zsh config directory
       ansible.builtin.file:
         path: ~/.config/zsh
@@ -49,6 +62,18 @@
         path: ~/.zshrc
         line: 'source ~/.config/zsh/neovim.zsh'
         create: true
+    # Mason shells out to npm and python3 to build its packages. Ansible runs
+    # this non-interactively, so nvm's node/npm are not on PATH (they are only
+    # added by ~/.zshrc) and python3 has no venv module on a stock Debian box.
+    # Without both, 13 of the 17 packages below fail silently behind
+    # ignore_errors -- only the ones needing neither npm nor python install.
+    - name: Install python3-venv for Mason's Python packages (Debian)
+      ansible.builtin.apt:
+        name: python3-venv
+        state: present
+      become: true
+      when: ansible_facts['os_family'] == "Debian"
+
     - name: Install Mason language servers
       vars:
         mason_packages: >-
@@ -56,6 +81,9 @@
           tailwindcss-language-server pyright rust-analyzer bash-language-server
           yaml-language-server prettierd stylua shfmt shellcheck black isort ruff
       ansible.builtin.shell: |
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+        export PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"
         nvim --headless -c "MasonInstall {{ mason_packages | replace('\n', ' ') }}" -c "sleep 30" -c "qa"
       args:
         creates: ~/.local/share/nvim/mason/bin/typescript-language-server
