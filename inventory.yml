@@ -32,12 +32,6 @@ all:
           theme_color: onedark
           theme_font: monaspace
           theme_style: slant
-    with_login_tools:
-      hosts:
-        macbookair:
-        desktop:
-        macmini:
-        optiplex-0:
     with_gui_tools:
       hosts:
         macbookair:
