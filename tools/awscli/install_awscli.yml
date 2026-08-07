@@ -1,5 +1,6 @@
 ---
 - name: Install AWS CLI
+  hosts: all
   gather_facts: true
 
   tasks:

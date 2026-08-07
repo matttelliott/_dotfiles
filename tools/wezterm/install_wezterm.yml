@@ -12,6 +12,8 @@
 
     - name: Install DejaVu Nerd Font via Homebrew Cask
       ansible.builtin.shell: /opt/homebrew/bin/brew install --cask font-dejavu-sans-mono-nerd-font
+      args:
+        creates: "~/Library/Fonts/DejaVuSansMNerdFont-Regular.ttf"
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Check if WezTerm is installed

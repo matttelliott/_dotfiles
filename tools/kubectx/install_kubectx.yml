@@ -1,5 +1,6 @@
 ---
 - name: Install kubectx
+  hosts: all
   gather_facts: true
 
   tasks:

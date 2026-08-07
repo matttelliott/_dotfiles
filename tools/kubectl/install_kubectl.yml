@@ -1,5 +1,6 @@
 ---
 - name: Install kubectl
+  hosts: all
   gather_facts: true
 
   tasks:

@@ -1,5 +1,6 @@
 ---
 - name: Install Syncthing
+  hosts: all
   gather_facts: true
 
   tasks:

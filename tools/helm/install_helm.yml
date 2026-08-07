@@ -1,5 +1,6 @@
 ---
 - name: Install helm
+  hosts: all
   gather_facts: true
 
   tasks:

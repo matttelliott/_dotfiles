@@ -1,5 +1,6 @@
 ---
 - name: Install GitLab CLI (glab)
+  hosts: all
   gather_facts: true
 
   vars:

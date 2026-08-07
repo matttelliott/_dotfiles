@@ -1,5 +1,6 @@
 ---
 - name: Install WireGuard
+  hosts: all
   gather_facts: true
 
   tasks:

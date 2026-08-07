@@ -1,5 +1,6 @@
 ---
 - name: Install Gitea/Forgejo CLI (tea)
+  hosts: all
   gather_facts: true
 
   vars:
