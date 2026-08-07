@@ -4,7 +4,7 @@
   gather_facts: true
 
   vars:
-    glab_version: "1.92.1"
+    glab_version: "1.112.0"
 
   tasks:
     - name: Install glab via Homebrew (macOS)
@@ -12,11 +12,15 @@
       args:
         creates: /opt/homebrew/bin/glab
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
-    - name: Check if glab is installed (Debian)
-      ansible.builtin.stat:
-        path: /usr/local/bin/glab
-      register: glab_check
+    # Version-aware so bumping glab_version actually upgrades the host.
+    - name: Check installed glab version (Debian)
+      ansible.builtin.command: /usr/local/bin/glab --version
+      register: glab_installed
+      changed_when: false
+      failed_when: false
+      check_mode: false
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Download and install glab (Debian)
@@ -27,11 +31,15 @@
         install /tmp/bin/glab /usr/local/bin/glab
         rm -rf /tmp/glab.tar.gz /tmp/bin
       become: true
-      when: ansible_facts['os_family'] == "Debian" and not glab_check.stat.exists
+      tags: system
+      when: >-
+        ansible_facts['os_family'] == "Debian"
+        and ("glab " ~ glab_version ~ " ") not in (glab_installed.stdout | default(""))
 
     - name: Install glab via pacman (Arch)
       community.general.pacman:
         name: glab
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

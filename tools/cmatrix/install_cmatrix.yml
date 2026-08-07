@@ -15,6 +15,7 @@
         name: cmatrix
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install cmatrix (Arch)
@@ -22,4 +23,5 @@
         name: cmatrix
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

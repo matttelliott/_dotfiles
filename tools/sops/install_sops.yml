@@ -3,9 +3,9 @@
   gather_facts: true
 
   vars:
-    sops_version: "3.11.0"
-    # Checksum from https://github.com/getsops/sops/releases/download/v3.11.0/sops-v3.11.0.checksums.txt
-    sops_checksum: "sha256:775f1384d55decfad228e7196a3f683791914f92a473f78fc47700531c29dfef"
+    sops_version: "3.13.3"
+    # Checksum from https://github.com/getsops/sops/releases/download/v3.13.3/sops-v3.13.3.checksums.txt
+    sops_checksum: "sha256:e5bec3346a873ae91d871550f3e698c1aad962aff462a080e40f25fde17fef6b"
 
   tasks:
     - name: Install sops via Homebrew
@@ -13,6 +13,7 @@
       args:
         creates: /opt/homebrew/bin/sops
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Download sops with checksum verification (Debian)
       ansible.builtin.get_url:
@@ -21,6 +22,7 @@
         mode: '0755'
         checksum: "{{ sops_checksum }}"
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install sops via yay (Arch)
@@ -28,3 +30,4 @@
       args:
         creates: /usr/bin/sops
       when: ansible_facts['os_family'] == "Archlinux"
+      tags: system

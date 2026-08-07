@@ -9,9 +9,14 @@
       args:
         creates: /opt/homebrew/bin/syncthing
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
+    # `brew services` writes state into the shared Homebrew prefix, so the
+    # machine's Syncthing service is registered once by an admin rather than
+    # per account.
     - name: Start Syncthing service (macOS)
       ansible.builtin.shell: /opt/homebrew/bin/brew services start syncthing
+      tags: system
       register: brew_services_start
       changed_when: "'Successfully started' in brew_services_start.stdout"
       failed_when:
@@ -24,6 +29,7 @@
         name: syncthing
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Syncthing via pacman (Arch)
@@ -31,6 +37,7 @@
         name: syncthing
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Enable and start Syncthing user service (Linux)

@@ -7,17 +7,20 @@
       args:
         creates: /opt/homebrew/bin/fzf
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
     - name: Install fzf via apt (Debian)
       ansible.builtin.apt:
         name: fzf
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
     - name: Install fzf via pacman (Arch)
       community.general.pacman:
         name: fzf
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
     - name: Create zsh config directory
       ansible.builtin.file:

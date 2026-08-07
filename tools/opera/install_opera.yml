@@ -9,6 +9,7 @@
       args:
         creates: /Applications/Opera.app
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Check if Opera is installed (Debian)
       ansible.builtin.stat:
@@ -26,6 +27,7 @@
           https://deb.opera.com/opera-stable/ stable non-free" \
           | tee /etc/apt/sources.list.d/opera.list > /dev/null
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian" and not opera_check.stat.exists
 
     - name: Install Opera via apt (Debian)
@@ -34,6 +36,7 @@
         state: present
         update_cache: true
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Opera via yay (Arch)
@@ -41,3 +44,4 @@
       args:
         creates: /usr/bin/opera
       when: ansible_facts['os_family'] == "Archlinux"
+      tags: system

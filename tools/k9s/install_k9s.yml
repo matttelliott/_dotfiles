@@ -7,6 +7,7 @@
       args:
         creates: /opt/homebrew/bin/k9s
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
     - name: Check if k9s is installed (Debian)
       ansible.builtin.stat:
         path: /usr/local/bin/k9s
@@ -19,12 +20,14 @@
         install /tmp/k9s /usr/local/bin
         rm -f /tmp/k9s /tmp/k9s.tar.gz
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian" and not k9s_check.stat.exists
     - name: Install k9s via yay (Arch)
       ansible.builtin.shell: yay -S --noconfirm k9s
       args:
         creates: /usr/bin/k9s
       when: ansible_facts['os_family'] == "Archlinux"
+      tags: system
     # macOS uses ~/Library/Application Support/k9s/
     - name: Create k9s skins directory (macOS)
       ansible.builtin.file:

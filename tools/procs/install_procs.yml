@@ -1,28 +1,40 @@
 - name: Install procs
   hosts: all
   gather_facts: true
+
+  vars:
+    procs_version: "0.14.12"
+
   tasks:
     - name: Install procs via Homebrew
       ansible.builtin.shell: /opt/homebrew/bin/brew install procs
       args:
         creates: /opt/homebrew/bin/procs
       when: ansible_facts['os_family'] == "Darwin"
-    - name: Check if procs is installed (Debian)
-      ansible.builtin.stat:
-        path: /usr/local/bin/procs
-      register: procs_check
+      tags: system
+    # Version-aware so bumping procs_version actually upgrades the host.
+    - name: Check installed procs version (Debian)
+      ansible.builtin.command: /usr/local/bin/procs --version
+      register: procs_installed
+      changed_when: false
+      failed_when: false
+      check_mode: false
       when: ansible_facts['os_family'] == "Debian"
     - name: Download and install procs (Debian)
       ansible.builtin.shell: |
-        curl -Lo /tmp/procs.zip "https://github.com/dalance/procs/releases/latest/download/procs-v0.14.8-x86_64-linux.zip"
+        curl -fLo /tmp/procs.zip "https://github.com/dalance/procs/releases/download/v{{ procs_version }}/procs-v{{ procs_version }}-x86_64-linux.zip"
         unzip -o /tmp/procs.zip -d /tmp
         install /tmp/procs /usr/local/bin
         rm -f /tmp/procs /tmp/procs.zip
       become: true
-      when: ansible_facts['os_family'] == "Debian" and not procs_check.stat.exists
+      tags: system
+      when: >-
+        ansible_facts['os_family'] == "Debian"
+        and ("procs " ~ procs_version) not in (procs_installed.stdout | default(""))
     - name: Install procs via pacman (Arch)
       community.general.pacman:
         name: procs
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

@@ -9,12 +9,14 @@
       args:
         creates: /opt/homebrew/bin/mosh
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Install mosh via apt (Debian)
       ansible.builtin.apt:
         name: mosh
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install mosh via pacman (Arch)
@@ -22,6 +24,7 @@
         name: mosh
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Check if firewalld is running
@@ -38,6 +41,7 @@
         permanent: true
         immediate: true
       become: true
+      tags: system
       when:
         - ansible_facts['os_family'] != "Darwin"
         - firewalld_status.status.ActiveState == "active"

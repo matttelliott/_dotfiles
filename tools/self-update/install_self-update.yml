@@ -16,6 +16,21 @@
         dest: "{{ ansible_facts['env']['HOME'] }}/_dotfiles/tools/self-update/self-update.sh"
         mode: "0755"
 
+    - name: Ensure dotfiles config directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_facts['env']['HOME'] }}/.config/dotfiles"
+        state: directory
+        mode: "0755"
+
+    # Written outside the repo on purpose: self-update.sh runs `git pull` on
+    # the working tree while executing, so its per-account settings must not
+    # live anywhere git manages.
+    - name: Deploy self-update settings for this account
+      ansible.builtin.template:
+        src: self-update.env.j2
+        dest: "{{ ansible_facts['env']['HOME'] }}/.config/dotfiles/self-update.env"
+        mode: "0644"
+
     - name: Deploy changelog script
       ansible.builtin.copy:
         src: changelog.sh
@@ -78,6 +93,7 @@
         name: cron
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Ensure cronie is installed (Arch)
@@ -85,6 +101,7 @@
         name: cronie
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Ensure cron service is enabled and running (Debian/Ubuntu)
@@ -93,6 +110,7 @@
         enabled: true
         state: started
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Ensure cronie service is enabled and running (Arch)
@@ -101,6 +119,7 @@
         enabled: true
         state: started
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Set up cron job on Linux to self-update every 2 hours

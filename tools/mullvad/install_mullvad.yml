@@ -9,6 +9,7 @@
       args:
         creates: /Applications/Mullvad Browser.app
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Check if Mullvad Browser is installed (Debian)
       ansible.builtin.stat:
@@ -28,6 +29,7 @@
         dest: /opt
         remote_src: true
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian" and not mullvad_check.stat.exists
 
     - name: Create symlink for Mullvad Browser (Debian)
@@ -36,6 +38,7 @@
         dest: /usr/local/bin/mullvad-browser
         state: link
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Clean up Mullvad Browser archive (Debian)
@@ -49,3 +52,4 @@
       args:
         creates: /usr/bin/mullvad-browser
       when: ansible_facts['os_family'] == "Archlinux"
+      tags: system

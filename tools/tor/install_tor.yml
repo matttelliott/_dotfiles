@@ -9,12 +9,14 @@
       args:
         creates: /Applications/Tor Browser.app
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Install Tor Browser Launcher via apt (Debian)
       ansible.builtin.apt:
         name: torbrowser-launcher
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Import Tor Browser GPG signing key (Arch)
@@ -29,3 +31,4 @@
       args:
         creates: /usr/bin/tor-browser
       when: ansible_facts['os_family'] == "Archlinux"
+      tags: system

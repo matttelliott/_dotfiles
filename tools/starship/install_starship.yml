@@ -9,6 +9,7 @@
       args:
         creates: /opt/homebrew/bin/starship
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Check if Starship is installed (Debian)
       ansible.builtin.stat:
@@ -22,6 +23,7 @@
       # https://github.com/starship/starship/releases (provides SHA256 checksums)
       ansible.builtin.shell: curl -sS https://starship.rs/install.sh | sh -s -- -y
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian" and not starship_check.stat.exists
 
     - name: Install Starship via pacman (Arch)
@@ -29,6 +31,7 @@
         name: starship
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Create zsh config directory

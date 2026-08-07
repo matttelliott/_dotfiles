@@ -3,32 +3,52 @@
   hosts: with_gui_tools:&with_ai_tools
   gather_facts: true
 
+  vars:
+    # Upstream (lencx/ChatGPT) has published nothing since v1.1.0 in Aug 2023,
+    # so this is both the pinned and the latest version. The machinery below is
+    # still version-aware so a bump would actually take effect.
+    chatgpt_version: "1.1.0"
+    chatgpt_checksum: "sha256:f2a1e3699f797086e57a92258de46722f09f6802c5fc5a9d0d54813e6fd2f04b"
+
   tasks:
     - name: Install ChatGPT Desktop via Homebrew (macOS)
       ansible.builtin.shell: /opt/homebrew/bin/brew install --cask chatgpt
       args:
         creates: /Applications/ChatGPT.app
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
-    - name: Check if ChatGPT Desktop is installed (Linux)
-      ansible.builtin.stat:
-        path: /opt/chatgpt-desktop/chatgpt
-      register: chatgpt_linux
+    # An AppImage exposes no version, so the installed version is recorded in
+    # a stamp file beside it. Missing stamp (or an older one) means install.
+    - name: Read installed ChatGPT Desktop version (Linux)
+      ansible.builtin.slurp:
+        src: /opt/chatgpt-desktop/.version
+      register: chatgpt_stamp
+      failed_when: false
+      check_mode: false
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
+
+    - name: Determine whether ChatGPT Desktop needs installing (Linux)
+      ansible.builtin.set_fact:
+        chatgpt_needed: >-
+          {{ (chatgpt_stamp.content | default('') | b64decode | trim) != chatgpt_version }}
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
 
     - name: Download ChatGPT Desktop AppImage tarball (Linux)
       ansible.builtin.get_url:
-        url: https://github.com/lencx/ChatGPT/releases/download/v1.1.0/ChatGPT_1.1.0_linux_x86_64.AppImage.tar.gz
+        url: >-
+          https://github.com/lencx/ChatGPT/releases/download/v{{ chatgpt_version }}/ChatGPT_{{ chatgpt_version }}_linux_x86_64.AppImage.tar.gz
         dest: /tmp/ChatGPT.AppImage.tar.gz
         mode: "0644"
-      when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and not chatgpt_linux.stat.exists
+        checksum: "{{ chatgpt_checksum }}"
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and chatgpt_needed | bool
 
     - name: Extract ChatGPT Desktop AppImage (Linux)
       ansible.builtin.unarchive:
         src: /tmp/ChatGPT.AppImage.tar.gz
         dest: /tmp
         remote_src: true
-      when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and not chatgpt_linux.stat.exists
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and chatgpt_needed | bool
 
     - name: Create ChatGPT Desktop directory (Linux)
       ansible.builtin.file:
@@ -36,16 +56,27 @@
         state: directory
         mode: "0755"
       become: true
-      when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and not chatgpt_linux.stat.exists
+      tags: system
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and chatgpt_needed | bool
 
     - name: Install ChatGPT Desktop AppImage (Linux)
       ansible.builtin.copy:
-        src: /tmp/chat-gpt_1.1.0_amd64.AppImage
+        src: /tmp/chat-gpt_{{ chatgpt_version }}_amd64.AppImage
         dest: /opt/chatgpt-desktop/chatgpt
         mode: "0755"
         remote_src: true
       become: true
-      when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and not chatgpt_linux.stat.exists
+      tags: system
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and chatgpt_needed | bool
+
+    - name: Record installed ChatGPT Desktop version (Linux)
+      ansible.builtin.copy:
+        content: "{{ chatgpt_version }}\n"
+        dest: /opt/chatgpt-desktop/.version
+        mode: "0644"
+      become: true
+      tags: system
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and chatgpt_needed | bool
 
     - name: Create ChatGPT Desktop symlink (Linux)
       ansible.builtin.file:
@@ -53,6 +84,7 @@
         dest: /usr/local/bin/chatgpt
         state: link
       become: true
+      tags: system
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
 
     - name: Create ChatGPT Desktop .desktop file (Linux)
@@ -70,4 +102,5 @@
           Categories=Network;Chat;
           StartupWMClass=chat-gpt
       become: true
+      tags: system
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]

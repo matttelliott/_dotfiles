@@ -7,6 +7,7 @@
       args:
         creates: /opt/homebrew/bin/nvim
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
     - name: Check if Neovim is installed (Debian)
       ansible.builtin.stat:
         path: /usr/local/bin/nvim
@@ -21,12 +22,14 @@
       args:
         chdir: /tmp
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian" and not nvim_check.stat.exists
     - name: Install Neovim via pacman (Arch)
       community.general.pacman:
         name: neovim
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
     # The nvim config is many small files. ansible.builtin.copy transfers them
     # one per SSH round trip, which measured at ~100s. rsync sends them in a
@@ -36,12 +39,14 @@
         name: rsync
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
     - name: Ensure rsync is present (Arch)
       community.general.pacman:
         name: rsync
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
     - name: Install neovim config
       ansible.posix.synchronize:
@@ -72,6 +77,7 @@
         name: python3-venv
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Mason language servers

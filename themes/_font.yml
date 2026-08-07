@@ -137,6 +137,7 @@
       args:
         creates: "~/Library/Fonts/{{ current.mac_font_file }}"
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     # Install font - Arch
     - name: Install font via yay (Arch)
@@ -144,6 +145,7 @@
       args:
         creates: "/usr/share/fonts/TTF/{{ current.arch_font_file }}"
       when: ansible_facts['os_family'] == "Archlinux"
+      tags: system
 
     # Install font - Debian
     - name: Create fonts directory (Debian)

@@ -9,12 +9,14 @@
       args:
         creates: /Applications/Inkscape.app
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Install Inkscape via apt (Debian)
       ansible.builtin.apt:
         name: inkscape
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Inkscape via pacman (Arch)
@@ -22,4 +24,5 @@
         name: inkscape
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

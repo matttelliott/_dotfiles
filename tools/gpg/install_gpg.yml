@@ -9,12 +9,14 @@
       args:
         creates: /opt/homebrew/bin/gpg
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Install gnupg via apt (Debian)
       ansible.builtin.apt:
         name: gnupg
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install gnupg via pacman (Arch)
@@ -22,6 +24,7 @@
         name: gnupg
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Create gnupg directory

@@ -9,12 +9,14 @@
       args:
         creates: /opt/homebrew/bin/fd
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Install fd via apt (Debian)
       ansible.builtin.apt:
         name: fd-find
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install fd via pacman (Arch)
@@ -22,4 +24,5 @@
         name: fd
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

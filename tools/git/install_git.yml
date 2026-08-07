@@ -9,6 +9,7 @@
         name: git
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install git via pacman (Arch)
@@ -16,6 +17,7 @@
         name: git
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Install gitconfig (macOS with login)

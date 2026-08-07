@@ -1,3 +1,18 @@
+# Multi-user hosts
+#
+# One entry per (machine, account). The entry named after the machine is the
+# admin; extra accounts get their own entry pointing at the same ansible_host
+# and belong to the `standard_users` group, e.g.
+#
+#     macmini-alice:
+#       ansible_host: macmini.home.lan
+#       ansible_user: alice
+#       ansible_python_interpreter: /opt/homebrew/bin/python3
+#
+# then list macmini-alice under standard_users (and any with_* groups they
+# should get). host_users on the admin entry declares which accounts should
+# exist on the machine and which of them may sudo -- see
+# tools/users/install_users.yml.
 all:
   children:
     macs:
@@ -10,11 +25,17 @@ all:
           theme_color: dracula
           theme_font: sourcecodepro
           theme_style: round
+          host_users:
+            - name: matt
+              role: admin
         macmini:
           ansible_host: macmini.home.lan
           ansible_user: matt
           ansible_ssh_timeout: 60
           ansible_python_interpreter: /opt/homebrew/bin/python3
+          host_users:
+            - name: matt
+              role: admin
     debian:
       hosts:
         optiplex-0:
@@ -22,6 +43,9 @@ all:
           ansible_user: matt
           ansible_ssh_timeout: 60
           ansible_python_interpreter: /usr/bin/python3
+          host_users:
+            - name: matt
+              role: admin
     arch:
       hosts:
         desktop:
@@ -32,6 +56,16 @@ all:
           theme_color: onedark
           theme_font: monaspace
           theme_style: slant
+          host_users:
+            - name: matt
+              role: admin
+    # Accounts on a machine that another entry administers. These run with
+    # --skip-tags system: user-level config only, no sudo. setup-all.sh and
+    # the per-account self-update job apply that automatically.
+    # dotfiles_user_role for this group is set in group_vars/standard_users.yml
+    # -- an inline `vars:` block here would lose to group_vars/all.yml.
+    standard_users:
+      hosts: {}
     with_gui_tools:
       hosts:
         macbookair:

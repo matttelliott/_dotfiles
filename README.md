@@ -145,15 +145,112 @@ If you're forking this repo for your own use:
 
 Hosts are added to groups to control which tools are installed:
 
-| Group            | Description                            |
-| ---------------- | -------------------------------------- |
-| `macs`           | macOS machines                         |
-| `debian`         | Debian/Ubuntu machines                 |
-| `arch`           | Arch Linux machines                    |
-| `with_gui_tools` | WezTerm, 1Password, DBeaver            |
-| `with_browsers`  | Chrome, Firefox, Brave, Arc, etc.      |
-| `with_ai_tools`  | Claude Code                            |
-| `with_nas`       | Automount NAS shares from nas.home.lan |
+| Group            | Description                                       |
+| ---------------- | ------------------------------------------------- |
+| `macs`           | macOS machines                                    |
+| `debian`         | Debian/Ubuntu machines                            |
+| `arch`           | Arch Linux machines                               |
+| `with_gui_tools` | WezTerm, 1Password, DBeaver                       |
+| `with_browsers`  | Chrome, Firefox, Brave, Arc, etc.                 |
+| `with_ai_tools`  | Claude Code                                       |
+| `with_nas`       | Automount NAS shares from nas.home.lan            |
+| `standard_users` | Non-admin accounts on a machine someone else owns |
+
+## Multi-user Hosts
+
+A machine can carry several accounts. Work splits into two layers:
+
+- **System layer** — package installs, services, sudoers, account creation,
+  and anything writing a shared prefix like `/opt/homebrew`. Done once per
+  machine by an **admin**. Every such task is tagged `system`.
+- **User layer** — everything under `~`: zshrc, gitconfig, nvim, tmux,
+  starship, themes, per-account launchd/cron jobs. Applied per account.
+
+A **standard** user runs the same `setup.yml` with `--skip-tags system`, so
+they get the full user layer and never touch anything needing sudo.
+
+### Declaring accounts
+
+Put the machine's accounts on the admin's inventory entry:
+
+```yaml
+macmini:
+  ansible_host: macmini.home.lan
+  ansible_user: matt
+  host_users:
+    - name: matt
+      role: admin
+    - name: alice
+      role: standard
+      fullname: Alice Example
+      ssh_keys:
+        - "ssh-ed25519 AAAA... alice@laptop"
+```
+
+`role` decides sudo: admins get a `/etc/sudoers.d` drop-in and membership in
+`admin` (macOS) / `sudo` (Debian) / `wheel` (Arch); standard users have both
+removed, so demoting someone in inventory actually takes their sudo away.
+
+Creating an account needs a password. Never commit one — pass it at run time:
+
+```bash
+ansible-playbook setup.yml --limit macmini \
+  -e '{"user_passwords": {"alice": "<password>"}}'
+```
+
+An account that does not exist yet and has no password available is reported
+and skipped rather than created without one, so unattended self-update runs
+never hang or leave a passwordless account behind. Passwords are applied on
+creation only — reruns never reset a password the user has since changed.
+
+Hosts with no `host_users` behave exactly as before: single-user, sudo granted
+to the connecting account.
+
+### Applying dotfiles to each account
+
+Each account keeps its own clone of this repo and its own config. Either the
+account sets itself up locally:
+
+```bash
+# bootstrap.sh asks for the role and picks the right flags
+curl -fsSL https://raw.githubusercontent.com/matttelliott/_dotfiles/master/bootstrap.sh | bash
+
+# or, on an existing clone
+ansible-playbook setup.yml --connection=local --limit $(hostname -s) --skip-tags system
+```
+
+...or the admin drives it from a control node, with one inventory entry per
+(machine, account) pointing at the same `ansible_host`:
+
+```yaml
+macs:
+  hosts:
+    macmini-alice:
+      ansible_host: macmini.home.lan
+      ansible_user: alice
+      ansible_python_interpreter: /opt/homebrew/bin/python3
+standard_users:
+  hosts:
+    macmini-alice:
+```
+
+Membership in `standard_users` sets `dotfiles_user_role: standard`.
+`setup-all.sh` picks that up and runs those entries with `--skip-tags system`
+automatically, and each account's self-update job bakes in the same flag.
+
+### What standard users do not get
+
+Anything that is machine-wide by nature, because one copy serves everyone:
+system packages, Homebrew formulae and casks, Mac App Store apps, Nerd Fonts,
+Docker/GPU group membership, system services (sshd, fail2ban, cron), NAS
+automounts, and the Syncthing service. Install those from an admin account
+and every user shares them.
+
+Homebrew is the subtle one: it needs no sudo, but `/opt/homebrew` is a single
+prefix writable only by the `admin` group, so every `brew install` is tagged
+`system`. A standard user gets the config for a tool (nvim, tmux, fzf, bat,
+lazygit, …) and uses the binary the admin installed. If a tool is missing for
+them, install it once from an admin account.
 
 ## What's Included
 

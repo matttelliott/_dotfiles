@@ -9,12 +9,14 @@
       args:
         creates: /opt/homebrew/bin/unzip
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Install unzip via apt (Debian)
       ansible.builtin.apt:
         name: unzip
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install unzip via pacman (Arch)
@@ -22,4 +24,5 @@
         name: unzip
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

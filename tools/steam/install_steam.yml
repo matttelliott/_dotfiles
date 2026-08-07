@@ -9,10 +9,12 @@
       args:
         creates: /Applications/Steam.app
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Add i386 architecture (Debian)
       ansible.builtin.command: dpkg --add-architecture i386
       become: true
+      tags: system
       changed_when: false
       when: ansible_facts['os_family'] == "Debian"
 
@@ -20,6 +22,7 @@
       ansible.builtin.apt:
         update_cache: true
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Steam via apt (Debian)
@@ -27,6 +30,7 @@
         name: steam
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Enable multilib repository (Arch)
@@ -35,6 +39,7 @@
         regexp: '^#?\[multilib\]'
         line: '[multilib]'
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Enable multilib Include (Arch)
@@ -43,6 +48,7 @@
         insertafter: '^\[multilib\]'
         line: 'Include = /etc/pacman.d/mirrorlist'
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Install Steam via pacman (Arch)
@@ -51,4 +57,5 @@
         state: present
         update_cache: true
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

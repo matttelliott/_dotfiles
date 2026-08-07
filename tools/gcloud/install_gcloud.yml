@@ -12,6 +12,7 @@
       args:
         creates: /opt/homebrew/bin/gcloud
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Check if gcloud is installed (Debian)
       ansible.builtin.stat:
@@ -29,6 +30,7 @@
           https://packages.cloud.google.com/apt cloud-sdk main" \
           | tee /etc/apt/sources.list.d/google-cloud-sdk.list
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian" and not gcloud_check.stat.exists
 
     - name: Install Google Cloud CLI via apt (Debian)
@@ -37,6 +39,7 @@
         state: present
         update_cache: true
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Google Cloud CLI via yay (Arch)
@@ -44,3 +47,4 @@
       args:
         creates: /usr/bin/gcloud
       when: ansible_facts['os_family'] == "Archlinux"
+      tags: system

@@ -13,6 +13,7 @@
     - name: Enable Wake-on-LAN (macOS)
       ansible.builtin.command: pmset -a womp 1
       become: true
+      tags: system
       changed_when: false
       when: ansible_facts['os_family'] == "Darwin"
     # Debian: Install ethtool
@@ -21,6 +22,7 @@
         name: ethtool
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
     # Arch: Install ethtool
     - name: Install ethtool (Arch)
@@ -28,6 +30,7 @@
         name: ethtool
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
     # Linux: Create systemd service to enable WOL on boot
     - name: Create WOL systemd service (Linux)
@@ -47,6 +50,7 @@
           WantedBy=multi-user.target
         mode: "0644"
       become: true
+      tags: system
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
     # Linux: Enable and start WOL service
     - name: Enable and start WOL service (Linux)
@@ -56,4 +60,5 @@
         state: started
         daemon_reload: true
       become: true
+      tags: system
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]

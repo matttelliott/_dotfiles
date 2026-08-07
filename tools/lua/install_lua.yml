@@ -17,12 +17,14 @@
       args:
         creates: /opt/homebrew/bin/lua
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Install Lua via apt (Debian)
       ansible.builtin.apt:
         name: lua5.4
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Lua via pacman (Arch)
@@ -30,6 +32,7 @@
         name: lua
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Install stylua via Homebrew (macOS)
@@ -37,6 +40,7 @@
       args:
         creates: /opt/homebrew/bin/stylua
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Download stylua release with checksum verification (Debian)
       ansible.builtin.get_url:
@@ -47,19 +51,33 @@
         mode: "0644"
       when: ansible_facts['os_family'] == "Debian"
 
+    # Version-aware so bumping stylua_version actually upgrades the host. The
+    # download above already re-fetches on a version change (versioned dest +
+    # checksum); without this the new zip would never be unpacked.
+    - name: Check installed stylua version (Debian)
+      ansible.builtin.command: /usr/local/bin/stylua --version
+      register: stylua_installed
+      changed_when: false
+      failed_when: false
+      check_mode: false
+      when: ansible_facts['os_family'] == "Debian"
+
     - name: Install stylua binary (Debian)
       ansible.builtin.unarchive:
         src: /tmp/stylua-{{ stylua_version }}.zip
         dest: /usr/local/bin
         remote_src: true
         mode: "0755"
-        creates: /usr/local/bin/stylua
       become: true
-      when: ansible_facts['os_family'] == "Debian"
+      tags: system
+      when: >-
+        ansible_facts['os_family'] == "Debian"
+        and ("stylua " ~ stylua_version) not in (stylua_installed.stdout | default(""))
 
     - name: Install stylua via pacman (Arch)
       community.general.pacman:
         name: stylua
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

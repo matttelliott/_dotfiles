@@ -8,8 +8,10 @@
       ansible.builtin.hostname:
         name: "{{ ansible_host }}"
       become: true
+      tags: system
 
     - name: Update package database
       community.general.pacman:
         update_cache: true
       become: true
+      tags: system

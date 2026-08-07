@@ -9,12 +9,14 @@
       args:
         creates: /opt/homebrew/bin/curl
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Install curl via apt (Debian)
       ansible.builtin.apt:
         name: curl
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install curl via pacman (Arch)
@@ -22,4 +24,5 @@
         name: curl
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

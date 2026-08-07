@@ -1,44 +1,60 @@
 ---
+{#
+  Local inventory for this account, regenerated on every run.
+
+  On a multi-user host each account keeps its own clone and its own
+  localhost.yml, named after the inventory entry that provisioned it
+  (macmini, macmini-alice, ...) rather than the machine hostname -- several
+  accounts on one machine cannot share a single entry name.
+
+  dotfiles_user_role is carried through so a standard user's local runs stay
+  unprivileged without having to remember the flag.
+#}
+{% set entry = inventory_hostname_short %}
+{% set role = dotfiles_user_role | default('admin') %}
 all:
   children:
     macs:
       hosts:
 {% if ansible_facts['os_family'] == 'Darwin' %}
-        {{ inventory_hostname_short }}:
+        {{ entry }}:
           ansible_connection: local
           ansible_python_interpreter: /opt/homebrew/bin/python3
+          dotfiles_user_role: {{ role }}
 {% endif %}
 
     debian:
       hosts:
 {% if ansible_facts['os_family'] == 'Debian' %}
-        {{ inventory_hostname_short }}:
+        {{ entry }}:
           ansible_connection: local
           ansible_python_interpreter: /usr/bin/python3
+          dotfiles_user_role: {{ role }}
 {% endif %}
 
     arch:
       hosts:
 {% if ansible_facts['os_family'] == 'Archlinux' %}
-        {{ inventory_hostname_short }}:
+        {{ entry }}:
           ansible_connection: local
           ansible_python_interpreter: /usr/bin/python3
+          dotfiles_user_role: {{ role }}
 {% endif %}
 {% if 'with_gui_tools' in group_names %}
 
     with_gui_tools:
       hosts:
-        {{ inventory_hostname_short }}:
+        {{ entry }}:
 {% endif %}
 {% if 'with_browsers' in group_names %}
 
     with_browsers:
       hosts:
-        {{ inventory_hostname_short }}:
+        {{ entry }}:
 {% endif %}
 {% if 'with_ai_tools' in group_names %}
 
     with_ai_tools:
       hosts:
-        {{ inventory_hostname_short }}:
+        {{ entry }}:
 {% endif %}

@@ -2,32 +2,40 @@
   hosts: all
   gather_facts: true
   vars:
-    lazygit_version: "0.44.1"
+    lazygit_version: "0.64.0"
   tasks:
     - name: Install lazygit via Homebrew
       ansible.builtin.shell: /opt/homebrew/bin/brew install lazygit
       args:
         creates: /opt/homebrew/bin/lazygit
       when: ansible_facts['os_family'] == "Darwin"
-    - name: Check if lazygit is installed (Debian)
-      ansible.builtin.stat:
-        path: /usr/local/bin/lazygit
-      register: lazygit_check
+      tags: system
+    # Version-aware so bumping lazygit_version actually upgrades the host.
+    - name: Check installed lazygit version (Debian)
+      ansible.builtin.command: /usr/local/bin/lazygit --version
+      register: lazygit_installed
+      changed_when: false
+      failed_when: false
+      check_mode: false
       when: ansible_facts['os_family'] == "Debian"
     - name: Download and install lazygit (Debian)
       ansible.builtin.shell: |
         LAZYGIT_URL="https://github.com/jesseduffield/lazygit/releases/download"
-        curl -Lo /tmp/lazygit.tar.gz "${LAZYGIT_URL}/v{{ lazygit_version }}/lazygit_{{ lazygit_version }}_Linux_x86_64.tar.gz"
+        curl -Lo /tmp/lazygit.tar.gz "${LAZYGIT_URL}/v{{ lazygit_version }}/lazygit_{{ lazygit_version }}_linux_x86_64.tar.gz"
         tar xf /tmp/lazygit.tar.gz -C /tmp lazygit
         install /tmp/lazygit /usr/local/bin
         rm -f /tmp/lazygit /tmp/lazygit.tar.gz
       become: true
-      when: ansible_facts['os_family'] == "Debian" and not lazygit_check.stat.exists
+      tags: system
+      when: >-
+        ansible_facts['os_family'] == "Debian"
+        and ("version=" ~ lazygit_version ~ ",") not in (lazygit_installed.stdout | default(""))
     - name: Install lazygit via pacman (Arch)
       community.general.pacman:
         name: lazygit
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
     - name: Create zsh config directory
       ansible.builtin.file:

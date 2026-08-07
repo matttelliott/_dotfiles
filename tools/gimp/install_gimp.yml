@@ -9,12 +9,14 @@
       args:
         creates: /Applications/GIMP.app
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Install GIMP via apt (Debian)
       ansible.builtin.apt:
         name: gimp
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install GIMP via pacman (Arch)
@@ -22,4 +24,5 @@
         name: gimp
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

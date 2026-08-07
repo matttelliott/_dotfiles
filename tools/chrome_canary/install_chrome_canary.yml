@@ -10,3 +10,4 @@
       args:
         creates: /Applications/Google Chrome Canary.app
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system

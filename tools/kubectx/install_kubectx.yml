@@ -9,12 +9,14 @@
       args:
         creates: /opt/homebrew/bin/kubectx
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Install kubectx via apt (Debian)
       ansible.builtin.apt:
         name: kubectx
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install kubectx via pacman (Arch)
@@ -22,4 +24,5 @@
         name: kubectx
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

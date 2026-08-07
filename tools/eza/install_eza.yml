@@ -9,12 +9,14 @@
       args:
         creates: /opt/homebrew/bin/eza
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Install eza via apt (Debian)
       ansible.builtin.apt:
         name: eza
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install eza via pacman (Arch)
@@ -22,6 +24,7 @@
         name: eza
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Create zsh config directory

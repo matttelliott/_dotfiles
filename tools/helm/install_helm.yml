@@ -3,25 +3,53 @@
   hosts: all
   gather_facts: true
 
+  vars:
+    helm_version: "4.2.3"
+
   tasks:
     - name: Install helm via Homebrew (macOS)
       ansible.builtin.shell: /opt/homebrew/bin/brew install helm
       args:
         creates: /opt/homebrew/bin/helm
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
+
+    # Version-aware so bumping helm_version actually upgrades the host.
+    # `helm version` prints version.BuildInfo{Version:"v4.2.3", ...}.
+    - name: Check installed helm version (Debian)
+      ansible.builtin.command: /usr/local/bin/helm version
+      register: helm_installed
+      changed_when: false
+      failed_when: false
+      check_mode: false
+      when: ansible_facts['os_family'] == "Debian"
 
     - name: Install helm via official installer (Debian)
-      # SECURITY: Pinned to v3.17.3. Update: check https://github.com/helm/helm/releases
+      # SECURITY: installer script pinned to tag v{{ helm_version }}.
+      # Update: check https://github.com/helm/helm/releases
+      #
+      # Left to itself get-helm-4 installs whatever the Helm CDN currently
+      # calls latest, so --version is passed explicitly -- otherwise the pin
+      # above would only fix the script, not the helm it installs. That was
+      # the old behaviour: get-helm-3 pinned to the v3.17.3 tag still tracked
+      # latest Helm 3, despite the comment claiming 3.17.3.
+      #
+      # This is a MAJOR upgrade (Helm 3 -> 4) on Debian. Homebrew (macOS) and
+      # pacman (Arch) already ship Helm 4, so it brings Debian in line.
       ansible.builtin.shell: |
-        curl -fsSL https://raw.githubusercontent.com/helm/helm/v3.17.3/scripts/get-helm-3 | bash
-      args:
-        creates: /usr/local/bin/helm
+        curl -fsSL https://raw.githubusercontent.com/helm/helm/v{{ helm_version }}/scripts/get-helm-4 \
+          | bash -s -- --version v{{ helm_version }}
+      changed_when: true
       become: true
-      when: ansible_facts['os_family'] == "Debian"
+      tags: system
+      when: >-
+        ansible_facts['os_family'] == "Debian"
+        and ('Version:"v' ~ helm_version ~ '"') not in (helm_installed.stdout | default(""))
 
     - name: Install helm via pacman (Arch)
       community.general.pacman:
         name: helm
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

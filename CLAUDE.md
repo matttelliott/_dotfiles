@@ -84,14 +84,74 @@ ansible-lint tools/*/install_*.yml
 
 ## Host Groups
 
-| Group            | Description            |
-| ---------------- | ---------------------- |
-| `macs`           | macOS machines         |
-| `debian`         | Debian/Ubuntu machines |
-| `arch`           | Arch Linux machines    |
-| `with_gui_tools` | GUI applications       |
-| `with_browsers`  | Browser suite          |
-| `with_ai_tools`  | AI tools (Claude Code) |
+| Group            | Description                                |
+| ---------------- | ------------------------------------------ |
+| `macs`           | macOS machines                             |
+| `debian`         | Debian/Ubuntu machines                     |
+| `arch`           | Arch Linux machines                        |
+| `with_gui_tools` | GUI applications                           |
+| `with_browsers`  | Browser suite                              |
+| `with_ai_tools`  | AI tools (Claude Code)                     |
+| `standard_users` | Non-admin accounts on a shared machine     |
+
+## Multi-user Hosts
+
+One machine can carry several accounts, split into two layers:
+
+- **System layer** (`tags: system`) — package installs, services, sudoers,
+  account creation, and writes to shared prefixes like `/opt/homebrew`. Run
+  once per machine by an admin.
+- **User layer** (untagged) — everything under `~`. Run per account.
+
+Standard users run the same playbook with `--skip-tags system`:
+
+```bash
+# admin
+ansible-playbook setup.yml --connection=local --limit $(hostname -s)
+
+# standard user
+ansible-playbook setup.yml --connection=local --limit $(hostname -s) --skip-tags system
+```
+
+**When adding a task that needs `become: true`, or that writes anywhere
+outside `$HOME`, tag it `system`.** Untagged means "safe for any account". Two
+rules keep the split working:
+
+1. A privileged task must not `register:` a variable an untagged task reads —
+   the untagged task would fail on an undefined variable when the run skips
+   the tag. Tag both, or make the consumer tolerate it.
+2. `become: true` is not the only privileged marker. Homebrew needs no sudo
+   but writes a single shared prefix (`/opt/homebrew`) that only the `admin`
+   group can touch, so **every `brew install` / `brew tap` / `brew services`
+   / `mas install` task is tagged `system`** even though none of them use
+   `become`. Same for anything else writing outside `$HOME`:
+   `softwareupdate` (`tools/homebrew`), the fortune data files
+   (`tools/fortune`), and Nerd Font casks (`themes/_font.yml`). `yay` is the
+   same trap on Arch — it must _not_ run under `become`, but it calls `sudo`
+   itself, so every `yay -S` task is tagged too.
+
+   The `creates:` guard is not a substitute — it only skips the task once the
+   formula is already installed. On the first run, or for any formula the
+   admin has not installed yet, an untagged brew task fails for a standard
+   user.
+
+Read-only probes (`Check if <tool> is installed`) stay untagged: they need no
+privileges, and their registered values are read by tasks on both sides.
+
+Accounts are declared per host via `host_users` in `inventory.yml` and
+provisioned by `tools/users/install_users.yml`. See `tools/users/README.md`.
+
+### Variable Precedence Gotcha
+
+`group_vars/all.yml` (playbook group_vars/all) **outranks** a `vars:` block
+written inline under a group in `inventory.yml`. `dotfiles_user_role` for the
+`standard_users` group therefore lives in `group_vars/standard_users.yml` —
+playbook `group_vars/<group>` beats `group_vars/all`, and a per-host value in
+`inventory.yml` beats both.
+
+For the same reason, `host_users` and `user_passwords` are defaulted in
+`group_vars/all.yml` and never in a play's `vars:` block: play vars outrank
+inventory host vars and would silently discard the per-host list.
 
 ## Ansible Patterns
 
@@ -140,14 +200,84 @@ Package managers (Homebrew, apt, pacman) provide stable versions by default.
 
 ### Current Implementation
 
-| Tool           | Version Strategy | Method                                                |
-| -------------- | ---------------- | ----------------------------------------------------- |
-| Node.js        | LTS              | `nvm install --lts`, `nvm alias default lts/*`        |
-| Rust           | Stable           | rustup defaults to stable toolchain                   |
-| Neovim         | Latest stable    | GitHub releases (NOT apt - apt versions are outdated) |
-| Go             | Current stable   | Pinned version (Go has no LTS)                        |
-| All Homebrew   | Stable           | Formulae provide stable versions                      |
-| All apt/pacman | Stable           | Repos provide stable versions                         |
+| Tool             | Version Strategy | Method                                                |
+| ---------------- | ---------------- | ----------------------------------------------------- |
+| Node.js          | LTS              | `nvm install --lts`, `nvm alias default lts/*`        |
+| Rust             | Stable           | rustup defaults to stable toolchain                   |
+| Neovim           | Latest stable    | GitHub `stable` tag (NOT apt - apt versions are old)  |
+| Go               | Current stable   | Pinned version (Go has no LTS)                        |
+| fastfetch, k9s   | Latest stable    | Resolved at run time from the releases API            |
+| Pinned releases  | Latest stable    | `<tool>_version` var, Linux paths only                |
+| All Homebrew     | Stable           | Formulae provide stable versions                      |
+| All apt/pacman   | Stable           | Repos provide stable versions                         |
+
+### Updating Pinned Versions
+
+Every pinned tool declares a `<tool>_version` play var: `doctl`, `go`,
+`lazygit`, `stylua` (in `tools/lua`), `tea`, `glab`, `sops`, `procs`,
+`lazydocker`, `helm`, `nvm` (in `tools/node`), `uv` (in `tools/python`),
+`pulumi`, `obsidian`, `chatgpt`. Apart from Go — which uses a `.pkg` on
+macOS — these govern the Linux paths only; macOS goes through Homebrew.
+
+**Bumping the var must actually upgrade the host.** Guard installs on the
+*installed version*, never on mere existence — `creates:` and
+`stat` + `not X.stat.exists` pin a machine to whatever it first installed:
+
+```yaml
+- name: Check installed procs version (Debian)
+  ansible.builtin.command: /usr/local/bin/procs --version
+  register: procs_installed
+  changed_when: false
+  failed_when: false      # not installed yet -> empty stdout -> install
+  check_mode: false       # or --check reports everything as missing
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Download and install procs (Debian)
+  ...
+  when: >-
+    ansible_facts['os_family'] == "Debian"
+    and ("procs " ~ procs_version) not in (procs_installed.stdout | default(""))
+```
+
+Build the match with `~` concatenation, not `{{ }}` — `when:` is already a
+Jinja context and ansible-lint flags `no-jinja-when`. Match a delimiter too
+(`"procs " ~ version`, `"version=" ~ version ~ ","`) so `1.16.0` cannot match
+inside `1.16.05`. Dropping `creates:` also means adding `changed_when:`.
+
+Tools with no queryable version use a checksum instead — `get_url` re-downloads
+when the recorded checksum no longer matches what is at `dest`, which makes
+`sops`, `stylua`, and the `obsidian` AppImage version-aware for free. The
+`chatgpt-desktop` AppImage records its version in a `.version` stamp file.
+
+Node is special: it tracks the LTS *line*, not a pin. `nvm install --lts` runs
+on every pass (no `creates:`) so a new LTS is picked up; global npm packages
+are checked against the **active** Node, since a glob over
+`~/.nvm/versions/node/*/bin/` would match the previous one and silently skip.
+
+Current versions:
+
+```bash
+gh release view --repo <owner>/<repo> --json tagName -q .tagName
+curl -s "https://go.dev/dl/?mode=json" | jq -r '.[] | select(.stable) | .version' | head -1
+curl -s "https://gitlab.com/api/v4/projects/gitlab-org%2Fcli/releases" | jq -r '.[0].tag_name'   # glab
+curl -s "https://gitea.com/api/v1/repos/gitea/tea/releases?limit=1" | jq -r '.[0].tag_name'      # tea
+```
+
+After bumping, **verify the asset URL still resolves** — upstreams rename
+assets between releases. lazygit switched `Linux_x86_64` to `linux_x86_64`
+after 0.44.1, which silently 404s:
+
+```bash
+curl -sIL -o /dev/null -w '%{http_code}\n' "<download url>"
+```
+
+Never write `releases/latest/download/<file-with-a-version-in-it>` — the
+`latest` redirect resolves to the newest release, which by definition no
+longer contains an older version's filename, so it 404s the moment upstream
+publishes. Use an explicit tag, or a genuinely version-free asset name.
+
+`sops` additionally verifies a checksum; update `sops_checksum` from the
+release's `checksums.txt` in the same commit as `sops_version`.
 
 ## Claude Code Configuration
 

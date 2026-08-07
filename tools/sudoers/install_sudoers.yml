@@ -1,19 +1,57 @@
 ---
 # Passwordless sudo for Ansible
 #
-# Enables NOPASSWD sudo for the current user.
-# Run with -K (--ask-become-pass) the first time:
+# Grants NOPASSWD sudo to admin accounts only. Run with -K
+# (--ask-become-pass) the first time:
 #   ansible-playbook tools/sudoers/install_sudoers.yml --connection=local --limit macbookair -K
+#
+# When the host declares `host_users` (see tools/users/install_users.yml), the
+# declared admins get a sudoers drop-in and the declared standard users have
+# theirs removed -- demoting a user in inventory.yml actually takes their sudo
+# away. Hosts with no host_users keep the original single-user behaviour and
+# grant the connecting account.
+#
+# Every task is privileged and tagged `system`, so a standard user running
+# setup.yml with --skip-tags system never touches sudoers at all.
 
 - name: Configure passwordless sudo
   hosts: all
   gather_facts: true
 
+  vars:
+    # Not defaulted in play vars on purpose -- play vars outrank inventory host
+    # vars and would discard the per-host list. See group_vars/all.yml.
+    declared_users: "{{ host_users | default([]) }}"
+
   tasks:
-    - name: Enable passwordless sudo for user
+    - name: Enable passwordless sudo for the connecting user (single-user host)
       ansible.builtin.copy:
         content: "{{ ansible_facts['user_id'] }} ALL=(ALL) NOPASSWD: ALL\n"
         dest: "/etc/sudoers.d/{{ ansible_facts['user_id'] }}"
         mode: "0440"
         validate: "visudo -cf %s"
       become: true
+      when: declared_users | length == 0
+      tags: system
+
+    - name: Enable passwordless sudo for admin users
+      ansible.builtin.copy:
+        content: "{{ item.name }} ALL=(ALL) NOPASSWD: ALL\n"
+        dest: "/etc/sudoers.d/{{ item.name }}"
+        mode: "0440"
+        validate: "visudo -cf %s"
+      become: true
+      loop: "{{ declared_users | selectattr('role', 'eq', 'admin') | list }}"
+      loop_control:
+        label: "{{ item.name }}"
+      tags: system
+
+    - name: Remove passwordless sudo from standard users
+      ansible.builtin.file:
+        path: "/etc/sudoers.d/{{ item.name }}"
+        state: absent
+      become: true
+      loop: "{{ declared_users | selectattr('role', 'eq', 'standard') | list }}"
+      loop_control:
+        label: "{{ item.name }}"
+      tags: system

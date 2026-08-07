@@ -9,6 +9,7 @@
         name: fail2ban
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install fail2ban via pacman (Arch)
@@ -16,6 +17,7 @@
         name: fail2ban
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Create jail.local config
@@ -24,6 +26,7 @@
         dest: /etc/fail2ban/jail.local
         mode: '0644'
       become: true
+      tags: system
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
 
     - name: Enable and start fail2ban
@@ -32,4 +35,5 @@
         enabled: true
         state: started
       become: true
+      tags: system
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]

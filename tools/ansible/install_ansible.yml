@@ -9,12 +9,14 @@
       args:
         creates: /opt/homebrew/bin/ansible
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Install ansible-lint via Homebrew
       ansible.builtin.shell: /opt/homebrew/bin/brew install ansible-lint
       args:
         creates: /opt/homebrew/bin/ansible-lint
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Install Ansible via uv (Debian)
       ansible.builtin.shell: ~/.local/bin/uv tool install ansible
@@ -33,6 +35,7 @@
         name: ansible
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Install ansible-lint via pacman (Arch)
@@ -40,6 +43,7 @@
         name: ansible-lint
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Add Ansible to shell config

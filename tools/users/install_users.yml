@@ -1,0 +1,264 @@
+---
+# Host user accounts (multi-user hosts)
+#
+# Declares every account that should exist on a machine and whether it is an
+# admin (may sudo, may write the shared /opt/homebrew prefix) or a standard
+# user (no sudo, consumes what the admin installed).
+#
+# Declare accounts per host in inventory.yml:
+#
+#   macmini:
+#     ansible_user: matt
+#     host_users:
+#       - name: matt
+#         role: admin
+#       - name: alice
+#         role: standard
+#         fullname: Alice Example
+#         ssh_keys:
+#           - "ssh-ed25519 AAAA... alice@laptop"
+#
+# Every task here is privileged, so each one carries `tags: system` and the
+# whole playbook is skipped when a standard user runs setup.yml with
+# --skip-tags system. Account management is always the admin's job.
+#
+# Creating an account needs a password. Never commit one -- pass it at run
+# time (or from SOPS):
+#
+#   ansible-playbook setup.yml --limit macmini \
+#     -e '{"user_passwords": {"alice": "correct-horse-battery-staple"}}'
+#
+# Accounts that do not exist yet and have no password available are skipped
+# with a notice rather than created without one, so unattended self-update
+# runs never hang and never leave a passwordless account behind. Passwords are
+# only applied on creation -- reruns never reset a password the user has since
+# changed.
+
+- name: Manage host user accounts
+  hosts: all
+  gather_facts: true
+
+  vars:
+    # Group that confers sudo rights on each platform.
+    admin_group: >-
+      {{ 'admin' if ansible_facts['os_family'] == 'Darwin'
+         else 'sudo' if ansible_facts['os_family'] == 'Debian'
+         else 'wheel' }}
+    # NOTE: host_users and user_passwords are deliberately NOT defaulted in
+    # play vars -- play vars outrank inventory host vars, which would silently
+    # discard the per-host host_users list. Defaults live in group_vars/all.yml
+    # and every reference below carries an inline default as well.
+    declared_users: "{{ host_users | default([]) }}"
+    standard_accounts: "{{ host_users | default([]) | selectattr('role', 'eq', 'standard') | list }}"
+    passwords: "{{ user_passwords | default({}) }}"
+    # Accounts that exist by the time the shared tasks below run: already
+    # present on the machine, or created above because a password was
+    # supplied. Templated lazily, so the registers are populated by then.
+    existing_or_created: >-
+      {{ (mac_existing_users.stdout_lines | default([]))
+         + (ansible_facts['getent_passwd'] | default({}) | list)
+         + (passwords.keys() | list) }}
+
+  tasks:
+    - name: Validate declared users
+      ansible.builtin.assert:
+        that:
+          - item.name is defined
+          - item.name | length > 0
+          - item.role is defined
+          - item.role in ['admin', 'standard']
+        fail_msg: >-
+          Each host_users entry needs a name and a role of 'admin' or
+          'standard'. Got: {{ item }}
+      loop: "{{ declared_users }}"
+      loop_control:
+        label: "{{ item.name | default('<unnamed>') }}"
+      tags: system
+
+    # ------------------------------------------------------------------
+    # macOS
+    # ------------------------------------------------------------------
+    # check_mode: false on the read-only lookups -- without it `--check` skips
+    # them, and every account then looks missing.
+    - name: List existing accounts (macOS)
+      ansible.builtin.command: dscl . -list /Users
+      register: mac_existing_users
+      changed_when: false
+      check_mode: false
+      when:
+        - declared_users | length > 0
+        - ansible_facts['os_family'] == "Darwin"
+      tags: system
+
+    - name: Report accounts that cannot be created without a password (macOS)
+      ansible.builtin.debug:
+        msg: >-
+          Account '{{ item.name }}' does not exist and no password was
+          supplied. Create it with: ansible-playbook setup.yml --limit
+          {{ inventory_hostname }} -e '{"user_passwords":
+          {"{{ item.name }}": "<password>"}}'
+      loop: "{{ declared_users }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - ansible_facts['os_family'] == "Darwin"
+        - item.name not in mac_existing_users.stdout_lines | default([])
+        - item.name not in passwords
+      tags: system
+
+    # Created as a standard account regardless of role; the dseditgroup task
+    # below is the single place that grants or revokes admin rights, so role
+    # changes on an existing account are handled the same way as creation.
+    - name: Create missing accounts (macOS)
+      ansible.builtin.command:
+        argv:
+          - sysadminctl
+          - -addUser
+          - "{{ item.name }}"
+          - -fullName
+          - "{{ item.fullname | default(item.name) }}"
+          - -password
+          - "{{ passwords[item.name] }}"
+          - -shell
+          - /bin/zsh
+      become: true
+      no_log: true
+      loop: "{{ declared_users }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - ansible_facts['os_family'] == "Darwin"
+        - item.name not in mac_existing_users.stdout_lines | default([])
+        - item.name in passwords
+      changed_when: true
+      tags: system
+
+    - name: Check admin group membership (macOS)
+      ansible.builtin.command: dseditgroup -o checkmember -m {{ item.name }} -t user admin
+      register: mac_admin_check
+      loop: "{{ declared_users }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - ansible_facts['os_family'] == "Darwin"
+        - item.name in existing_or_created
+      changed_when: false
+      check_mode: false
+      failed_when: false
+      tags: system
+
+    - name: Grant admin rights (macOS)
+      ansible.builtin.command: dseditgroup -o edit -a {{ item.item.name }} -t user admin
+      become: true
+      loop: "{{ mac_admin_check.results | default([]) }}"
+      loop_control:
+        label: "{{ item.item.name | default('') }}"
+      when:
+        - not item.skipped | default(false)
+        - item.item.role == 'admin'
+        - item.rc != 0
+      changed_when: true
+      tags: system
+
+    - name: Revoke admin rights from standard users (macOS)
+      ansible.builtin.command: dseditgroup -o edit -d {{ item.item.name }} -t user admin
+      become: true
+      loop: "{{ mac_admin_check.results | default([]) }}"
+      loop_control:
+        label: "{{ item.item.name | default('') }}"
+      when:
+        - not item.skipped | default(false)
+        - item.item.role == 'standard'
+        - item.rc == 0
+      changed_when: true
+      tags: system
+
+    # ------------------------------------------------------------------
+    # Linux (Debian / Arch)
+    # ------------------------------------------------------------------
+    - name: Read existing accounts (Linux)
+      ansible.builtin.getent:
+        database: passwd
+      when:
+        - declared_users | length > 0
+        - ansible_facts['os_family'] in ["Debian", "Archlinux"]
+      tags: system
+
+    - name: Report accounts that cannot be created without a password (Linux)
+      ansible.builtin.debug:
+        msg: >-
+          Account '{{ item.name }}' does not exist and no password was
+          supplied. Create it with: ansible-playbook setup.yml --limit
+          {{ inventory_hostname }} -e '{"user_passwords":
+          {"{{ item.name }}": "<password>"}}'
+      loop: "{{ declared_users }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - ansible_facts['os_family'] in ["Debian", "Archlinux"]
+        - item.name not in ansible_facts['getent_passwd'] | default({})
+        - item.name not in passwords
+      tags: system
+
+    - name: Create and configure accounts (Linux)
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        comment: "{{ item.fullname | default(omit) }}"
+        shell: "{{ item.shell | default('/usr/bin/zsh') }}"
+        create_home: true
+        password: >-
+          {{ passwords[item.name] | password_hash('sha512')
+             if item.name in passwords else omit }}
+        update_password: on_create
+        groups: "{{ [admin_group] if item.role == 'admin' else omit }}"
+        append: true
+        state: present
+      become: true
+      no_log: true
+      loop: "{{ declared_users }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - ansible_facts['os_family'] in ["Debian", "Archlinux"]
+        # Existing accounts are always reconciled; missing ones need a password.
+        - "item.name in ansible_facts['getent_passwd'] | default({}) or item.name in passwords"
+      tags: system
+
+    - name: Read admin group membership (Linux)
+      ansible.builtin.getent:
+        database: group
+        key: "{{ admin_group }}"
+      when:
+        - standard_accounts | length > 0
+        - ansible_facts['os_family'] in ["Debian", "Archlinux"]
+      tags: system
+
+    - name: Revoke admin rights from standard users (Linux)
+      ansible.builtin.command: gpasswd -d {{ item.name }} {{ admin_group }}
+      become: true
+      loop: "{{ standard_accounts }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - ansible_facts['os_family'] in ["Debian", "Archlinux"]
+        - item.name in (ansible_facts['getent_group'][admin_group][2] | default('')).split(',')
+      changed_when: true
+      tags: system
+
+    # ------------------------------------------------------------------
+    # Shared
+    # ------------------------------------------------------------------
+    # Guarded on existence: an account declared without a password is reported
+    # and skipped above, and authorized_key would otherwise fail the whole run
+    # trying to write a home directory that is not there.
+    - name: Authorize SSH keys for each account
+      ansible.posix.authorized_key:
+        user: "{{ item.0.name }}"
+        key: "{{ item.1 }}"
+        state: present
+      become: true
+      loop: "{{ declared_users | subelements('ssh_keys', skip_missing=True) }}"
+      loop_control:
+        label: "{{ item.0.name }}"
+      when: item.0.name in existing_or_created
+      tags: system

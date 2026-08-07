@@ -1,0 +1,10 @@
+---
+# Accounts on a machine that another inventory entry administers.
+#
+# Must live here rather than in a `vars:` block under the standard_users group
+# in inventory.yml: Ansible ranks inventory-file group vars BELOW
+# playbook group_vars/all, so the `dotfiles_user_role: admin` default in
+# group_vars/all.yml would silently win and standard users would run the full
+# privileged playbook. Playbook group_vars/<group> outranks group_vars/all, so
+# this file wins -- and a per-host override in inventory.yml still beats both.
+dotfiles_user_role: standard

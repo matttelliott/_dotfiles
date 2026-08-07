@@ -4,7 +4,7 @@
   gather_facts: true
 
   vars:
-    doctl_version: "1.104.0"
+    doctl_version: "1.166.0"
 
   tasks:
     - name: Install doctl via Homebrew
@@ -12,11 +12,15 @@
       args:
         creates: /opt/homebrew/bin/doctl
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
-    - name: Check if doctl is installed (Debian)
-      ansible.builtin.stat:
-        path: /usr/local/bin/doctl
-      register: doctl_check
+    # Version-aware so bumping doctl_version actually upgrades the host.
+    - name: Check installed doctl version (Debian)
+      ansible.builtin.command: /usr/local/bin/doctl version
+      register: doctl_installed
+      changed_when: false
+      failed_when: false
+      check_mode: false
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Download and install doctl (Debian)
@@ -25,10 +29,14 @@
         install /tmp/doctl /usr/local/bin
         rm -f /tmp/doctl
       become: true
-      when: ansible_facts['os_family'] == "Debian" and not doctl_check.stat.exists
+      tags: system
+      when: >-
+        ansible_facts['os_family'] == "Debian"
+        and ("doctl version " ~ doctl_version) not in (doctl_installed.stdout | default(""))
 
     - name: Install doctl via yay (Arch)
       ansible.builtin.shell: yay -S --noconfirm doctl
       args:
         creates: /usr/bin/doctl
       when: ansible_facts['os_family'] == "Archlinux"
+      tags: system

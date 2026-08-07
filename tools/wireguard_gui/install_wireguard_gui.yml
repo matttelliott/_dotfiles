@@ -9,6 +9,7 @@
       args:
         creates: /Applications/WireGuard.app
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Darwin"
 
     - name: Install WireGuard tools via apt (Debian)
@@ -18,6 +19,7 @@
           - wireguard-tools
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install WireGuard tools via pacman (Arch)
@@ -26,4 +28,5 @@
           - wireguard-tools
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

@@ -9,6 +9,7 @@
       args:
         creates: /Applications/Brave Browser.app
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Check if Brave is installed (Debian)
       ansible.builtin.stat:
@@ -24,6 +25,7 @@
           https://brave-browser-apt-release.s3.brave.com/ stable main" \
           | tee /etc/apt/sources.list.d/brave-browser-release.list > /dev/null
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian" and not brave_check.stat.exists
 
     - name: Install Brave via apt (Debian)
@@ -32,6 +34,7 @@
         state: present
         update_cache: true
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Brave via yay (Arch)
@@ -39,3 +42,4 @@
       args:
         creates: /usr/bin/brave
       when: ansible_facts['os_family'] == "Archlinux"
+      tags: system
