@@ -22,7 +22,7 @@
       ansible.builtin.template:
         src: gitconfig.darwin.j2
         dest: ~/.gitconfig
-      when: ansible_facts['os_family'] == "Darwin" and 'with_login_tools' in group_names
+      when: ansible_facts['os_family'] == "Darwin"
 
     - name: Write allowed_signers for SSH commit signing
       ansible.builtin.copy:
@@ -30,7 +30,6 @@
         content: "{{ git_user_email }} {{ git_signing_key }}\n"
         mode: "0644"
       when:
-        - "'with_login_tools' in group_names"
         - git_signing_key is defined
         - git_signing_key | length > 0
 
@@ -38,13 +37,12 @@
       ansible.builtin.template:
         src: gitconfig.debian.j2
         dest: ~/.gitconfig
-      when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and 'with_login_tools' in group_names
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
 
     - name: Install gitconfig (minimal)
       ansible.builtin.template:
         src: gitconfig.minimal.j2
         dest: ~/.gitconfig
-      when: "'with_login_tools' not in group_names"
 
     - name: Create zsh config directory
       ansible.builtin.file:
@@ -59,5 +57,5 @@
     - name: Source git aliases in zshrc
       ansible.builtin.lineinfile:
         path: ~/.zshrc
-        line: 'source ~/.config/zsh/git.zsh'
+        line: "source ~/.config/zsh/git.zsh"
         create: true

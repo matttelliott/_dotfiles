@@ -1,6 +1,6 @@
 ---
 - name: Install Claude Code
-  hosts: with_ai_tools:&with_login_tools
+  hosts: with_ai_tools
   gather_facts: true
 
   tasks:

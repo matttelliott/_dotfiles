@@ -1,6 +1,5 @@
 ---
 - name: Install GitHub CLI
-  hosts: with_login_tools
   gather_facts: true
 
   tasks:

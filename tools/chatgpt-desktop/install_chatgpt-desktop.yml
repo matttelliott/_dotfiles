@@ -1,6 +1,6 @@
 ---
 - name: Install ChatGPT Desktop
-  hosts: with_gui_tools:&with_login_tools:&with_ai_tools
+  hosts: with_gui_tools:&with_ai_tools
   gather_facts: true
 
   tasks:

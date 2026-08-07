@@ -24,12 +24,6 @@ all:
           ansible_connection: local
           ansible_python_interpreter: /usr/bin/python3
 {% endif %}
-{% if 'with_login_tools' in group_names %}
-
-    with_login_tools:
-      hosts:
-        {{ inventory_hostname_short }}:
-{% endif %}
 {% if 'with_gui_tools' in group_names %}
 
     with_gui_tools:

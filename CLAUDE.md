@@ -84,15 +84,14 @@ ansible-lint tools/*/install_*.yml
 
 ## Host Groups
 
-| Group              | Description                     |
-| ------------------ | ------------------------------- |
-| `macs`             | macOS machines                  |
-| `debian`           | Debian/Ubuntu machines          |
-| `arch`             | Arch Linux machines             |
-| `with_login_tools` | Git signing, SSH, cloud CLIs    |
-| `with_gui_tools`   | GUI applications                |
-| `with_browsers`    | Browser suite                   |
-| `with_ai_tools`    | AI tools (Claude Code)          |
+| Group            | Description            |
+| ---------------- | ---------------------- |
+| `macs`           | macOS machines         |
+| `debian`         | Debian/Ubuntu machines |
+| `arch`           | Arch Linux machines    |
+| `with_gui_tools` | GUI applications       |
+| `with_browsers`  | Browser suite          |
+| `with_ai_tools`  | AI tools (Claude Code) |
 
 ## Ansible Patterns
 
@@ -202,10 +201,10 @@ Claude Code configuration follows a three-layer architecture, each with distinct
 
 ### Powerline Separator Code Points
 
-| Style  | Right | Left | Code Points    |
+| Style | Right | Left | Code Points |
 | ------ | ----- | ---- | -------------- | ----------------------------------------------------------------------------------------------------------- |
-| Angled | ``    | ``   | U+E0B0, U+E0B2 | <-- ALERT! this is an example of what happens when claude tries to edit files with these special characters |
-| Round  | ``    | ``   | U+E0B4, U+E0B6 | <-- BAD! claude tried to edit this file and the special characters disappeared!                             |
+| Angled | `   |` | U+E0B0, U+E0B2 | <-- ALERT! this is an example of what happens when claude tries to edit files with these special characters |
+| Round | `   |` | U+E0B4, U+E0B6 | <-- BAD! claude tried to edit this file and the special characters disappeared! |
 
 ### Editing Approaches
 

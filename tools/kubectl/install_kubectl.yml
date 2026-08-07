@@ -1,6 +1,5 @@
 ---
 - name: Install kubectl
-  hosts: with_login_tools
   gather_facts: true
 
   tasks:

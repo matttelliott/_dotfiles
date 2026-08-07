@@ -1,6 +1,5 @@
 ---
 - name: Install WireGuard
-  hosts: with_login_tools
   gather_facts: true
 
   tasks:

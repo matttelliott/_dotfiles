@@ -74,7 +74,7 @@
     - name: Remove nvim-ai source line from zshrc
       ansible.builtin.lineinfile:
         path: ~/.zshrc
-        line: 'source ~/.config/zsh/nvim-ai.zsh'
+        line: "source ~/.config/zsh/nvim-ai.zsh"
         state: absent
 
 - name: Configure macOS
@@ -120,10 +120,6 @@
         path: ~/.ssh/id_rsa
       register: ssh_key_file
 
-    - name: Set use_ssh fact
-      ansible.builtin.set_fact:
-        use_ssh: "{{ (inventory_hostname in (groups['with_login_tools'] | default([]))) and ssh_key_file.stat.exists }}"
-
     - name: Clone dotfiles via SSH
       ansible.builtin.git:
         repo: "{{ dotfiles_ssh_url }}"
@@ -145,7 +141,6 @@
       when:
         - dotfiles_dir.stat.exists
         - use_ssh
-        - "'with_login_tools' in group_names"
       changed_when: false
 
     - name: Set remote to HTTPS
@@ -155,7 +150,6 @@
       when:
         - dotfiles_dir.stat.exists
         - not use_ssh
-        - "'with_login_tools' in group_names"
       changed_when: false
 
     - name: Update dotfiles repo
