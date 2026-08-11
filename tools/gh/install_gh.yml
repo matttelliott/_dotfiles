@@ -1,6 +1,6 @@
 ---
 - name: Install GitHub CLI
-  hosts: with_login_tools
+  hosts: all
   gather_facts: true
 
   tasks:
@@ -9,6 +9,7 @@
       args:
         creates: /opt/homebrew/bin/gh
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Check if gh is installed (Debian)
       ansible.builtin.stat:
@@ -28,6 +29,7 @@
           https://cli.github.com/packages stable main" \
           | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian" and not gh_check.stat.exists
 
     - name: Install GitHub CLI via apt (Debian)
@@ -36,6 +38,7 @@
         state: present
         update_cache: true
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install GitHub CLI via pacman (Arch)
@@ -43,4 +46,5 @@
         name: github-cli
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

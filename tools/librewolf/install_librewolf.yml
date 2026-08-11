@@ -9,6 +9,7 @@
       args:
         creates: /Applications/LibreWolf.app
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Check if LibreWolf is installed (Debian)
       ansible.builtin.stat:
@@ -21,6 +22,7 @@
         apt-get update && apt-get install -y extrepo
         extrepo enable librewolf
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian" and not librewolf_check.stat.exists
 
     - name: Install LibreWolf via apt (Debian)
@@ -29,6 +31,7 @@
         state: present
         update_cache: true
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install LibreWolf via yay (Arch)
@@ -36,3 +39,4 @@
       args:
         creates: /usr/bin/librewolf
       when: ansible_facts['os_family'] == "Archlinux"
+      tags: system

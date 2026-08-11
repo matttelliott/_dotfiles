@@ -8,3 +8,4 @@
       ansible.builtin.shell: /opt/homebrew/bin/brew install mas
       args:
         creates: /opt/homebrew/bin/mas
+      tags: system

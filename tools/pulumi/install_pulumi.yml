@@ -3,20 +3,34 @@
   hosts: all
   gather_facts: true
 
+  vars:
+    pulumi_version: "3.256.0"
+
   tasks:
     - name: Install Pulumi via Homebrew
       ansible.builtin.shell: /opt/homebrew/bin/brew install pulumi
       args:
         creates: /opt/homebrew/bin/pulumi
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
+
+    # Version-aware so bumping pulumi_version actually upgrades the host.
+    # `pulumi version` prints e.g. "v3.256.0".
+    - name: Check installed Pulumi version (Linux)
+      ansible.builtin.command: "{{ ansible_facts['env']['HOME'] }}/.pulumi/bin/pulumi version"
+      register: pulumi_installed
+      changed_when: false
+      failed_when: false
+      check_mode: false
+      when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
 
     - name: Install Pulumi via official installer (Linux)
-      # Pulumi installer with pinned version (update periodically)
       # Latest version: https://github.com/pulumi/pulumi/releases
-      ansible.builtin.shell: curl -fsSL https://get.pulumi.com | sh -s -- --version 3.216.0
-      args:
-        creates: ~/.pulumi/bin/pulumi
-      when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
+      ansible.builtin.shell: curl -fsSL https://get.pulumi.com | sh -s -- --version {{ pulumi_version }}
+      changed_when: true
+      when: >-
+        ansible_facts['os_family'] in ["Debian", "Archlinux"]
+        and ("v" ~ pulumi_version) not in (pulumi_installed.stdout | default(""))
 
     - name: Add Pulumi to shell config
       ansible.builtin.blockinfile:

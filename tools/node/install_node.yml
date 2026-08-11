@@ -3,6 +3,7 @@
   gather_facts: true
   vars:
     nvm_dir: ~/.nvm
+    nvm_version: "0.40.6"
   tasks:
     # macOS: Install nvm via Homebrew
     - name: Install nvm via Homebrew
@@ -10,6 +11,7 @@
       args:
         creates: /opt/homebrew/opt/nvm
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
     - name: Create nvm directory
       ansible.builtin.file:
         path: "{{ nvm_dir }}"
@@ -32,43 +34,67 @@
         path: ~/.zshrc
         marker: "# {mark} NVM"
         state: absent
+    # No `creates:` guard: that pinned the host to whatever LTS line was
+    # current at first install, so Node never moved to the next LTS. `nvm
+    # install --lts` is cheap when already current -- it prints
+    # "is already installed" and exits -- so run it every time and report
+    # changed only when it actually installs something.
     - name: Install Node.js LTS (macOS)
       ansible.builtin.shell: |
         export NVM_DIR="$HOME/.nvm"
         . /opt/homebrew/opt/nvm/nvm.sh
         nvm install --lts
-        nvm alias default lts/*
-      args:
-        creates: ~/.nvm/alias/default
+        nvm alias default 'lts/*'
+      register: node_lts_mac
+      changed_when: "'is already installed' not in node_lts_mac.stdout"
       when: ansible_facts['os_family'] == "Darwin"
-    # Debian/Arch: Install nvm from official script
-    - name: Install nvm from official script (Linux)
-      ansible.builtin.shell: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-      args:
-        creates: ~/.nvm/nvm.sh
+    # Debian/Arch: Install nvm from official script.
+    # Version-aware so bumping nvm_version actually upgrades nvm itself.
+    - name: Check installed nvm version (Linux)
+      ansible.builtin.shell: . ~/.nvm/nvm.sh && nvm --version
+      register: nvm_installed
+      changed_when: false
+      failed_when: false
+      check_mode: false
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
+
+    - name: Install nvm from official script (Linux)
+      ansible.builtin.shell: >-
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v{{ nvm_version }}/install.sh | bash
+      changed_when: true
+      when: >-
+        ansible_facts['os_family'] in ["Debian", "Archlinux"]
+        and nvm_version not in (nvm_installed.stdout | default(""))
     - name: Install Node.js LTS (Linux)
       ansible.builtin.shell: |
         export NVM_DIR="$HOME/.nvm"
         . ~/.nvm/nvm.sh
         nvm install --lts
-        nvm alias default lts/*
-      args:
-        creates: ~/.nvm/alias/default
+        nvm alias default 'lts/*'
+      register: node_lts_linux
+      changed_when: "'is already installed' not in node_lts_linux.stdout"
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]
+    # Checked against the ACTIVE Node, not a glob over every installed one.
+    # `creates: ~/.nvm/versions/node/*/bin/tsc` matched the previous Node after
+    # an LTS upgrade, so a freshly installed Node would silently be left
+    # without these packages (and nvim's LSP setup with it).
     - name: Install global npm packages (macOS)
       ansible.builtin.shell: |
         export NVM_DIR="$HOME/.nvm"
         . /opt/homebrew/opt/nvm/nvm.sh
+        nvm use default >/dev/null
+        command -v tsc >/dev/null && echo ALREADY_PRESENT && exit 0
         npm install -g typescript @fsouza/prettierd eslint_d
-      args:
-        creates: ~/.nvm/versions/node/*/bin/tsc
+      register: npm_globals_mac
+      changed_when: "'ALREADY_PRESENT' not in npm_globals_mac.stdout"
       when: ansible_facts['os_family'] == "Darwin"
     - name: Install global npm packages (Linux)
       ansible.builtin.shell: |
         export NVM_DIR="$HOME/.nvm"
         . ~/.nvm/nvm.sh
+        nvm use default >/dev/null
+        command -v tsc >/dev/null && echo ALREADY_PRESENT && exit 0
         npm install -g typescript @fsouza/prettierd eslint_d
-      args:
-        creates: ~/.nvm/versions/node/*/bin/tsc
+      register: npm_globals_linux
+      changed_when: "'ALREADY_PRESENT' not in npm_globals_linux.stdout"
       when: ansible_facts['os_family'] in ["Debian", "Archlinux"]

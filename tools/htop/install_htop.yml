@@ -9,12 +9,14 @@
       args:
         creates: /opt/homebrew/bin/htop
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Install htop via apt (Debian)
       ansible.builtin.apt:
         name: htop
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install htop via pacman (Arch)
@@ -22,4 +24,5 @@
         name: htop
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

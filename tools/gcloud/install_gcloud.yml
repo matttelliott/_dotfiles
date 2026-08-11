@@ -1,14 +1,18 @@
 ---
 - name: Install Google Cloud CLI
-  hosts: with_login_tools
+  hosts: all
   gather_facts: true
 
   tasks:
     - name: Install Google Cloud SDK via Homebrew Cask
-      ansible.builtin.shell: /opt/homebrew/bin/brew install --cask google-cloud-sdk
+      # Cask was renamed google-cloud-sdk -> gcloud-cli. Guard on the symlinked
+      # binary rather than the Caskroom path so a future rename cannot make this
+      # task re-run on every play.
+      ansible.builtin.shell: /opt/homebrew/bin/brew install --cask gcloud-cli
       args:
-        creates: /opt/homebrew/Caskroom/google-cloud-sdk
+        creates: /opt/homebrew/bin/gcloud
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Check if gcloud is installed (Debian)
       ansible.builtin.stat:
@@ -26,6 +30,7 @@
           https://packages.cloud.google.com/apt cloud-sdk main" \
           | tee /etc/apt/sources.list.d/google-cloud-sdk.list
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian" and not gcloud_check.stat.exists
 
     - name: Install Google Cloud CLI via apt (Debian)
@@ -34,6 +39,7 @@
         state: present
         update_cache: true
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Google Cloud CLI via yay (Arch)
@@ -41,3 +47,4 @@
       args:
         creates: /usr/bin/gcloud
       when: ansible_facts['os_family'] == "Archlinux"
+      tags: system

@@ -1,6 +1,6 @@
 ---
 - name: Install WireGuard
-  hosts: with_login_tools
+  hosts: all
   gather_facts: true
 
   tasks:
@@ -9,12 +9,14 @@
       args:
         creates: /opt/homebrew/bin/wg
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Install WireGuard tools via apt (Debian)
       ansible.builtin.apt:
         name: wireguard-tools
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install WireGuard tools via pacman (Arch)
@@ -22,4 +24,5 @@
         name: wireguard-tools
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

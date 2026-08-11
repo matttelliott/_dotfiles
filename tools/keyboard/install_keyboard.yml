@@ -41,6 +41,7 @@
         name: keyd
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Check if keyd is available in apt (Debian)
@@ -55,6 +56,7 @@
         name: keyd
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian" and keyd_apt_check.rc == 0
 
     - name: Install keyd build dependencies (Debian - if not in apt)
@@ -64,6 +66,7 @@
           - git
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian" and keyd_apt_check.rc != 0
 
     - name: Clone keyd repository (Debian - if not in apt)
@@ -81,6 +84,7 @@
       args:
         creates: /usr/local/bin/keyd
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian" and keyd_apt_check.rc != 0
 
     - name: Create keyd config directory
@@ -89,6 +93,7 @@
         state: directory
         mode: '0755'
       become: true
+      tags: system
       when: ansible_facts['os_family'] in ["Archlinux", "Debian"]
 
     - name: Configure keyd to remap Caps Lock to Ctrl
@@ -102,6 +107,7 @@
           capslock = leftcontrol
         mode: '0644'
       become: true
+      tags: system
       register: keyd_config
       when: ansible_facts['os_family'] in ["Archlinux", "Debian"]
 
@@ -111,6 +117,7 @@
         enabled: true
         state: started
       become: true
+      tags: system
       when: ansible_facts['os_family'] in ["Archlinux", "Debian"]
 
     # Restart the service (rather than `keyd reload`) to apply config changes:
@@ -124,5 +131,6 @@
         name: keyd
         state: restarted
       become: true
+      tags: system
       failed_when: false
       when: ansible_facts['os_family'] in ["Archlinux", "Debian"] and keyd_config.changed

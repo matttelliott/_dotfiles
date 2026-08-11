@@ -7,6 +7,7 @@
       args:
         creates: /opt/homebrew/bin/tldr
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
     - name: Install tldr via uv (Debian)
       ansible.builtin.shell: ~/.local/bin/uv tool install tldr
       args:
@@ -17,4 +18,5 @@
         name: tldr
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

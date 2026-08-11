@@ -6,3 +6,21 @@
 theme_color: tokyonight
 theme_font: dejavu
 theme_style: angle
+
+# Multi-user host support.
+#
+# host_users declares every account a machine should have and its role.
+# Override per-host in inventory.yml; see tools/users/install_users.yml.
+# Empty means "single-user host" -- sudoers falls back to granting the
+# connecting account, exactly as before.
+host_users: []
+
+# Passwords for accounts that do not exist yet, keyed by username. Never
+# commit these -- pass at run time with
+#   -e '{"user_passwords": {"alice": "<password>"}}'
+user_passwords: {}
+
+# Role of the account this run is configuring. Admins run the full setup.yml;
+# standard users run with --skip-tags system and get user-level config only.
+# Set per inventory entry, not here.
+dotfiles_user_role: admin

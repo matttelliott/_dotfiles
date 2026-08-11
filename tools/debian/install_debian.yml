@@ -8,3 +8,4 @@
       ansible.builtin.hostname:
         name: "{{ ansible_host }}"
       become: true
+      tags: system

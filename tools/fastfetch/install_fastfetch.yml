@@ -40,6 +40,7 @@
         deb: /tmp/fastfetch.deb
         state: present
       become: true
+      tags: system
       when:
         - ansible_facts['os_family'] == "Debian"
         - fastfetch_check.rc != 0
@@ -49,4 +50,5 @@
         name: fastfetch
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

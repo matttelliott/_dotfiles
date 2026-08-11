@@ -19,17 +19,20 @@
       args:
         creates: /opt/homebrew/bin/wakeonlan
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
     - name: Install wakeonlan (Debian)
       apt:
         name: wakeonlan
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
     - name: Install wakeonlan (Arch)
       pacman:
         name: wakeonlan
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
     - name: Set hosts to wake
       set_fact:

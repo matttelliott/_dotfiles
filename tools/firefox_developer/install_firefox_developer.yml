@@ -9,6 +9,7 @@
       args:
         creates: /Applications/Firefox Developer Edition.app
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Check if Firefox Developer Edition is installed (Debian)
       ansible.builtin.stat:
@@ -28,11 +29,13 @@
         dest: /opt
         remote_src: true
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian" and not firefox_dev_check.stat.exists
 
     - name: Rename Firefox Developer Edition directory (Debian)
       ansible.builtin.command: mv /opt/firefox /opt/firefox-developer
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian" and not firefox_dev_check.stat.exists
 
     - name: Create symlink for Firefox Developer Edition (Debian)
@@ -41,6 +44,7 @@
         dest: /usr/local/bin/firefox-developer
         state: link
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Clean up Firefox Developer Edition archive (Debian)
@@ -54,3 +58,4 @@
       args:
         creates: /usr/bin/firefox-developer-edition
       when: ansible_facts['os_family'] == "Archlinux"
+      tags: system

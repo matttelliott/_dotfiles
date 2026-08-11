@@ -9,12 +9,14 @@
       args:
         creates: /opt/homebrew/bin/ffmpeg
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Install ffmpeg via apt (Debian)
       ansible.builtin.apt:
         name: ffmpeg
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install ffmpeg via pacman (Arch)
@@ -22,4 +24,5 @@
         name: ffmpeg
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

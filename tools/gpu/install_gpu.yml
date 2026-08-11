@@ -43,6 +43,7 @@
           - lib32-vulkan-icd-loader
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
 
     # Arch Linux - NVIDIA (using nvidia-dkms for kernel-agnostic support)
@@ -55,6 +56,7 @@
           - nvidia-settings
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux" and has_nvidia | default(false)
 
     - name: Blacklist nouveau driver (Arch)
@@ -65,6 +67,7 @@
           options nouveau modeset=0
         mode: '0644'
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux" and has_nvidia | default(false)
 
     # Arch Linux - AMD
@@ -78,6 +81,7 @@
           - xf86-video-amdgpu
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux" and has_amd | default(false)
 
     # Arch Linux - Intel
@@ -90,6 +94,7 @@
           - lib32-vulkan-intel
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux" and has_intel | default(false)
 
     # Arch Linux - Add user to video group
@@ -99,6 +104,7 @@
         groups: video
         append: true
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
 
     # Debian - Enable non-free repos for NVIDIA
@@ -114,12 +120,14 @@
           - non-free-firmware
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian" and has_nvidia | default(false)
 
     - name: Update apt cache after adding non-free repo (Debian)
       ansible.builtin.apt:
         update_cache: true
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian" and has_nvidia | default(false)
 
     # Debian - NVIDIA
@@ -131,6 +139,7 @@
           - firmware-misc-nonfree
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian" and has_nvidia | default(false)
 
     # Debian - AMD
@@ -142,6 +151,7 @@
           - libvulkan1
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian" and has_amd | default(false)
 
     # Debian - Intel
@@ -153,6 +163,7 @@
           - libvulkan1
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian" and has_intel | default(false)
 
     # Debian - Add user to video group
@@ -162,6 +173,7 @@
         groups: video
         append: true
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     # macOS - Log GPU info (drivers are built-in via Metal)

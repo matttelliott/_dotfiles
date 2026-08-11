@@ -9,12 +9,14 @@
       args:
         creates: /Applications/krita.app
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Install Krita via apt (Debian)
       ansible.builtin.apt:
         name: krita
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Krita via pacman (Arch)
@@ -22,4 +24,5 @@
         name: krita
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

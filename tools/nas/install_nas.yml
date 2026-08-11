@@ -31,6 +31,7 @@
           {% endfor %}
         mode: "0644"
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Darwin"
     - name: Add NAS to auto_master (macOS)
       ansible.builtin.lineinfile:
@@ -38,6 +39,7 @@
         line: "/System/Volumes/Data/Users/{{ ansible_user_id }}/NAS /etc/auto_nas"
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Darwin"
       notify: Restart autofs macOS
     # Debian/Ubuntu setup using autofs
@@ -48,6 +50,7 @@
           - cifs-utils
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
     - name: Create NAS credentials file (Debian)
       ansible.builtin.copy:
@@ -67,6 +70,7 @@
           {% endfor %}
         mode: "0644"
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
     - name: Add NAS to auto.master (Debian)
       ansible.builtin.lineinfile:
@@ -75,6 +79,7 @@
         insertbefore: "^\\+auto.master"
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
       notify: Restart autofs Debian
     # Arch Linux setup using autofs
@@ -85,6 +90,7 @@
         state: present
         update_cache: true
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Check if autofs is installed (Arch)
@@ -99,6 +105,7 @@
       when:
         - ansible_facts['os_family'] == "Archlinux"
         - autofs_check.rc != 0
+      tags: system
     - name: Create NAS credentials file (Arch)
       ansible.builtin.copy:
         dest: "{{ ansible_env.HOME }}/.nas-credentials"
@@ -117,6 +124,7 @@
           {% endfor %}
         mode: "0644"
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
     - name: Add NAS to auto.master (Arch)
       ansible.builtin.lineinfile:
@@ -124,19 +132,23 @@
         line: "{{ ansible_env.HOME }}/NAS /etc/autofs/auto.nas --timeout=60"
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
       notify: Restart autofs Arch
   handlers:
     - name: Restart autofs macOS
       ansible.builtin.command: automount -vc
       become: true
+      tags: system
     - name: Restart autofs Debian
       ansible.builtin.service:
         name: autofs
         state: restarted
       become: true
+      tags: system
     - name: Restart autofs Arch
       ansible.builtin.service:
         name: autofs
         state: restarted
       become: true
+      tags: system

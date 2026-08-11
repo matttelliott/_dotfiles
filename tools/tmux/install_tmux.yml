@@ -9,12 +9,14 @@
       args:
         creates: /opt/homebrew/bin/tmux
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Install tmux via apt (Debian)
       ansible.builtin.apt:
         name: tmux
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install tmux via pacman (Arch)
@@ -22,6 +24,7 @@
         name: tmux
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
 
     - name: Create tmux config directory

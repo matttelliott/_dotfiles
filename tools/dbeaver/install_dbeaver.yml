@@ -9,6 +9,7 @@
       args:
         creates: /Applications/DBeaver.app
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Check if DBeaver is installed (Debian)
       ansible.builtin.stat:
@@ -26,6 +27,7 @@
       ansible.builtin.apt:
         deb: /tmp/dbeaver.deb
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian" and not dbeaver_check.stat.exists
 
     - name: Clean up DBeaver deb package (Debian)
@@ -39,4 +41,5 @@
         name: dbeaver
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

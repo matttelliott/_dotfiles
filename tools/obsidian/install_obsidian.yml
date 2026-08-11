@@ -3,19 +3,30 @@
   hosts: with_gui_tools
   gather_facts: true
 
+  vars:
+    obsidian_version: "1.13.4"
+    # sha256 of the AppImage below. An AppImage has no queryable version, so
+    # the checksum is what makes this version-aware: get_url re-downloads when
+    # the recorded checksum stops matching the file already at dest.
+    obsidian_checksum: "sha256:b66f01d2a6afbb6b7abd93e4b5c6602645f03c16ad2d6dd49fd5a90dddd87872"
+
   tasks:
     - name: Install Obsidian via Homebrew (macOS)
       ansible.builtin.shell: /opt/homebrew/bin/brew install --cask obsidian
       args:
         creates: /Applications/Obsidian.app
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Download Obsidian AppImage (Debian)
       ansible.builtin.get_url:
-        url: https://github.com/obsidianmd/obsidian-releases/releases/download/v1.5.12/Obsidian-1.5.12.AppImage
+        url: >-
+          https://github.com/obsidianmd/obsidian-releases/releases/download/v{{ obsidian_version }}/Obsidian-{{ obsidian_version }}.AppImage
         dest: /usr/local/bin/obsidian
         mode: '0755'
+        checksum: "{{ obsidian_checksum }}"
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install Obsidian via pacman (Arch)
@@ -23,4 +34,5 @@
         name: obsidian
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"

@@ -9,12 +9,14 @@
       args:
         creates: /opt/homebrew/bin/magick
       when: ansible_facts['os_family'] == "Darwin"
+      tags: system
 
     - name: Install imagemagick via apt (Debian)
       ansible.builtin.apt:
         name: imagemagick
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Install imagemagick via pacman (Arch)
@@ -22,4 +24,5 @@
         name: imagemagick
         state: present
       become: true
+      tags: system
       when: ansible_facts['os_family'] == "Archlinux"
