@@ -1,6 +1,6 @@
 {% include 'gitconfig.base.j2' %}
 {% include 'gitconfig.personal.j2' %}
-{% if git_signing_key %}
+{% if git_signing_key | default('') %}
 [user]
 	signingkey = ~/.ssh/id_rsa.pub
 [gpg]

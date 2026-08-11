@@ -5,7 +5,7 @@
 
   tasks:
     - name: Install LibreWolf via Homebrew Cask (macOS)
-      ansible.builtin.shell: /opt/homebrew/bin/brew install --cask --no-quarantine librewolf
+      ansible.builtin.shell: /opt/homebrew/bin/brew install --cask librewolf
       args:
         creates: /Applications/LibreWolf.app
       when: ansible_facts['os_family'] == "Darwin"

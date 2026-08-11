@@ -22,7 +22,11 @@
       ansible.builtin.template:
         src: gitconfig.darwin.j2
         dest: ~/.gitconfig
-      when: ansible_facts['os_family'] == "Darwin" and 'with_login_tools' in group_names
+      when:
+        - ansible_facts['os_family'] == "Darwin"
+        - "'with_login_tools' in group_names"
+        - git_user_email is defined
+        - git_user_name is defined
 
     - name: Write allowed_signers for SSH commit signing
       ansible.builtin.copy:
@@ -38,7 +42,11 @@
       ansible.builtin.template:
         src: gitconfig.debian.j2
         dest: ~/.gitconfig
-      when: ansible_facts['os_family'] in ["Debian", "Archlinux"] and 'with_login_tools' in group_names
+      when:
+        - ansible_facts['os_family'] in ["Debian", "Archlinux"]
+        - "'with_login_tools' in group_names"
+        - git_user_email is defined
+        - git_user_name is defined
 
     - name: Install gitconfig (minimal)
       ansible.builtin.template:

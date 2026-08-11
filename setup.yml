@@ -124,19 +124,24 @@
       ansible.builtin.set_fact:
         use_ssh: "{{ (inventory_hostname in (groups['with_login_tools'] | default([]))) and ssh_key_file.stat.exists }}"
 
+    - name: Warn when github_username is unset
+      ansible.builtin.debug:
+        msg: "github_username is undefined - skipping dotfiles clone/remote tasks"
+      when: github_username is not defined
+
     - name: Clone dotfiles via SSH
       ansible.builtin.git:
         repo: "{{ dotfiles_ssh_url }}"
         dest: ~/_dotfiles
         version: master
-      when: not dotfiles_dir.stat.exists and use_ssh
+      when: not dotfiles_dir.stat.exists and use_ssh and github_username is defined
 
     - name: Clone dotfiles via HTTPS
       ansible.builtin.git:
         repo: "{{ dotfiles_https_url }}"
         dest: ~/_dotfiles
         version: master
-      when: not dotfiles_dir.stat.exists and not use_ssh
+      when: not dotfiles_dir.stat.exists and not use_ssh and github_username is defined
 
     - name: Set remote to SSH
       ansible.builtin.command: git remote set-url origin {{ dotfiles_ssh_url }}
@@ -146,6 +151,7 @@
         - dotfiles_dir.stat.exists
         - use_ssh
         - "'with_login_tools' in group_names"
+        - github_username is defined
       changed_when: false
 
     - name: Set remote to HTTPS
@@ -156,6 +162,7 @@
         - dotfiles_dir.stat.exists
         - not use_ssh
         - "'with_login_tools' in group_names"
+        - github_username is defined
       changed_when: false
 
     - name: Update dotfiles repo
