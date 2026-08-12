@@ -48,7 +48,6 @@
         src: statusline.sh
         dest: ~/.claude/statusline.sh
         mode: "0755"
-        force: false
 
     - name: Ensure ~/.claude/scripts exists
       ansible.builtin.file:
