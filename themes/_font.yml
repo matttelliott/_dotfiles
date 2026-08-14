@@ -133,7 +133,7 @@
   tasks:
     # Install font - macOS
     - name: Install font via Homebrew (macOS)
-      ansible.builtin.shell: "brew install --cask {{ current.brew_cask }}"
+      ansible.builtin.shell: "/opt/homebrew/bin/brew install --cask {{ current.brew_cask }}"
       args:
         creates: "~/Library/Fonts/{{ current.mac_font_file }}"
       when: ansible_facts['os_family'] == "Darwin"
