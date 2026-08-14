@@ -67,10 +67,6 @@ if [[ "$OS" == "arch" ]]; then
 	sudo pacman -Sy --noconfirm git ansible
 fi
 
-# Install SOPS ansible collection (needed for ansible.cfg plugin)
-echo "Installing Ansible SOPS collection..."
-ansible-galaxy collection install community.sops
-
 echo "Cloning dotfiles..."
 rm -rf $DOTFILES_DIR
 git clone https://github.com/matttelliott/_dotfiles.git "$DOTFILES_DIR"
