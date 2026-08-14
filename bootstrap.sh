@@ -23,49 +23,7 @@ fi
 
 echo
 
-# Account role. On a shared machine only admins install system packages and
-# manage accounts; standard users get user-level config only and never need
-# sudo. See "Multi-user hosts" in README.md.
-echo "Account role:"
-echo "  admin    - can sudo; installs system packages, manages user accounts"
-echo "  standard - no sudo; user-level dotfiles only (an admin must set the machine up first)"
-read -p "Role for $(whoami) [admin/standard] (admin): " INPUT_ROLE
-ROLE=${INPUT_ROLE:-admin}
-if [[ "$ROLE" != "admin" && "$ROLE" != "standard" ]]; then
-	echo "Role must be 'admin' or 'standard'"
-	exit 1
-fi
-
-echo
-
-# Group selection
-echo "Select groups to enable (y/n):"
-echo
-
-read -p "with_gui_tools (WezTerm, LibreWolf, DBeaver)? [y/n]: " GUI
-read -p "with_browsers (Chrome, Firefox, etc)? [y/n]: " BROWSERS
-read -p "with_ai_tools (Claude Code)? [y/n]: " AI
-
-# Install dependencies.
-#
-# Standard users cannot install system packages, so they inherit whatever the
-# admin already put on the machine. Bail out early with a clear message rather
-# than failing partway through a sudo prompt they cannot answer.
-if [[ "$ROLE" == "standard" ]]; then
-	MISSING=""
-	command -v git >/dev/null 2>&1 || MISSING="$MISSING git"
-	if [[ "$OS" == "darwin" ]]; then
-		export PATH="/opt/homebrew/bin:$PATH"
-	fi
-	command -v ansible-playbook >/dev/null 2>&1 || MISSING="$MISSING ansible"
-	if [[ -n "$MISSING" ]]; then
-		echo "Missing required tools:$MISSING"
-		echo "An admin account must run bootstrap.sh on this machine first."
-		exit 1
-	fi
-fi
-
-if [[ "$ROLE" == "admin" && "$OS" == "darwin" ]]; then
+if [[ "$OS" == "darwin" ]]; then
 	if [ ! -f /Library/Developer/CommandLineTools/usr/bin/git ]; then
 		echo "Installing Xcode Command Line Tools..."
 		touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
@@ -98,13 +56,13 @@ if [[ "$ROLE" == "admin" && "$OS" == "darwin" ]]; then
 	fi
 fi
 
-if [[ "$ROLE" == "admin" && "$OS" == "debian" ]]; then
+if [[ "$OS" == "debian" ]]; then
 	echo "Installing dependencies..."
 	sudo apt update
 	sudo apt install -y git ansible
 fi
 
-if [[ "$ROLE" == "admin" && "$OS" == "arch" ]]; then
+if [[ "$OS" == "arch" ]]; then
 	echo "Installing dependencies..."
 	sudo pacman -Sy --noconfirm git ansible
 fi
