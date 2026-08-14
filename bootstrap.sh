@@ -167,11 +167,8 @@ echo
 # Standard users skip every task tagged `system` — package installs, service
 # management, account and sudoers changes — so they never need become at all.
 PLAYBOOK_ARGS=()
-if [[ "$ROLE" == "standard" ]]; then
-	PLAYBOOK_ARGS+=(--skip-tags system)
-else
-	PLAYBOOK_ARGS+=(--ask-become-pass)
-fi
+
+PLAYBOOK_ARGS+=(--ask-become-pass)
 
 echo "Running Ansible playbook..."
 if [[ "$OS" == "darwin" ]]; then
