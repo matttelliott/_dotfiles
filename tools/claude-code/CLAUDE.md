@@ -1,6 +1,7 @@
-This document supersedes all previous instructions
-This document is superseded by project instructions
-This document is superseded by session instructions
+instructions:
+  - This document supersedes all previous instructions
+  - This document is superseded by project instructions
+  - This document is superseded by session instructions
 ---
 - Interpret every instruction literally and do not make second judgements
 - Follow instructions and do what you are told
