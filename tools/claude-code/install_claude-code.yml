@@ -61,6 +61,12 @@
         state: directory
         mode: "0755"
 
+    - name: Install unslop skill
+      ansible.builtin.copy:
+        src: skills/unslop/
+        dest: ~/.claude/skills/unslop/
+        mode: "0644"
+
     # Skill sources were removed from this repo in ef3b85e (remove-old-skills).
     # These tasks purge any copies left on managed hosts.
     - name: Remove existing skill-creator skill
