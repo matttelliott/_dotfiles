@@ -1,0 +1,22 @@
+# A TOML linter such as Tombi can use this schema to validate your config.
+#:schema https://yazi-rs.github.io/schemas/yazi.json
+
+[mgr]
+sort_by = "natural"
+sort_dir_first = true
+linemode = "size"
+show_hidden = false
+show_symlink = true
+
+[preview]
+max_width = 1000
+max_height = 1000
+
+# resvg skips <text> (no font db on macOS). magick goes through rsvg-convert.
+[plugin]
+prepend_previewers = [
+  { mime = "image/svg+xml", run = "magick" },
+]
+prepend_preloaders = [
+  { mime = "image/svg+xml", run = "magick" },
+]

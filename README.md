@@ -287,6 +287,7 @@ them, install it once from an admin account.
 - **ripgrep** - Fast grep alternative
 - **bat** - cat with syntax highlighting
 - **eza** - Modern ls replacement (aliased to `ls`, `l`)
+- **yazi** - Terminal file manager (aliased to `y`, cds on quit)
 - **jq** - JSON processor
 - **sd** - sed alternative
 - **lazygit** - Terminal UI for git (aliased to `gg`)
@@ -328,6 +329,7 @@ Chrome, Chromium, Firefox, Brave, Arc, Opera, Vivaldi, LibreWolf, Waterfox, Orio
 | `gg`   | `lazygit`                    |
 | `ls`   | `eza`                        |
 | `l`    | `eza -lah`                   |
+| `y`    | yazi wrapper (cd on quit)    |
 
 ## Neovim Keymaps
 

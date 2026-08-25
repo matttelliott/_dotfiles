@@ -216,7 +216,7 @@ Package managers (Homebrew, apt, pacman) provide stable versions by default.
 Every pinned tool declares a `<tool>_version` play var: `doctl`, `go`,
 `lazygit`, `stylua` (in `tools/lua`), `tea`, `glab`, `sops`, `procs`,
 `lazydocker`, `helm`, `nvm` (in `tools/node`), `uv` (in `tools/python`),
-`pulumi`, `obsidian`, `chatgpt`. Apart from Go — which uses a `.pkg` on
+`pulumi`, `obsidian`, `chatgpt`, `yazi`. Apart from Go — which uses a `.pkg` on
 macOS — these govern the Linux paths only; macOS goes through Homebrew.
 
 **Bumping the var must actually upgrade the host.** Guard installs on the

@@ -240,6 +240,8 @@
   import_playbook: tools/eza/install_eza.yml
 - name: Install tree
   import_playbook: tools/tree/install_tree.yml
+- name: Install yazi
+  import_playbook: tools/yazi/install_yazi.yml
 - name: Install dust
   import_playbook: tools/dust/install_dust.yml
 - name: Install duf

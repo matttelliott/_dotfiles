@@ -1,0 +1,73 @@
+---
+- name: Install yazi
+  hosts: all
+  gather_facts: true
+
+  vars:
+    yazi_version: "26.8.15"
+
+  tasks:
+    - name: Install yazi via Homebrew
+      ansible.builtin.shell: /opt/homebrew/bin/brew install yazi
+      args:
+        creates: /opt/homebrew/bin/yazi
+      when: ansible_facts['os_family'] == "Darwin"
+      tags: system
+
+    # Version-aware so bumping yazi_version actually upgrades the host.
+    # `yazi --version` prints "Version: 26.8.15 (...)".
+    - name: Check installed yazi version (Debian)
+      ansible.builtin.command: /usr/local/bin/yazi --version
+      register: yazi_installed
+      changed_when: false
+      failed_when: false
+      check_mode: false
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Download and install yazi (Debian)
+      ansible.builtin.shell: |
+        curl -fLo /tmp/yazi.zip "https://github.com/sxyazi/yazi/releases/download/v{{ yazi_version }}/yazi-x86_64-unknown-linux-musl.zip"
+        unzip -o /tmp/yazi.zip -d /tmp
+        install /tmp/yazi-x86_64-unknown-linux-musl/yazi /usr/local/bin
+        install /tmp/yazi-x86_64-unknown-linux-musl/ya /usr/local/bin
+        rm -rf /tmp/yazi.zip /tmp/yazi-x86_64-unknown-linux-musl
+      changed_when: true
+      become: true
+      tags: system
+      when: >-
+        ansible_facts['os_family'] == "Debian"
+        and ("Version: " ~ yazi_version) not in (yazi_installed.stdout | default(""))
+
+    - name: Install yazi via pacman (Arch)
+      community.general.pacman:
+        name: yazi
+        state: present
+      become: true
+      tags: system
+      when: ansible_facts['os_family'] == "Archlinux"
+
+    - name: Create zsh config directory
+      ansible.builtin.file:
+        path: ~/.config/zsh
+        state: directory
+
+    - name: Install yazi zsh config
+      ansible.builtin.copy:
+        src: yazi.zsh
+        dest: ~/.config/zsh/yazi.zsh
+
+    - name: Source yazi config in zshrc
+      ansible.builtin.lineinfile:
+        path: ~/.zshrc
+        line: source ~/.config/zsh/yazi.zsh
+        create: true
+
+    - name: Create yazi config directory
+      ansible.builtin.file:
+        path: ~/.config/yazi
+        state: directory
+
+    - name: Install yazi config
+      ansible.builtin.copy:
+        src: yazi.toml
+        dest: ~/.config/yazi/yazi.toml
