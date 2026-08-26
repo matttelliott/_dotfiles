@@ -1,5 +1,5 @@
 # yazi
 
-Terminal file manager. `y` opens it and cds to the last directory on quit (`Q` quits without cd).
+Terminal file manager. Sets `$EXPLORER`. Aliased to `f`.
 
 https://github.com/sxyazi/yazi

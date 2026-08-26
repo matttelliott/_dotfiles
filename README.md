@@ -285,9 +285,9 @@ them, install it once from an admin account.
 - **fd** - Fast file finder
 - **fzf** - Fuzzy finder
 - **ripgrep** - Fast grep alternative
-- **bat** - cat with syntax highlighting
+- **bat** - cat with syntax highlighting (`$PAGER`)
 - **eza** - Modern ls replacement (aliased to `ls`, `l`)
-- **yazi** - Terminal file manager (aliased to `y`, cds on quit)
+- **yazi** - Terminal file manager (aliased to `f`)
 - **jq** - JSON processor
 - **sd** - sed alternative
 - **lazygit** - Terminal UI for git (aliased to `gg`)
@@ -321,6 +321,7 @@ Chrome, Chromium, Firefox, Brave, Arc, Opera, Vivaldi, LibreWolf, Waterfox, Orio
 | ------ | ---------------------------- |
 | `q`    | `exit`                       |
 | `e`    | `$EDITOR` (nvim)             |
+| `f`    | `$EXPLORER` (yazi)           |
 | `g`    | `git status`                 |
 | `gac`  | `git add . && git commit`    |
 | `gacm` | `git add . && git commit -m` |
@@ -329,7 +330,6 @@ Chrome, Chromium, Firefox, Brave, Arc, Opera, Vivaldi, LibreWolf, Waterfox, Orio
 | `gg`   | `lazygit`                    |
 | `ls`   | `eza`                        |
 | `l`    | `eza -lah`                   |
-| `y`    | yazi wrapper (cd on quit)    |
 
 ## Neovim Keymaps
 
