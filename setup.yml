@@ -373,6 +373,8 @@
   import_playbook: tools/drg/install_drg.yml
 - name: Install dotfiles self-update
   import_playbook: tools/self-update/install_self-update.yml
+- name: Install dotfiles-install
+  import_playbook: tools/dotfiles-install/install_dotfiles-install.yml
 # Re-apply per-host theme last so it overwrites any defaults baked into tool
 # install templates (tmux.conf, starship.toml, init.lua, etc.). The cron
 # self-update reruns setup.yml, so without this step every run reverts the

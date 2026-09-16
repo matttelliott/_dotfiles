@@ -1,0 +1,17 @@
+---
+- name: Install dotfiles-install
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Create ~/.local/bin
+      ansible.builtin.file:
+        path: ~/.local/bin
+        state: directory
+        mode: "0755"
+
+    - name: Deploy dotfiles-install script
+      ansible.builtin.copy:
+        src: dotfiles-install.sh
+        dest: ~/.local/bin/dotfiles-install
+        mode: "0755"
