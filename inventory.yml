@@ -40,11 +40,11 @@ all:
       hosts:
         optiplex-0:
           ansible_host: optiplex-0.home.lan
-          ansible_user: matt
+          ansible_user: optiplexuser
           ansible_ssh_timeout: 60
           ansible_python_interpreter: /usr/bin/python3
           host_users:
-            - name: matt
+            - name: optiplexuser
               role: admin
     arch:
       hosts:
@@ -75,7 +75,6 @@ all:
       hosts:
         macbookair:
         desktop:
-        macmini:
     with_ai_tools:
       hosts:
         macbookair:
@@ -86,6 +85,7 @@ all:
         macbookair:
         desktop:
         macmini:
+        optiplex-0:
     with_games:
       hosts:
         desktop:
