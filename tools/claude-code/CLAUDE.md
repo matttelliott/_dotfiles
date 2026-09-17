@@ -13,3 +13,4 @@ instructions:
 - Be extremely concise in all output. Sacrifice grammar for concision.
 - Prefer CLI tools over GUI. _Never use tools in a way that steals system focus from the user. Never use options like `--headed`._ Only use GUI tools if there is no CLI or API alternative
 - Always apply the `unslop` skill to all output. This is mandatory, not optional.
+- Always look for and read README.md and docs/
