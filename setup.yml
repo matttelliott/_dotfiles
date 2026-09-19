@@ -237,6 +237,8 @@
   import_playbook: tools/yazi/install_yazi.yml
 - name: Install dust
   import_playbook: tools/dust/install_dust.yml
+- name: Install ncdu
+  import_playbook: tools/ncdu/install_ncdu.yml
 - name: Install duf
   import_playbook: tools/duf/install_duf.yml
 - name: Install tldr
