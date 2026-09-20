@@ -1,6 +1,6 @@
 ---
 - name: Install Team Fortress 2
-  hosts: with_games
+  hosts: all
   gather_facts: true
 
   vars:

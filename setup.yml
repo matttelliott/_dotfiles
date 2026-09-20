@@ -335,8 +335,6 @@
   import_playbook: tools/obsidian/install_obsidian.yml
 - name: Install VLC
   import_playbook: tools/vlc/install_vlc.yml
-- name: Install Mumble
-  import_playbook: tools/mumble/install_mumble.yml
 - name: Install Chrome
   import_playbook: tools/chrome/install_chrome.yml
 - name: Install Chromium
@@ -369,10 +367,6 @@
   import_playbook: tools/steam/install_steam.yml
 - name: Install Whisky
   import_playbook: tools/whisky/install_whisky.yml
-- name: Install Team Fortress 2
-  import_playbook: tools/tf2/install_tf2.yml
-- name: Install Deep Rock Galactic
-  import_playbook: tools/drg/install_drg.yml
 - name: Install dotfiles self-update
   import_playbook: tools/self-update/install_self-update.yml
 - name: Install dotfiles-install

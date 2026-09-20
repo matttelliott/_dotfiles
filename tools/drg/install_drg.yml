@@ -1,6 +1,6 @@
 ---
 - name: Install Deep Rock Galactic config
-  hosts: with_games
+  hosts: all
   gather_facts: true
 
   vars:
