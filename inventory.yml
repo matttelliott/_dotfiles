@@ -71,21 +71,3 @@ all:
         macbookair:
         desktop:
         macmini:
-    with_browsers:
-      hosts:
-        macbookair:
-        desktop:
-    with_ai_tools:
-      hosts:
-        macbookair:
-        desktop:
-        macmini:
-    with_nas:
-      hosts:
-        macbookair:
-        desktop:
-        macmini:
-        optiplex-0:
-    with_games:
-      hosts:
-        desktop:

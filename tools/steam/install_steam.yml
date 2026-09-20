@@ -1,6 +1,6 @@
 ---
 - name: Install Steam
-  hosts: with_games
+  hosts: with_gui_tools
   gather_facts: true
 
   tasks:
@@ -37,7 +37,7 @@
       ansible.builtin.lineinfile:
         path: /etc/pacman.conf
         regexp: '^#?\[multilib\]'
-        line: '[multilib]'
+        line: "[multilib]"
       become: true
       tags: system
       when: ansible_facts['os_family'] == "Archlinux"
@@ -46,7 +46,7 @@
       ansible.builtin.lineinfile:
         path: /etc/pacman.conf
         insertafter: '^\[multilib\]'
-        line: 'Include = /etc/pacman.d/mirrorlist'
+        line: "Include = /etc/pacman.d/mirrorlist"
       become: true
       tags: system
       when: ansible_facts['os_family'] == "Archlinux"
