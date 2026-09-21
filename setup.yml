@@ -1,3 +1,9 @@
+- name: apply softwareupdate
+  hosts: macs
+  become: true
+  tasks:
+    - name: apply softareupdate
+      ansible.builtin.raw: softwareupdate -i -a
 - name: Install sudoers
   import_playbook: tools/sudoers/install_sudoers.yml
 - name: Manage host user accounts
@@ -10,6 +16,8 @@
       ansible.builtin.command: pmset -a disablesleep 1
       become: true
       tags: system
+- name: Install Homebrew
+  import_playbook: tools/homebrew/install_homebrew.yml
 - name: Update Homebrew (macOS)
   hosts: macs
   gather_facts: false
@@ -187,8 +195,6 @@
 
 - name: Install mosh
   import_playbook: tools/mosh/install_mosh.yml
-- name: Install Homebrew
-  import_playbook: tools/homebrew/install_homebrew.yml
 - name: Install mas
   import_playbook: tools/mas/install_mas.yml
 - name: Install Python
@@ -255,8 +261,6 @@
   import_playbook: tools/imagemagick/install_imagemagick.yml
 - name: Install GIMP
   import_playbook: tools/gimp/install_gimp.yml
-- name: Install Krita
-  import_playbook: tools/krita/install_krita.yml
 - name: Install Inkscape
   import_playbook: tools/inkscape/install_inkscape.yml
 - name: Install pandoc

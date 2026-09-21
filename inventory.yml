@@ -21,7 +21,6 @@ all:
           ansible_host: macbookair.home.lan
           ansible_user: matt
           ansible_ssh_timeout: 60
-          ansible_python_interpreter: /opt/homebrew/bin/python3
           theme_color: dracula
           theme_font: sourcecodepro
           theme_style: round
@@ -32,7 +31,6 @@ all:
           ansible_host: macmini.home.lan
           ansible_user: matt
           ansible_ssh_timeout: 60
-          ansible_python_interpreter: /opt/homebrew/bin/python3
           host_users:
             - name: matt
               role: admin
