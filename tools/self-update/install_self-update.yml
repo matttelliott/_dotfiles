@@ -78,8 +78,11 @@
     - name: Reload launchd agent on macOS
       ansible.builtin.shell: |
         set -e
-        launchctl bootout "gui/$(id -u)/com.local.dotfiles-selfupdate" 2>/dev/null || true
-        launchctl bootstrap "gui/$(id -u)" "{{ ansible_facts['env']['HOME'] }}/Library/LaunchAgents/com.local.dotfiles-selfupdate.plist"
+        uid=$(id -u)
+        label=com.local.dotfiles-selfupdate
+        launchctl bootout "user/$uid/$label" 2>/dev/null || true
+        launchctl bootstrap "user/$uid" "$HOME/Library/LaunchAgents/$label.plist"
+      become: false
       when:
         - ansible_facts['os_family'] == "Darwin"
         - selfupdate_plist.changed

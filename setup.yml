@@ -285,8 +285,6 @@
   import_playbook: tools/docker/install_docker.yml
 - name: Install WireGuard
   import_playbook: tools/wireguard/install_wireguard.yml
-- name: Install Syncthing
-  import_playbook: tools/syncthing/install_syncthing.yml
 - name: Install NAS
   import_playbook: tools/nas/install_nas.yml
 - name: Install fail2ban
