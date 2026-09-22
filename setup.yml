@@ -365,8 +365,8 @@
   import_playbook: tools/gpu/install_gpu.yml
 - name: Install Whisky
   import_playbook: tools/whisky/install_whisky.yml
-- name: Install dotfiles self-update
-  import_playbook: tools/self-update/install_self-update.yml
+# - name: Install dotfiles self-update
+#   import_playbook: tools/self-update/install_self-update.yml
 - name: Install dotfiles-install
   import_playbook: tools/dotfiles-install/install_dotfiles-install.yml
 # Re-apply per-host theme last so it overwrites any defaults baked into tool

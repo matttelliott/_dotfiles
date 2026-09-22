@@ -1,22 +1,26 @@
 ---
 - name: Install dotfiles self-update
   hosts: all
+  become: false
   gather_facts: true
 
   tasks:
     - name: Ensure log directory exists
+      become: false
       ansible.builtin.file:
         path: "{{ ansible_facts['env']['HOME'] }}/.cache"
         state: directory
         mode: "0755"
 
     - name: Deploy self-update script
+      become: false
       ansible.builtin.copy:
         src: self-update.sh
         dest: "{{ ansible_facts['env']['HOME'] }}/_dotfiles/tools/self-update/self-update.sh"
         mode: "0755"
 
     - name: Ensure dotfiles config directory exists
+      become: false
       ansible.builtin.file:
         path: "{{ ansible_facts['env']['HOME'] }}/.config/dotfiles"
         state: directory
@@ -26,18 +30,21 @@
     # the working tree while executing, so its per-account settings must not
     # live anywhere git manages.
     - name: Deploy self-update settings for this account
+      become: false
       ansible.builtin.template:
         src: self-update.env.j2
         dest: "{{ ansible_facts['env']['HOME'] }}/.config/dotfiles/self-update.env"
         mode: "0644"
 
     - name: Deploy changelog script
+      become: false
       ansible.builtin.copy:
         src: changelog.sh
         dest: "{{ ansible_facts['env']['HOME'] }}/_dotfiles/tools/self-update/changelog.sh"
         mode: "0755"
 
     - name: Deploy changelog AI prompt
+      become: false
       ansible.builtin.copy:
         src: changelog-prompt.txt
         dest: "{{ ansible_facts['env']['HOME'] }}/_dotfiles/tools/self-update/changelog-prompt.txt"
